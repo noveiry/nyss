@@ -5,6 +5,6 @@ export const feedbackSiteMap = [
   {
     path: "/feedback",
     title: () => strings(stringKeys.feedback.send),
-    access: accessMap.feedback.send
+    access: accessMap.feedback.send,
   },
 ];

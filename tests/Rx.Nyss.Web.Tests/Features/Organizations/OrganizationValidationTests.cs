@@ -1,5 +1,4 @@
-﻿using FluentValidation.TestHelper;
-using NSubstitute;
+﻿using NSubstitute;
 using RX.Nyss.Web.Features.Organizations.Dto;
 using RX.Nyss.Web.Features.Organizations.Validation;
 using Xunit;

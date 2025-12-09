@@ -102,13 +102,13 @@ public class ExportQuery : IRequest<byte[]>
                         .Select(lc => lc.Name)
                         .Single(),
 
-                    InvestigationEventSubtype = _nyssContext.AlertEventLogs
-                        .Where(log => log.AlertId == a.Id && log.AlertEventType.Id == 1)//Investigation
-                        .Select(log => log.AlertEventSubtype)
-                        .First(),
                     investigationComment = _nyssContext.AlertEventLogs
                         .Where(log => log.AlertId == a.Id && log.AlertEventType.Id == 1)
                         .Select(log => log.Text)
+                        .First(),
+                    InvestigationEventSubtype = _nyssContext.AlertEventLogs
+                        .Where(log => log.AlertId == a.Id && log.AlertEventType.Id == 1)//Investigation
+                        .Select(log => log.AlertEventSubtype)
                         .First(),
 
                     publicHealthActionTakenComment = _nyssContext.AlertEventLogs
@@ -127,8 +127,14 @@ public class ExportQuery : IRequest<byte[]>
                     OutcomeEventSubtype = _nyssContext.AlertEventLogs
                         .Where(log => log.AlertId == a.Id && log.AlertEventType.Id == 4)//Outcome
                         .Select(log => log.AlertEventSubtype)
+                        .First(),
+
+                    summaryComment = _nyssContext.AlertEventLogs
+                        .Where(log => log.AlertId == a.Id && log.AlertEventType.Id == 5)
+                        .Select(log => log.Text)
                         .First()
                 })
+                .AsSplitQuery()
                 .ToListAsync();
 
             var dtos = alerts
@@ -142,8 +148,12 @@ public class ExportQuery : IRequest<byte[]>
                     ClosedAt = a.ClosedAt?.AddHours(filterRequestDto.UtcOffset),
                     Status = strings[$"alerts.alertStatus.{a.Status.ToString().ToLower()}"],
                     EscalatedOutcome = a.EscalatedOutcome,
-                    Comments = a.investigationComment + " --- " + a.outcomeComment + " --- " + a.publicHealthActionTakenComment,
+                    InvestigationComment = a.investigationComment,
+                    OutcomeComment = a.outcomeComment,
+                    PublicHealthActionComment = a.publicHealthActionTakenComment,
+                    SummaryComment = a.summaryComment,
                     ReportCount = a.ReportCount,
+                    LastReportZone = a.LastReport.ZoneName,
                     LastReportVillage = a.LastReport.IsAnonymized
                         ? ""
                         : a.LastReport.VillageName,
@@ -170,7 +180,7 @@ public class ExportQuery : IRequest<byte[]>
         }
 
         private static IReadOnlyList<string> GetColumnLabels(StringsResourcesVault strings) =>
-            new []
+            new[]
             {
                 strings["alerts.export.id"],
                 strings["alerts.export.dateTriggered"],
@@ -193,7 +203,11 @@ public class ExportQuery : IRequest<byte[]>
                 strings["alerts.export.investigation"],
                 strings["alerts.export.outcome"],
                 strings["alerts.export.publicHealthAction"],
-                strings["alerts.export.closedComments"]
+                strings["alerts.export.investigationComment"],
+                strings["alerts.export.outcomeComment"],
+                strings["alerts.export.summaryComment"],
+                strings["alerts.export.phatComment"]
+
             };
     }
 }

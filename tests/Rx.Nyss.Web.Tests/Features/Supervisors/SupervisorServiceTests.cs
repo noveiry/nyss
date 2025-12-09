@@ -15,6 +15,7 @@ using RX.Nyss.Data.Queries;
 using RX.Nyss.Web.Features.Organizations;
 using RX.Nyss.Web.Features.Supervisors;
 using RX.Nyss.Web.Features.Supervisors.Dto;
+using RX.Nyss.Web.Features.Users;
 using RX.Nyss.Web.Services;
 using RX.Nyss.Web.Services.Authorization;
 using Shouldly;
@@ -45,6 +46,7 @@ namespace RX.Nyss.Web.Tests.Features.Supervisors
         private readonly int _dataCollectorId = 1;
         private readonly int _deletedDataCollectorId = 2;
         private readonly IDeleteUserService _deleteUserService;
+        private readonly IUserService _userService;
 
 
         public SupervisorServiceTests()
@@ -56,13 +58,14 @@ namespace RX.Nyss.Web.Tests.Features.Supervisors
             _deleteUserService = Substitute.For<IDeleteUserService>();
             _organizationServiceMock = Substitute.For<IOrganizationService>();
             _authorizationServiceMock = Substitute.For<IAuthorizationService>();
+            _userService = Substitute.For<IUserService>();
             var dateTimeProvider = Substitute.For<IDateTimeProvider>();
             var applicationLanguages = new List<ApplicationLanguage>();
             var applicationLanguagesDbSet = applicationLanguages.AsQueryable().BuildMockDbSet();
             _nyssContext.ApplicationLanguages.Returns(applicationLanguagesDbSet);
 
             _supervisorService = new SupervisorService(_identityUserRegistrationServiceMock, _nyssContext, _organizationServiceMock, _loggerAdapter, _verificationEmailServiceMock,
-                _deleteUserService, dateTimeProvider, _authorizationServiceMock);
+                _deleteUserService, dateTimeProvider, _authorizationServiceMock, _userService);
 
             _identityUserRegistrationServiceMock.CreateIdentityUser(Arg.Any<string>(), Arg.Any<Role>()).Returns(ci => new IdentityUser
             {

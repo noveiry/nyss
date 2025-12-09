@@ -1,0 +1,11 @@
+{
+   "tasks": [
+      {
+        "name": "Run lint-staged in ClientApp",
+        "group": "pre-commit",
+        "cwd": "src/RX.Nyss.Web/ClientApp",
+        "command": "npx",
+        "args": ["lint-staged"]
+      }
+   ]
+}

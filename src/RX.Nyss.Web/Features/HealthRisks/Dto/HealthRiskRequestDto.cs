@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using FluentValidation;
 using RX.Nyss.Data.Concepts;
-using RX.Nyss.Web.Features.SuspectedDiseases.Dto;
 using RX.Nyss.Data.Models;
+using RX.Nyss.Web.Features.SuspectedDiseases.Dto;
 
 namespace RX.Nyss.Web.Features.HealthRisks.Dto
 {

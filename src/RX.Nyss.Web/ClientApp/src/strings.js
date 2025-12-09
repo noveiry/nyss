@@ -18,18 +18,18 @@ export const stringKeys = {
     errorPage: {
       message: "error.generalErrorMessage",
       goHome: "error.goHome",
-      notFound: "error.notFound"
-    }
+      notFound: "error.notFound",
+    },
   },
   roles: {
-    "TechnicalAdvisor": "role.technicaladvisor",
-    "Administrator": "role.administrator",
-    "GlobalCoordinator": "role.globalcoordinator",
-    "DataConsumer": "role.dataconsumer",
-    "Manager": "role.manager",
-    "Supervisor": "role.supervisor",
-    "Coordinator": "role.coordinator",
-    "HeadSupervisor": "role.headsupervisor"
+    TechnicalAdvisor: "role.technicaladvisor",
+    Administrator: "role.administrator",
+    GlobalCoordinator: "role.globalcoordinator",
+    DataConsumer: "role.dataconsumer",
+    Manager: "role.manager",
+    Supervisor: "role.supervisor",
+    Coordinator: "role.coordinator",
+    HeadSupervisor: "role.headsupervisor",
   },
   login: {
     title: "login.title",
@@ -39,20 +39,18 @@ export const stringKeys = {
     password: "login.password",
     forgotPassword: "login.forgotPassword",
     notSucceeded: "login.notSucceeded",
-    lockedOut: "login.lockedOut"
+    lockedOut: "login.lockedOut",
   },
   nationalSociety: {
     title: "nationalSociety.title",
     edit: "nationalSociety.edit",
-    archive:
-    {
+    archive: {
       title: "nationalSociety.archive.title",
-      content: "nationalSociety.archive.content"
+      content: "nationalSociety.archive.content",
     },
-    reopen:
-    {
+    reopen: {
       title: "nationalSociety.reopen.title",
-      content: "nationalSociety.reopen.content"
+      content: "nationalSociety.reopen.content",
     },
     form: {
       creationTitle: "nationalSociety.form.creationTitle",
@@ -63,33 +61,35 @@ export const stringKeys = {
       contentLanguage: "nationalSociety.form.contentLanguage",
       epiWeekStandard: {
         title: "nationalSociety.form.epiWeekStandard.title",
-        "Sunday": {
+        Sunday: {
           label: "nationalSociety.form.epiWeekStandard.sunday.label",
-          description: "nationalSociety.form.epiWeekStandard.sunday.description"
+          description:
+            "nationalSociety.form.epiWeekStandard.sunday.description",
         },
-        "Monday": {
+        Monday: {
           label: "nationalSociety.form.epiWeekStandard.monday.label",
-          description: "nationalSociety.form.epiWeekStandard.monday.description"
-        }
+          description:
+            "nationalSociety.form.epiWeekStandard.monday.description",
+        },
       },
       enableEidsrIntegration: "nationalSociety.form.enableEidsrIntegration",
     },
     messages: {
       create: {
-        success: "nationalSociety.create.success"
+        success: "nationalSociety.create.success",
       },
       edit: {
-        success: "nationalSociety.edit.success"
+        success: "nationalSociety.edit.success",
       },
       delete: {
-        success: "nationalSociety.delete.success"
+        success: "nationalSociety.delete.success",
       },
       archive: {
-        success: "nationalSociety.archive.success"
+        success: "nationalSociety.archive.success",
       },
       reopen: {
-        success: "nationalSociety.reopen.success"
-      }
+        success: "nationalSociety.reopen.success",
+      },
     },
     list: {
       country: "nationalSociety.list.country",
@@ -101,10 +101,10 @@ export const stringKeys = {
       reopen: "nationalSociety.list.reopen",
     },
     settings: {
-      title: "nationalSociety.settings.title"
+      title: "nationalSociety.settings.title",
     },
     overview: {
-      title: "nationalSociety.overview.title"
+      title: "nationalSociety.overview.title",
     },
     structure: {
       title: "nationalSociety.structure.title",
@@ -120,12 +120,12 @@ export const stringKeys = {
         region: "nationalSociety.structure.region",
         district: "nationalSociety.structure.district",
         village: "nationalSociety.structure.village",
-        zone: "nationalSociety.structure.zone"
+        zone: "nationalSociety.structure.zone",
       },
     },
     setHead: {
-      notAMemberOfSociety: "nationalSociety.setHead.notAMemberOfSociety"
-    }
+      notAMemberOfSociety: "nationalSociety.setHead.notAMemberOfSociety",
+    },
   },
   reportsMap: {
     reports: "reportsMap.reports",
@@ -146,25 +146,28 @@ export const stringKeys = {
       alertRuleDescription: "healthRisk.form.alertRuleDescription",
       alertRuleCountThreshold: "healthRisk.form.alertRuleCountThreshold",
       alertRuleDaysThreshold: "healthRisk.form.alertRuleDaysThreshold",
-      alertRuleKilometersThreshold: "healthRisk.form.alertRuleKilometersThreshold",
+      alertRuleKilometersThreshold:
+        "healthRisk.form.alertRuleKilometersThreshold",
       contentLanguageName: "healthRisk.form.contentLanguageName",
-      contentLanguageCaseDefinition: "healthRisk.form.contentLanguageCaseDefinition",
-      contentLanguageFeedbackMessage: "healthRisk.form.contentLanguageFeedbackMessage"
+      contentLanguageCaseDefinition:
+        "healthRisk.form.contentLanguageCaseDefinition",
+      contentLanguageFeedbackMessage:
+        "healthRisk.form.contentLanguageFeedbackMessage",
     },
     list: {
       healthRiskCode: "healthRisk.list.healthRiskCode",
       name: "healthRisk.list.name",
       healthRiskType: "healthRisk.list.healthRiskType",
-      removalConfirmation: "healthRisk.list.removalConfirmation"
+      removalConfirmation: "healthRisk.list.removalConfirmation",
     },
     create: {
-      success: "healthRisk.create.success"
+      success: "healthRisk.create.success",
     },
     edit: {
-      success: "healthRisk.edit.success"
+      success: "healthRisk.edit.success",
     },
     delete: {
-      success: "healthRisk.delete.success"
+      success: "healthRisk.delete.success",
     },
     constants: {
       healthRiskType: {
@@ -172,8 +175,8 @@ export const stringKeys = {
         nonhuman: "healthRisk.type.nonhuman",
         unusualevent: "healthRisk.type.unusualevent",
         activity: "healthRisk.type.activity",
-      }
-    }
+      },
+    },
   },
 
   suspectedDisease: {
@@ -188,17 +191,17 @@ export const stringKeys = {
     list: {
       suspectedDiseaseCode: "suspectedDisease.list.suspectedDiseaseCode",
       suspectedDiseaseName: "suspectedDisease.list.suspectedDiseaseName",
-      removalConfirmation: "suspectedDisease.list.removalConfirmation"
+      removalConfirmation: "suspectedDisease.list.removalConfirmation",
     },
     create: {
-      success: "suspectedDisease.create.success"
+      success: "suspectedDisease.create.success",
     },
     edit: {
-      success: "suspectedDisease.edit.success"
+      success: "suspectedDisease.edit.success",
     },
     delete: {
-      success: "suspectedDisease.delete.success"
-    }
+      success: "suspectedDisease.delete.success",
+    },
   },
 
   smsGateway: {
@@ -211,6 +214,13 @@ export const stringKeys = {
       gatewayType: "smsGateway.form.gatewayType",
       telerivetApiKey: "smsGateway.form.telerivetApiKey",
       telerivetProjectId: "smsGateway.form.telerivetProjectId",
+      gatewayApiKeyName: "smsGateway.form.gatewayApiKeyName",
+      gatewayApiKey: "smsGateway.form.gatewayApiKey",
+      gatewayExtraKeyName: "smsGateway.form.gatewayExtraKeyName",
+      gatewayExtraKey: "smsGateway.form.gatewayExtraKey",
+      gatewayUrl: "smsGateway.form.gatewayUrl",
+      gatewayAuthUrl: "smsGateway.form.gatewayAuthUrl",
+      gatewaySenderId: "smsGateway.form.gatewaySenderId",
       emailAddress: "smsGateway.form.emailAddress",
       useIotHub: "smsGateway.form.useIotHub",
       iotHubDeviceName: "smsGateway.form.iotHubDeviceName",
@@ -218,22 +228,22 @@ export const stringKeys = {
       pingIsRequired: "smsGateway.form.pingIsRequired",
       useDualModem: "smsGateway.form.useDualModem",
       modemOneName: "smsGateway.form.modemOneName",
-      modemTwoName: "smsGateway.form.modemTwoName"
+      modemTwoName: "smsGateway.form.modemTwoName",
     },
     create: {
-      success: "smsGateway.create.success"
+      success: "smsGateway.create.success",
     },
     edit: {
-      success: "smsGateway.edit.success"
+      success: "smsGateway.edit.success",
     },
     delete: {
-      success: "smsGateway.delete.success"
+      success: "smsGateway.delete.success",
     },
     list: {
       apiKey: "smsGateway.list.apiKey",
       gatewayType: "smsGateway.list.gatewayType",
       removalConfirmation: "smsGateway.list.removalConfirmation",
-      useIotHub: "smsGateway.list.useIotHub"
+      useIotHub: "smsGateway.list.useIotHub",
     },
   },
   eidsrIntegration: {
@@ -246,9 +256,12 @@ export const stringKeys = {
       apiBaseUrl: "eidsrIntegration.form.apiBaseUrl",
       trackerProgramId: "eidsrIntegration.form.trackerProgramId",
       locationDataElementId: "eidsrIntegration.form.locationDataElementId",
-      dateOfOnsetDataElementId: "eidsrIntegration.form.dateOfOnsetDataElementId",
-      phoneNumberDataElementId: "eidsrIntegration.form.phoneNumberDataElementId",
-      suspectedDiseaseDataElementId: "eidsrIntegration.form.suspectedDiseaseDataElementId",
+      dateOfOnsetDataElementId:
+        "eidsrIntegration.form.dateOfOnsetDataElementId",
+      phoneNumberDataElementId:
+        "eidsrIntegration.form.phoneNumberDataElementId",
+      suspectedDiseaseDataElementId:
+        "eidsrIntegration.form.suspectedDiseaseDataElementId",
       eventTypeDataElementId: "eidsrIntegration.form.eventTypeDataElementId",
       genderDataElementId: "eidsrIntegration.form.genderDataElementId",
       districts: "eidsrIntegration.form.districts",
@@ -260,61 +273,63 @@ export const stringKeys = {
       connNotTested: "eidsrIntegration.form.connNotTested",
       testConn: "eidsrIntegration.form.testConn",
       testConnToContinue: "eidsrIntegration.form.testConnToContinue",
-      allDistrictsShouldOrgUnit: "eidsrIntegration.form.allDistrictsShouldOrgUnit",
+      allDistrictsShouldOrgUnit:
+        "eidsrIntegration.form.allDistrictsShouldOrgUnit",
       dataNotSet: "eidsrIntegration.from.dataNotSet",
       dataElements: "eidsrIntegration.from.dataElements",
     },
     create: {
-      success: "eidsrIntegration.create.success"
+      success: "eidsrIntegration.create.success",
     },
     edit: {
-      success: "eidsrIntegration.edit.success"
+      success: "eidsrIntegration.edit.success",
     },
     eidsrApi: {
-      ConnectionError: "eidsrIntegration.EidsrApi.ConnectionError"
-    }
+      ConnectionError: "eidsrIntegration.EidsrApi.ConnectionError",
+    },
   },
   organization: {
     title: "organization.title",
     form: {
       creationTitle: "organization.form.creationTitle",
-      editionTitle: "organization.form.editionTitle"
+      editionTitle: "organization.form.editionTitle",
     },
     create: {
-      success: "organization.create.success"
+      success: "organization.create.success",
     },
     edit: {
-      success: "organization.edit.success"
+      success: "organization.edit.success",
     },
     delete: {
-      success: "organization.delete.success"
+      success: "organization.delete.success",
     },
     list: {
       projects: "organization.list.projects",
       headManager: "organization.list.headManager",
       removalConfirmation: "organization.list.removalConfirmation",
-      isDefaultOrganization: "organization.list.isDefaultOrganization"
+      isDefaultOrganization: "organization.list.isDefaultOrganization",
     },
   },
   projectOrganization: {
     title: "projectOrganization.title",
     form: {
       creationTitle: "projectOrganization.form.creationTitle",
-      organization: "projectOrganization.form.organization"
+      organization: "projectOrganization.form.organization",
     },
     create: {
-      success: "projectOrganization.create.success"
+      success: "projectOrganization.create.success",
     },
     delete: {
-      success: "projectOrganization.delete.success"
+      success: "projectOrganization.delete.success",
     },
     list: {
       name: "projectOrganization.list.name",
-      removalConfirmation: "projectOrganization.list.removalConfirmation"
+      removalConfirmation: "projectOrganization.list.removalConfirmation",
     },
   },
   projectAlertRecipient: {
     title: "projectAlertRecipient.title",
+    description: "projectAlertRecipient.description",
     form: {
       creationTitle: "projectAlertRecipient.form.creationTitle",
       editionTitle: "projectAlertRecipient.form.editionTitle",
@@ -328,16 +343,16 @@ export const stringKeys = {
       triggerDetails: "projectAlertRecipient.form.triggerDetails",
       receiverDetails: "projectAlertRecipient.form.receiverDetails",
       anySupervisor: "projectAlertRecipient.form.anySupervisor",
-      modem: "projectAlertRecipient.form.modem"
+      modem: "projectAlertRecipient.form.modem",
     },
     create: {
-      success: "projectAlertRecipient.create.success"
+      success: "projectAlertRecipient.create.success",
     },
     edit: {
-      success: "projectAlertRecipient.edit.success"
+      success: "projectAlertRecipient.edit.success",
     },
     delete: {
-      success: "projectAlertRecipient.delete.success"
+      success: "projectAlertRecipient.delete.success",
     },
     list: {
       role: "projectAlertRecipient.list.role",
@@ -345,12 +360,14 @@ export const stringKeys = {
       phoneNumber: "projectAlertRecipient.list.phoneNumber",
       removalConfirmation: "projectAlertRecipient.list.removalConfirmation",
       supervisors: "projectAlertRecipient.list.supervisors",
-      healthRisks: "projectAlertRecipient.list.healthRisks"
+      healthRisks: "projectAlertRecipient.list.healthRisks",
     },
   },
   projectAlertNotHandledRecipient: {
     title: "projectAlertNotHandledRecipient.title",
-    description: "projectAlertNotHandledRecipient.description"
+    description: "projectAlertNotHandledRecipient.description",
+    add: "projectAlertNotHandledRecipient.add",
+    error: "projectAlertNotHandledRecipient.error",
   },
   project: {
     title: "project.title",
@@ -360,6 +377,7 @@ export const stringKeys = {
     form: {
       creationTitle: "project.form.creationTitle",
       editionTitle: "project.form.editionTitle",
+      healthRisksEditionTitle: "project.form.healthRisksEditionTitle",
       name: "project.form.name",
       allowMultipleOrganizations: "project.form.allowMultipleOrganizations",
       organization: "project.form.organization",
@@ -371,18 +389,25 @@ export const stringKeys = {
       alertsSection: "project.form.alertsSection",
       alertRuleCountThreshold: "project.form.alertRuleCountThreshold",
       alertRuleDaysThreshold: "project.form.alertRuleDaysThreshold",
+      alertRuleDaysThresholdEdit: "project.form.alertRuleDaysThresholdEdit",
+      alertRuleDays: "project.form.alertRuleDays",
+      alertRuleDay: "project.form.alertRuleDay",
       alertRuleKilometersThreshold: "project.form.alertRuleKilometersThreshold",
-      alertNotHandledNotificationRecipient: "project.form.alertNotHandledNotificationRecipient"
+      alertRuleKilometersThresholdEdit:
+        "project.form.alertRuleKilometersThresholdEdit",
+      alertRuleKilometer: "project.form.alertRuleKilometer",
+      alertNotHandledNotificationRecipient:
+        "project.form.alertNotHandledNotificationRecipient",
     },
     messages: {
       create: {
-        success: "project.create.success"
+        success: "project.create.success",
       },
       edit: {
-        success: "project.edit.success"
+        success: "project.edit.success",
       },
       close: {
-        success: "project.close.success"
+        success: "project.close.success",
       },
     },
     list: {
@@ -398,13 +423,54 @@ export const stringKeys = {
       close: "project.list.close",
       removalConfirmation: "project.list.removalConfirmation",
       removalConfirmationText: "project.list.removalConfirmationText",
-      removalConfirmationTextTwo: "project.list.removalConfirmationTextTwo"
+      removalConfirmationTextTwo: "project.list.removalConfirmationTextTwo",
     },
     settings: "project.settings.title",
     errorMessages: {
       title: "project.settings.errorMessages.title",
       tooLongWarning: "project.settings.errorMessages.tooLongWarning",
-    }
+    },
+  },
+  projectSetup: {
+    projectName: {
+      name: "projectSetup.projectName.name",
+      title: "projectSetup.projectName.title",
+      error: "projectSetup.projectName.error",
+    },
+    projectOrganization: {
+      name: "projectSetup.organization.name",
+      title: "projectSetup.organization.title",
+      placeholder: "projectSetup.organization.placeholder",
+      error: "projectSetup.organization.error",
+    },
+    projectRecipients: {
+      name: "projectSetup.projectRecipients.name",
+      title: "projectSetup.projectRecipients.title",
+      placeholder: "projectSetup.projectRecipients.placeholder",
+      error: "projectSetup.projectRecipients.error",
+    },
+    cancelDialog: {
+      title: "projectSetup.cancelDialog.title",
+      description: "projectSetup.cancelDialog.description",
+    },
+    geographicalStructure: {
+      name: "projectSetup.geographicalStructure.name",
+      title: "projectSetup.geographicalStructure.title",
+      description: "projectSetup.geographicalStructure.description",
+      error: "projectSetup.geographicalStructure.error",
+    },
+    summary: {
+      name: "projectSetup.summary.name",
+      title: "projectSetup.summary.title",
+      notUpdated: "projectSetup.summary.notUpdated",
+    },
+    projectHealthRisks: {
+      name: "projectSetup.projectHealthRisks.name",
+      title: "projectSetup.projectHealthRisks.title",
+      placeholder: "projectSetup.projectHealthRisks.placeholder",
+      description: "projectSetup.projectHealthRisks.description",
+      error: "projectSetup.projectHealthRisks.error",
+    },
   },
   dashboard: {
     title: "dashboard.title",
@@ -418,7 +484,7 @@ export const stringKeys = {
       escalatedAlerts: "dashboard.numbers.escalatedAlerts",
       closedAlerts: "dashboard.numbers.closedAlerts",
       numberOfVillages: "dashboard.numbers.villages",
-      numberOfDistricts: "dashboard.numbers.districts"
+      numberOfDistricts: "dashboard.numbers.districts",
     },
     filters: {
       title: "dashboard.filters.title",
@@ -434,7 +500,8 @@ export const stringKeys = {
       reportsType: "dashboard.filters.reportsType",
       allReportsType: "dashboard.filters.allReportsType",
       dataCollectorReportsType: "dashboard.filters.dataCollectorReportsType",
-      dataCollectionPointReportsType: "dashboard.filters.dataCollectionPointReportsType",
+      dataCollectionPointReportsType:
+        "dashboard.filters.dataCollectionPointReportsType",
       trainingStatus: "dashboard.filters.trainingStatus",
     },
     reportsPerHealthRisk: {
@@ -451,28 +518,41 @@ export const stringKeys = {
       below5: "dashboard.reportsPerFeature.below5",
       above5: "dashboard.reportsPerFeature.above5",
       unspecifiedAge: "dashboard.reportsPerFeature.unspecifiedAge",
-      unspecifiedSex: "dashboard.reportsPerFeature.unspecifiedSex"
+      unspecifiedSex: "dashboard.reportsPerFeature.unspecifiedSex",
     },
     reportsPerFeatureAndDate: {
       femalesBelow5: "dashboard.reportsPerFeatureAndDate.femalesBelow5",
       femalesAbove5: "dashboard.reportsPerFeatureAndDate.femalesAbove5",
       malesBelow5: "dashboard.reportsPerFeatureAndDate.malesBelow5",
       malesAbove5: "dashboard.reportsPerFeatureAndDate.malesAbove5",
-      unspecifiedSexAndAge: "dashboard.reportsPerFeatureAndDate.unspecifiedSexAndAge",
+      unspecifiedSexAndAge:
+        "dashboard.reportsPerFeatureAndDate.unspecifiedSexAndAge",
       numberOfReports: "dashboard.reportsPerFeatureAndDate.numberOfReports",
-      title: "dashboard.reportsPerFeatureAndDate.title"
+      percentageOfReportedPeople:
+        "dashboard.reportsPerFeatureAndDate.percentageOfReportedPeople",
+      title: "dashboard.reportsPerFeatureAndDate.title",
+      titlePercentage: "dashboard.reportsPerFeatureAndDate.titlePercentage",
     },
     reportsPerVillageAndDate: {
       title: "dashboard.reportsPerVillageAndDate.title",
       rest: "dashboard.reportsPerVillageAndDate.rest",
-      numberOfReports: "dashboard.reportsPerVillageAndDate.numberOfReports"
+      numberOfReports: "dashboard.reportsPerVillageAndDate.numberOfReports",
     },
     dataCollectionPointReportsByDate: {
-      referredToHospitalCount: "dashboard.dataCollectionPointReportsByDate.referredToHospitalCount",
-      deathCount: "dashboard.dataCollectionPointReportsByDate.deathCount",
-      fromOtherVillagesCount: "dashboard.dataCollectionPointReportsByDate.fromOtherVillagesCount",
-      numberOfReports: "dashboard.dataCollectionPointReportsByDate.numberOfReports",
-      title: "dashboard.dataCollectionPointReportsByDate.title"
+      referredToHospitalCount:
+        "dashboard.dataCollectionPointReportsByDate.referredToHospitalCount",
+      //deathCount: "dashboard.dataCollectionPointReportsByDate.deathCount",
+      //fromOtherVillagesCount:
+      //"dashboard.dataCollectionPointReportsByDate.fromOtherVillagesCount",
+      numberOfReports:
+        "dashboard.dataCollectionPointReportsByDate.numberOfReports",
+      title: "dashboard.dataCollectionPointReportsByDate.title",
+    },
+    keptReportsInEscalatedAlerts: {
+      title: "dashboard.keptReportsInEscalatedAlerts.title",
+      timeRangeDescription:
+        "dashboard.keptReportsInEscalatedAlerts.timeRangeDescription",
+      yLabel: "dashboard.keptReportsInEscalatedAlerts.yLabel",
     },
     activeDataCollectorCount: "dashboard.activeDataCollectorCount",
     referredToHospitalCount: "dashboard.referredToHospitalCount",
@@ -483,9 +563,12 @@ export const stringKeys = {
     alertsSummary: "dashboard.alertsSummary",
     geographicalCoverageSummary: "dashboard.geographicalCoverageSummary",
     map: {
-      title: "dashboard.map.title"
+      title: "dashboard.map.title",
     },
-    generatePdf: "dashboard.generatePdf"
+    generatePdf: "dashboard.generatePdf",
+    buttons: {
+      all: "dashboard.buttons.all",
+    },
   },
   globalCoordinator: {
     title: "globalCoordinator.title",
@@ -494,22 +577,22 @@ export const stringKeys = {
       editionTitle: "globalCoordinator.form.editionTitle",
       phoneNumber: "globalCoordinator.form.phoneNumber",
       additionalPhoneNumber: "globalCoordinator.form.additionalPhoneNumber",
-      organization: "globalCoordinator.form.organization"
+      organization: "globalCoordinator.form.organization",
     },
     list: {
       phoneNumber: "globalCoordinator.list.phoneNumber",
       organization: "globalCoordinator.list.organization",
-      removalConfirmation: "globalCoordinator.list.removalConfirmation"
+      removalConfirmation: "globalCoordinator.list.removalConfirmation",
     },
     create: {
-      success: "globalCoordinator.create.success"
+      success: "globalCoordinator.create.success",
     },
     edit: {
-      success: "globalCoordinator.edit.success"
+      success: "globalCoordinator.edit.success",
     },
     delete: {
-      success: "globalCoordinator.delete.success"
-    }
+      success: "globalCoordinator.delete.success",
+    },
   },
   nationalSocietyUser: {
     title: "nationalSocietyUser.title",
@@ -529,20 +612,23 @@ export const stringKeys = {
       customOrganization: "nationalSocietyUser.form.customOrganization",
       projectIsClosed: "nationalSocietyUser.form.projectIsClosed",
       projectIsMissing: "nationalSocietyUser.form.projectIsMissing",
-      confirmCoordinatorCreation: "nationalSocietyUser.form.confirmCoordinatorCreation",
-      confirmCoordinatorCreationText: "nationalSocietyUser.form.confirmCoordinatorCreationText",
+      confirmCoordinatorCreation:
+        "nationalSocietyUser.form.confirmCoordinatorCreation",
+      confirmCoordinatorCreationText:
+        "nationalSocietyUser.form.confirmCoordinatorCreationText",
       headSupervisor: "nationalSocietyUser.form.headSupervisor",
-      headSupervisorNotAssigned: "nationalSocietyUser.form.headSupervisorNotAssigned",
-      modem: "nationalSocietyUser.form.modem"
+      headSupervisorNotAssigned:
+        "nationalSocietyUser.form.headSupervisorNotAssigned",
+      modem: "nationalSocietyUser.form.modem",
     },
     create: {
-      success: "nationalSocietyUser.create.success"
+      success: "nationalSocietyUser.create.success",
     },
     edit: {
-      success: "nationalSocietyUser.edit.success"
+      success: "nationalSocietyUser.edit.success",
     },
     remove: {
-      success: "nationalSocietyUser.remove.success"
+      success: "nationalSocietyUser.remove.success",
     },
     list: {
       phoneNumber: "nationalSocietyUser.list.phoneNumber",
@@ -551,12 +637,12 @@ export const stringKeys = {
       removalConfirmation: "nationalSocietyUser.list.removalConfirmation",
       headManager: "nationalSocietyUser.list.headManager",
       organization: "nationalSocietyUser.list.organization",
-      notVerified: "nationalSocietyUser.list.notVerified"
+      notVerified: "nationalSocietyUser.list.notVerified",
     },
     messages: {
       creationSuccessful: "nationalSocietyUser.messages.creationSuccessful",
-      roleNotValid: "nationalSocietyUser.messages.roleNotValid"
-    }
+      roleNotValid: "nationalSocietyUser.messages.roleNotValid",
+    },
   },
   dataCollectors: {
     title: "dataCollectors.title",
@@ -590,11 +676,12 @@ export const stringKeys = {
       locationsHeader: "dataCollectors.form.locationsHeader",
       showYourLocation: "dataCollectors.form.showYourLocation",
       retrievingLocation: "dataCollectors.form.retrievingLocation",
+      responsibleSupervisor: "dataCollectors.form.responsibleSupervisor",
       alerts: {
         noDistrictsAlert: "dataCollectors.form.alert.noDistrictsAlert",
         noVillagesAlert: "dataCollectors.form.alert.noVillagesAlert",
         noZonesAlert: "dataCollectors.form.alert.noZonesAlert",
-      }
+      },
     },
     list: {
       dataCollectorType: "dataCollectors.list.dataCollectorType",
@@ -609,25 +696,30 @@ export const stringKeys = {
       takeOutOfTraining: "dataCollectors.list.takeOutOfTraining",
       supervisor: "dataCollectors.list.supervisor",
       replaceSupervisor: "dataCollectors.list.replaceSupervisor",
-      supervisorReplacedSuccessfully: "dataCollectors.list.supervisorReplacedSuccessfully",
+      supervisorReplacedSuccessfully:
+        "dataCollectors.list.supervisorReplacedSuccessfully",
       setToDeployed: "dataCollectors.list.setToDeployed",
-      setToNotDeployed: "dataCollectors.list.setToNotDeployed"
+      setToNotDeployed: "dataCollectors.list.setToNotDeployed",
     },
     performanceList: {
       title: "dataCollectors.performanceList.title",
       completenessTitle: "dataCollectors.performanceList.completenessTitle",
-      completenessDescription: "dataCollectors.performanceList.completenessDescription",
-      completenessValueDescription: "dataCollectors.performanceList.completenessValueDescription",
+      completenessDescription:
+        "dataCollectors.performanceList.completenessDescription",
+      completenessValueDescription:
+        "dataCollectors.performanceList.completenessValueDescription",
       name: "dataCollectors.performanceList.name",
       phoneNumber: "dataCollectors.performanceList.phoneNumber",
       villageName: "dataCollectors.performanceList.villageName",
       daysSinceLastReport: "dataCollectors.performanceList.daysSinceLastReport",
       epiWeek: "dataCollectors.performanceList.epiWeek",
       legend: {
-        "ReportingCorrectly": "dataCollectors.performanceList.legend.reportingCorrectly",
-        "NotReporting": "dataCollectors.performanceList.legend.notReporting",
-        "ReportingWithErrors": "dataCollectors.performanceList.legend.reportingWithErrors"
-      }
+        ReportingCorrectly:
+          "dataCollectors.performanceList.legend.reportingCorrectly",
+        NotReporting: "dataCollectors.performanceList.legend.notReporting",
+        ReportingWithErrors:
+          "dataCollectors.performanceList.legend.reportingWithErrors",
+      },
     },
     filters: {
       supervisors: "dataCollectors.filters.supervisors",
@@ -637,7 +729,7 @@ export const stringKeys = {
       trainingStatus: "dataCollectors.filters.trainingStatus",
       deployedMode: "dataCollectors.filters.deployedMode",
       resetAll: "dataCollectors.filters.resetAll",
-      name: "dataCollectors.filters.name"
+      name: "dataCollectors.filters.name",
     },
     constants: {
       sex: {
@@ -646,28 +738,30 @@ export const stringKeys = {
         other: "dataCollectors.sex.other",
       },
       dataCollectorType: {
-        "Human": "dataCollectors.dataCollectorType.human",
-        "CollectionPoint": "dataCollectors.dataCollectorType.collectionPoint"
+        Human: "dataCollectors.dataCollectorType.human",
+        CollectionPoint: "dataCollectors.dataCollectorType.collectionPoint",
       },
       trainingStatus: {
-        "All": "dataCollectors.trainingStatus.all",
-        "InTraining": "dataCollectors.trainingStatus.inTraining",
-        "Trained": "dataCollectors.trainingStatus.trained"
+        All: "dataCollectors.trainingStatus.all",
+        InTraining: "dataCollectors.trainingStatus.inTraining",
+        Trained: "dataCollectors.trainingStatus.trained",
       },
       deployedMode: {
-        "All": "dataCollectors.deployedMode.all",
-        "Deployed": "dataCollectors.deployedMode.deployed",
-        "NotDeployed": "dataCollectors.deployedMode.notDeployed"
-      }
+        All: "dataCollectors.deployedMode.all",
+        Deployed: "dataCollectors.deployedMode.deployed",
+        NotDeployed: "dataCollectors.deployedMode.notDeployed",
+      },
     },
     mapOverview: {
       title: "dataCollectors.mapOverview.title",
       legend: {
-        "ReportingCorrectly": "dataCollectors.mapOverview.legend.reportingCorrectly",
-        "NotReporting": "dataCollectors.mapOverview.legend.notReporting",
-        "ReportingWithErrors": "dataCollectors.mapOverview.legend.reportingWithErrors"
-      }
-    }
+        ReportingCorrectly:
+          "dataCollectors.mapOverview.legend.reportingCorrectly",
+        NotReporting: "dataCollectors.mapOverview.legend.notReporting",
+        ReportingWithErrors:
+          "dataCollectors.mapOverview.legend.reportingWithErrors",
+      },
+    },
   },
   reports: {
     list: {
@@ -700,7 +794,7 @@ export const stringKeys = {
       errorType: "reports.list.errorType",
       corrected: "reports.list.corrected",
       markAsCorrected: "reports.list.markAsCorrected",
-      project: "reports.list.project"
+      project: "reports.list.project",
     },
     form: {
       title: "reports.form.editionTitle",
@@ -722,7 +816,7 @@ export const stringKeys = {
       femalesAtLeastFive: "reports.form.femalesAtLeastFive",
       referredCount: "reports.form.referredCount",
       deathCount: "reports.form.deathCount",
-      fromOtherVillagesCount: "reports.form.fromOtherVillagesCount"
+      fromOtherVillagesCount: "reports.form.fromOtherVillagesCount",
     },
     title: "reports.title",
     nationalSocietyReportsTitle: "reports.nationalSocietyReportsTitle",
@@ -736,38 +830,45 @@ export const stringKeys = {
       sendReport: "reports.sendReport.sendReport",
       goToReportList: "reports.sendReport.goToReportList",
       success: "reports.sendReport.success",
-      modem: "reports.sendReport.modem"
+      modem: "reports.sendReport.modem",
     },
     errorTypes: {
-      "GlobalHealthRiskCodeNotFound": "report.errorType.globalHealthRiskCodeNotFound",
-      "HealthRiskNotFound": "report.errorType.healthRiskNotFound",
-      "FormatError": "report.errorType.formatError",
-      "GatewayError": "report.errorType.gatewayError",
-      "TooLong": "report.errorType.tooLong",
-      "DataCollectorUsedCollectionPointFormat": "report.errorType.dataCollectorUsedCollectionPointFormat",
-      "CollectionPointUsedDataCollectorFormat": "report.errorType.collectionPointUsedDataCollectorFormat",
-      "CollectionPointNonHumanHealthRisk": "report.errorType.collectionPointNonHumanHealthRisk",
-      "SingleReportNonHumanHealthRisk": "report.errorType.singleReportNonHumanHealthRisk",
-      "AggregateReportNonHumanHealthRisk": "report.errorType.aggregateReportNonHumanHealthRisk",
-      "EventReportHumanHealthRisk": "report.errorType.eventReportHumanHealthRisk",
-      "GenderAndAgeNonHumanHealthRisk": "report.errorType.genderAndAgeNonHumanHealthRisk",
-      "Gateway": "report.errorType.gateway",
-      "Other": "report.errorType.other"
+      GlobalHealthRiskCodeNotFound:
+        "report.errorType.globalHealthRiskCodeNotFound",
+      HealthRiskNotFound: "report.errorType.healthRiskNotFound",
+      FormatError: "report.errorType.formatError",
+      GatewayError: "report.errorType.gatewayError",
+      TooLong: "report.errorType.tooLong",
+      DataCollectorUsedCollectionPointFormat:
+        "report.errorType.dataCollectorUsedCollectionPointFormat",
+      CollectionPointUsedDataCollectorFormat:
+        "report.errorType.collectionPointUsedDataCollectorFormat",
+      CollectionPointNonHumanHealthRisk:
+        "report.errorType.collectionPointNonHumanHealthRisk",
+      SingleReportNonHumanHealthRisk:
+        "report.errorType.singleReportNonHumanHealthRisk",
+      AggregateReportNonHumanHealthRisk:
+        "report.errorType.aggregateReportNonHumanHealthRisk",
+      EventReportHumanHealthRisk: "report.errorType.eventReportHumanHealthRisk",
+      GenderAndAgeNonHumanHealthRisk:
+        "report.errorType.genderAndAgeNonHumanHealthRisk",
+      Gateway: "report.errorType.gateway",
+      Other: "report.errorType.other",
     },
     status: {
-      "New": "report.status.notCrossChecked",
-      "Rejected": "report.status.rejected",
-      "Accepted": "report.status.accepted",
-      "Pending": "report.status.notCrossChecked",
-      "Closed": "report.status.notCrossChecked"
+      New: "report.status.notCrossChecked",
+      Rejected: "report.status.rejected",
+      Accepted: "report.status.accepted",
+      Pending: "report.status.notCrossChecked",
+      Closed: "report.status.notCrossChecked",
     },
     sexAgeConstants: {
-      "male": "report.sexAgeConstants.male",
-      "female": "report.sexAgeConstants.female",
-      "unspecified": "report.sexAgeConstants.unspecified",
-      "belowFive": "report.sexAgeConstants.belowFive",
-      "aboveFour": "report.sexAgeConstants.aboveFour"
-    }
+      male: "report.sexAgeConstants.male",
+      female: "report.sexAgeConstants.female",
+      unspecified: "report.sexAgeConstants.unspecified",
+      belowFive: "report.sexAgeConstants.belowFive",
+      aboveFour: "report.sexAgeConstants.aboveFour",
+    },
   },
   alerts: {
     list: {
@@ -780,15 +881,15 @@ export const stringKeys = {
       status: "alerts.list.status",
       success: "alerts.list.success",
       error: "alerts.list.error",
-      export: "alerts.list.export"
+      export: "alerts.list.export",
     },
     filters: {
       healthRisks: "alerts.filters.healthRisks",
       healthRisksAll: "alerts.filters.healthRisksAll",
-      status: "alerts.filters.status"
+      status: "alerts.filters.status",
     },
     details: {
-      title: "alerts.details.title"
+      title: "alerts.details.title",
     },
     assess: {
       title: "alerts.assess.title",
@@ -796,16 +897,25 @@ export const stringKeys = {
       introduction: "alerts.assess.introduction",
       reports: "alerts.assess.reports",
       closeReason: "alerts.assess.closeReason",
+      goBack: "alerts.assess.goBack",
+      status: {
+        Open: "alerts.assess.status.open",
+        Closed: "alerts.assess.status.closed",
+        Escalated: "alerts.assess.status.escalated",
+        Dismissed: "alerts.assess.status.dismissed",
+        ToDismiss: "alerts.assess.status.toDismiss",
+        ToEscalate: "alerts.assess.status.toEscalate",
+      },
       statusDescription: {
         closed: "alerts.assess.statusDescription.closed",
         escalated: "alerts.assess.statusDescription.escalated",
         dismissed: "alerts.assess.statusDescription.dismissed",
-        rejected: "alerts.assess.statusDescription.rejected"
+        rejected: "alerts.assess.statusDescription.rejected",
       },
       escalatedOutcomes: {
-        "Dismissed": "alerts.assess.escalatedOutcomes.dismiss",
-        "ActionTaken": "alerts.assess.escalatedOutcomes.actionTaken",
-        "Other": "alerts.assess.escalatedOutcomes.other"
+        Dismissed: "alerts.assess.escalatedOutcomes.dismiss",
+        ActionTaken: "alerts.assess.escalatedOutcomes.actionTaken",
+        Other: "alerts.assess.escalatedOutcomes.other",
       },
       alert: {
         close: "alerts.assess.alert.close",
@@ -813,12 +923,18 @@ export const stringKeys = {
         closeDescription: "alerts.assess.alert.closeDescription",
         escalate: "alerts.assess.alert.escalate",
         escalateConfirmation: "alerts.assess.alert.escalateConfirmation",
-        escalateConfirmationInformDataCollectors: "alerts.assess.alert.escalateConfirmationInformDataCollectors",
-        escalateNotificationEmails: "alerts.assess.alert.escalateNotificationEmails",
-        escalateNotificationSmses: "alerts.assess.alert.escalateNotificationSmses",
-        escalateWithoutNotification: "alerts.assess.alert.escalateWithoutNotification",
-        escalateWithoutNotificationDialogTitle: "alerts.assess.alert.escalateWithoutNotificationDialogTitle",
-        escalateWithoutNotificationConfirmation: "alerts.assess.alert.escalateWithoutNotificationConfirmation",
+        escalateConfirmationInformDataCollectors:
+          "alerts.assess.alert.escalateConfirmationInformDataCollectors",
+        escalateNotificationEmails:
+          "alerts.assess.alert.escalateNotificationEmails",
+        escalateNotificationSmses:
+          "alerts.assess.alert.escalateNotificationSmses",
+        escalateWithoutNotification:
+          "alerts.assess.alert.escalateWithoutNotification",
+        escalateWithoutNotificationDialogTitle:
+          "alerts.assess.alert.escalateWithoutNotificationDialogTitle",
+        escalateWithoutNotificationConfirmation:
+          "alerts.assess.alert.escalateWithoutNotificationConfirmation",
         dismiss: "alerts.assess.alert.dismiss",
         escalationPossible: "alerts.assess.alert.escalationPossible",
         dismissalPossible: "alerts.assess.alert.dismissalPossible",
@@ -827,11 +943,13 @@ export const stringKeys = {
         closedSuccessfully: "alerts.assess.alert.closedSuccessfully",
         eidsrValidation: {
           connection: "alerts.assess.alert.eidsrValidation.connection",
-          integrationValid: "alerts.assess.alert.eidsrValidation.integrationValid",
-          validReportsCount: "alerts.assess.alert.eidsrValidation.validReportsCount",
+          integrationValid:
+            "alerts.assess.alert.eidsrValidation.integrationValid",
+          validReportsCount:
+            "alerts.assess.alert.eidsrValidation.validReportsCount",
           tip: "alerts.assess.alert.eidsrValidation.tip",
           title: "alerts.assess.alert.eidsrValidation.title",
-        }
+        },
       },
       report: {
         accept: "alerts.assess.report.accept",
@@ -846,14 +964,28 @@ export const stringKeys = {
         sex: "alerts.assess.report.sex",
         age: "alerts.assess.report.age",
         id: "alerts.assess.report.id",
-        linkedToSupervisor: "alerts.assess.report.linkedToSupervisor"
+        linkedToSupervisor: "alerts.assess.report.linkedToSupervisor",
+        sent: "alerts.assess.report.sent",
+        reportId: "alerts.assess.report.reportId",
+        date: "alerts.assess.report.date",
+        time: "alerts.assess.report.time",
       },
       escalatedTo: {
         title: "alerts.assess.escalatedTo.title",
         role: "alerts.assess.escalatedTo.role",
         organization: "alerts.assess.escalatedTo.organization",
         phoneNumber: "alerts.assess.escalatedTo.phoneNumber",
-      }
+      },
+      thresholdInfo: {
+        threshold: "alerts.assess.alert.threshold",
+        reports: "alerts.assess.alert.reports",
+        report: "alerts.assess.alert.report",
+        days: "alerts.assess.alert.days",
+        day: "alerts.assess.alert.day",
+        in: "alerts.assess.alert.in",
+        within: "alerts.assess.alert.within",
+        kilometers: "alerts.assess.alert.kilometers",
+      },
     },
     eventLog: {
       title: "alerts.eventLog.title",
@@ -864,91 +996,97 @@ export const stringKeys = {
         type: "alerts.eventLog.list.type",
         subtype: "alerts.eventLog.list.subtype",
         comment: "alerts.eventLog.list.comment",
-        removalConfirmation: "alerts.eventLog.list.removalConfirmation"
+        removalConfirmation: "alerts.eventLog.list.removalConfirmation",
       },
       form: {
         dateOfEvent: "alerts.eventLog.form.dateOfEvent",
         timeOfEvent: "alerts.eventLog.form.timeOfEvent",
         comment: "alerts.eventLog.form.comment",
-      }
+      },
     },
     constants: {
       alertStatus: {
-        "All": "alerts.alertStatus.all",
-        "Open": "alerts.alertStatus.open",
-        "Dismissed": "alerts.alertStatus.dismissed",
-        "Escalated": "alerts.alertStatus.escalated",
-        "Closed": "alerts.alertStatus.closed"
+        All: "alerts.alertStatus.all",
+        Open: "alerts.alertStatus.open",
+        Dismissed: "alerts.alertStatus.dismissed",
+        Escalated: "alerts.alertStatus.escalated",
+        Closed: "alerts.alertStatus.closed",
       },
       escalatedOutcomes: {
-        "Dismissed": "alerts.escalatedOutcomes.dismissed",
-        "ActionTaken": "alerts.escalatedOutcomes.actionTaken",
-        "Other": "alerts.escalatedOutcomes.other"
+        Dismissed: "alerts.escalatedOutcomes.dismissed",
+        ActionTaken: "alerts.escalatedOutcomes.actionTaken",
+        Other: "alerts.escalatedOutcomes.other",
       },
       reportStatus: {
-        "Rejected": "alerts.reportStatus.rejected",
-        "Accepted": "alerts.reportStatus.accepted",
-        "Pending": "alerts.reportStatus.pending",
-        "Closed": "alerts.reportStatus.closed"
+        Rejected: "alerts.reportStatus.rejected",
+        Accepted: "alerts.reportStatus.accepted",
+        Pending: "alerts.reportStatus.pending",
+        Closed: "alerts.reportStatus.closed",
       },
       eventTypes: {
-        "Investigation": "alerts.eventTypes.investigation",
-        "Outcome": "alerts.eventTypes.outcome",
-        "Summary": "alerts.eventTypes.summary",
-        "PublicHealthActionTaken": "alerts.eventTypes.publicHealthActionTaken",
+        Investigation: "alerts.eventTypes.investigation",
+        Outcome: "alerts.eventTypes.outcome",
+        Summary: "alerts.eventTypes.summary",
+        PublicHealthActionTaken: "alerts.eventTypes.publicHealthActionTaken",
       },
       eventSubtypes: {
-        "Investigated": "alerts.eventTypes.subtypes.investigated",
-        "NotInvestigated": "alerts.eventTypes.subtypes.notInvestigated",
-        "Unknown": "alerts.eventTypes.subtypes.unknown",
-        "CasePositiveLab": "alerts.eventTypes.subtypes.casePositiveLab",
-        "PresumedCasePositiveClinical": "alerts.eventTypes.subtypes.presumedCasePositiveClinical",
-        "PresumedCasePositiveUnknown": "alerts.eventTypes.subtypes.presumedCasePositiveUnknown",
-        "CaseNegativeLab": "alerts.eventTypes.subtypes.caseNegativeLab",
-        "PresumedCaseNegativeClinical": "alerts.eventTypes.subtypes.presumedCaseNegativeClinical",
-        "PresumedCaseNegativeUnknown": "alerts.eventTypes.subtypes.presumedCaseNegativeUnknown",
-        "Recovered": "alerts.eventTypes.subtypes.recovered",
-        "Deceased": "alerts.eventTypes.subtypes.deceased",
-        "ImmunizationCampaign": "alerts.eventTypes.subtypes.immunizationCampaign",
-        "HealthMessagesAwarenessRaising": "alerts.eventTypes.subtypes.healthMessagesAwarenessRaising",
-        "Referral": "alerts.eventTypes.subtypes.referral",
-        "Isolation": "alerts.eventTypes.subtypes.isolation",
-        "ProvidedORS": "alerts.eventTypes.subtypes.providedORS",
-        "AnimalsDisposed": "alerts.eventTypes.subtypes.AnimalsDisposed",
-        "SafeDignifiedBurials": "alerts.eventTypes.subtypes.safeDignifiedBurials",
-        "CommunityMeeting": "alerts.eventTypes.subtypes.communityMeeting",
-        "AssistedInvestigation": "alerts.eventTypes.subtypes.assistedInvestigation",
-        "CleanupFogging": "alerts.eventTypes.subtypes.cleanupFogging",
-        "Other": "alerts.eventTypes.subtypes.other",
+        Investigated: "alerts.eventTypes.subtypes.investigated",
+        NotInvestigated: "alerts.eventTypes.subtypes.notInvestigated",
+        Unknown: "alerts.eventTypes.subtypes.unknown",
+        CasePositiveLab: "alerts.eventTypes.subtypes.casePositiveLab",
+        PresumedCasePositiveClinical:
+          "alerts.eventTypes.subtypes.presumedCasePositiveClinical",
+        PresumedCasePositiveUnknown:
+          "alerts.eventTypes.subtypes.presumedCasePositiveUnknown",
+        CaseNegativeLab: "alerts.eventTypes.subtypes.caseNegativeLab",
+        PresumedCaseNegativeClinical:
+          "alerts.eventTypes.subtypes.presumedCaseNegativeClinical",
+        PresumedCaseNegativeUnknown:
+          "alerts.eventTypes.subtypes.presumedCaseNegativeUnknown",
+        Recovered: "alerts.eventTypes.subtypes.recovered",
+        Deceased: "alerts.eventTypes.subtypes.deceased",
+        ImmunizationCampaign: "alerts.eventTypes.subtypes.immunizationCampaign",
+        HealthMessagesAwarenessRaising:
+          "alerts.eventTypes.subtypes.healthMessagesAwarenessRaising",
+        Referral: "alerts.eventTypes.subtypes.referral",
+        Isolation: "alerts.eventTypes.subtypes.isolation",
+        ProvidedORS: "alerts.eventTypes.subtypes.providedORS",
+        AnimalsDisposed: "alerts.eventTypes.subtypes.AnimalsDisposed",
+        SafeDignifiedBurials: "alerts.eventTypes.subtypes.safeDignifiedBurials",
+        CommunityMeeting: "alerts.eventTypes.subtypes.communityMeeting",
+        AssistedInvestigation:
+          "alerts.eventTypes.subtypes.assistedInvestigation",
+        CleanupFogging: "alerts.eventTypes.subtypes.cleanupFogging",
+        Other: "alerts.eventTypes.subtypes.other",
       },
       sex: {
-        "Female": "alerts.sex.female",
-        "Male": "alerts.sex.male",
-        "Unspecified": "alerts.sexAndAge.unspecified"
+        Female: "alerts.sex.female",
+        Male: "alerts.sex.male",
+        Unspecified: "alerts.sexAndAge.unspecified",
       },
       age: {
-        "BelowFive": "alerts.age.belowFive",
-        "AtLeastFive": "alerts.age.atLeastFive",
-        "Unspecified": "alerts.sexAndAge.unspecified"
+        BelowFive: "alerts.age.belowFive",
+        AtLeastFive: "alerts.age.atLeastFive",
+        Unspecified: "alerts.sexAndAge.unspecified",
       },
       logType: {
-        "TriggeredAlert": "alerts.logType.TriggeredAlert",
-        "EscalatedAlert": "alerts.logType.EscalatedAlert",
-        "DismissedAlert": "alerts.logType.DismissedAlert",
-        "ClosedAlert": "alerts.logType.ClosedAlert",
-        "AcceptedReport": "alerts.logType.AcceptedReport",
-        "RejectedReport": "alerts.logType.RejectedReport",
-        "ResetReport": "alerts.logType.ResetReport"
-      }
+        TriggeredAlert: "alerts.logType.TriggeredAlert",
+        EscalatedAlert: "alerts.logType.EscalatedAlert",
+        DismissedAlert: "alerts.logType.DismissedAlert",
+        ClosedAlert: "alerts.logType.ClosedAlert",
+        AcceptedReport: "alerts.logType.AcceptedReport",
+        RejectedReport: "alerts.logType.RejectedReport",
+        ResetReport: "alerts.logType.ResetReport",
+      },
     },
-    title: "alerts.title"
+    title: "alerts.title",
   },
   filters: {
     area: {
       all: "filters.area.all",
       unknown: "filters.area.unknown",
       selectAll: "filters.area.selectAll",
-      showResults: "filters.area.showResults"
+      showResults: "filters.area.showResults",
     },
     report: {
       healthRisk: "filters.report.healthRisk",
@@ -967,29 +1105,29 @@ export const stringKeys = {
       selectErrorType: "filters.report.selectErrorType",
       isCorrected: "filters.report.isCorrected",
       errorTypes: {
-        "All": "filters.report.errorTypeAll",
-        "HealthRiskNotFound": "filters.report.errorTypeHealthRiskNotFound",
-        "WrongFormat": "filters.report.errorTypeWrongFormat",
-        "GatewayError": "filters.report.errorTypeGatewayError",
-        "Other": "filters.report.errorTypeOther"
+        All: "filters.report.errorTypeAll",
+        HealthRiskNotFound: "filters.report.errorTypeHealthRiskNotFound",
+        WrongFormat: "filters.report.errorTypeWrongFormat",
+        GatewayError: "filters.report.errorTypeGatewayError",
+        Other: "filters.report.errorTypeOther",
       },
       correctedStates: {
-        "All": "filters.report.correctedStateAll",
-        "Corrected": "filters.report.correctedStateCorrected",
-        "NotCorrected": "filters.report.correctedStateNotCorrected",
+        All: "filters.report.correctedStateAll",
+        Corrected: "filters.report.correctedStateCorrected",
+        NotCorrected: "filters.report.correctedStateNotCorrected",
       },
     },
     autocomplete: {
-      noOptions: "filters.autocomplete.noOptions"
-    }
+      noOptions: "filters.autocomplete.noOptions",
+    },
   },
   table: {
-    noData: "table.noData"
+    noData: "table.noData",
   },
   form: {
     cancel: "form.cancel",
     confirm: "form.confirm",
-    inlineSave: "form.inlineSave"
+    inlineSave: "form.inlineSave",
   },
   user: {
     logout: "user.logout",
@@ -998,10 +1136,10 @@ export const stringKeys = {
       welcome: "user.verifyEmail.welcome",
       signIn: "user.verifyEmail.signIn",
       password: "user.verifyEmail.password",
-      failed: "user.verifyEmail.failed"
+      failed: "user.verifyEmail.failed",
     },
     registration: {
-      passwordTooWeak: "user.registration.passwordTooWeak"
+      passwordTooWeak: "user.registration.passwordTooWeak",
     },
     resetPassword: {
       success: "user.resetPassword.success",
@@ -1012,8 +1150,8 @@ export const stringKeys = {
       enterNewPassword: "user.resetPassword.enterNewPassword",
       notFound: "user.resetPassword.notFound",
       emailSent: "user.resetPassword.emailSent",
-      goToLoginPage: "user.resetPassword.goToLoginPage"
-    }
+      goToLoginPage: "user.resetPassword.goToLoginPage",
+    },
   },
   validation: {
     invalidPhoneNumber: "validation.invalidPhoneNumber",
@@ -1037,8 +1175,10 @@ export const stringKeys = {
     title: "headManagerConsents.title",
     consentText: "headManagerConsents.consentText",
     nationalSociety: "headManagerConsents.nationalSociety",
-    nationalSocietyWithUpdatedAgreement: "headManagerConsents.nationalSocietyWithUpdatedAgreement",
-    nationalSocietiesWithUpdatedAgreement: "headManagerConsents.nationalSocietiesWithUpdatedAgreement",
+    nationalSocietyWithUpdatedAgreement:
+      "headManagerConsents.nationalSocietyWithUpdatedAgreement",
+    nationalSocietiesWithUpdatedAgreement:
+      "headManagerConsents.nationalSocietiesWithUpdatedAgreement",
     nationalSocieties: "headManagerConsents.nationalSocieties",
     agreeToContinue: "headManagerConsents.agreeToContinue",
     submit: "headManagerConsents.submit",
@@ -1048,7 +1188,7 @@ export const stringKeys = {
     pendingHeadManager: "headManagerConsents.pendingHeadManager",
     setSuccessfully: "headManagerConsents.setSuccessfully",
     selectLanguage: "headManagerConsents.selectLanguage",
-    downloadDirectly: "headManagerConsents.downloadDirectly"
+    downloadDirectly: "headManagerConsents.downloadDirectly",
   },
   common: {
     buttons: {
@@ -1056,15 +1196,23 @@ export const stringKeys = {
       edit: "common.buttons.edit",
       update: "common.buttons.update",
       goBack: "common.buttons.goBack",
-      tryAgain: "common.buttons.tryAgain"
+      previous: "common.buttons.previous",
+      finish: "common.buttons.finish",
+      next: "common.buttons.next",
+      tryAgain: "common.buttons.tryAgain",
+      confirmCancelation: "common.buttons.confirmCancelation",
+      denyCancelation: "common.buttons.denyCancelation",
+      showResults: "common.buttons.showResults",
     },
     boolean: {
       true: "common.true",
-      false: "common.false"
+      false: "common.false",
     },
     name: "common.name",
     location: "common.location",
-    email: "common.email"
+    email: "common.email",
+    filter: "common.filter",
+    filters: "common.filters",
   },
   translations: {
     title: "translations.title",
@@ -1073,9 +1221,9 @@ export const stringKeys = {
     smsCharacters: "translations.smsCharacters",
     smsParts: "translations.smsParts",
     list: {
-      key: "translations.list.key"
+      key: "translations.list.key",
     },
-    needsImprovement: "translations.needsImprovement"
+    needsImprovement: "translations.needsImprovement",
   },
   feedback: {
     title: "feedback.title",
@@ -1092,11 +1240,11 @@ export const stringKeys = {
     account: "sideMenu.account",
     general: "sideMenu.general",
     nationalSocieties: "sideMenu.nationalSocieties",
-  }
+  },
 };
 
 export const isStringKey = (key) =>
-  (key && key.substr(0, stringPrefix.length) === stringPrefix);
+  key && key.substr(0, stringPrefix.length) === stringPrefix;
 
 export const extractString = (keyValue, noEditor) =>
   strings(extractKey(keyValue), noEditor);
@@ -1105,39 +1253,51 @@ export const strings = (key, noEditor) => {
   const value = stringList[key];
 
   if (showKeys) {
-    return noEditor
-      ? key
-      : <StringsEditor stringKey={key} type="strings" needsImprovement={!!value ? value.needsImprovement : true} />;
+    return noEditor ? (
+      key
+    ) : (
+      <StringsEditor
+        stringKey={key}
+        type="strings"
+        needsImprovement={!!value ? value.needsImprovement : true}
+      />
+    );
   }
 
   return value === undefined ? key : value.value;
-}
+};
 
 export const stringsFormat = (key, data, noEditor) => {
   const value = stringList[key];
 
   if (showKeys) {
-    return noEditor
-      ? key
-      : <StringsEditor stringKey={key} type="strings" needsImprovement={!!value ? value.needsImprovement : true} />;
+    return noEditor ? (
+      key
+    ) : (
+      <StringsEditor
+        stringKey={key}
+        type="strings"
+        needsImprovement={!!value ? value.needsImprovement : true}
+      />
+    );
   }
 
   if (value === undefined) {
     return key;
   }
 
-  return Object.keys(data || {}).reduce((result, stringKey) => result.replace(`{${stringKey}}`, data[stringKey]), value.value || "");
-}
+  return Object.keys(data || {}).reduce(
+    (result, stringKey) => result.replace(`{${stringKey}}`, data[stringKey]),
+    value.value || "",
+  );
+};
 
 const stringPrefix = "string:";
 
-export const stringKey = (key) =>
-  `${stringPrefix}${key}`;
+export const stringKey = (key) => `${stringPrefix}${key}`;
 
 export const extractKey = (key) =>
-  isStringKey(key)
-    ? key.substring(stringPrefix.length)
-    : key
+  isStringKey(key) ? key.substring(stringPrefix.length) : key;
 
 export function updateStrings(strings) {
   Object.assign(stringList, strings);

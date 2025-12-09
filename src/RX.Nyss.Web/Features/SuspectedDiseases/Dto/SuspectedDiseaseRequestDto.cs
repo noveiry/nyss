@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using FluentValidation;
-using RX.Nyss.Data.Concepts;
 
 namespace RX.Nyss.Web.Features.SuspectedDiseases.Dto
 {

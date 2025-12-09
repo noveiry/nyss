@@ -4,18 +4,18 @@ import ListSubheader from "@material-ui/core/ListSubheader";
 import List from "@material-ui/core/List";
 import { NationalSocietyLocationListItem } from "./NationalSocietyLocationListItem";
 import { Typography, Button, Grid } from "@material-ui/core";
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from "@material-ui/icons/Add";
 import { InlineTextEditor } from "../common/InlineTextEditor/InlineTextEditor";
-import EditIcon from '@material-ui/icons/Edit';
+import EditIcon from "@material-ui/icons/Edit";
 import { strings, stringKeys } from "../../strings";
 
 export const NationalSocietyLocationList = (props) => {
   const [activeIndex, setActiveIndex] = useState("");
-  const [isCreatingLocation, setIsCreatingLocation] = useState(false)
-  const [isEditingLocations, setIsEditingLocations] = useState(false)
+  const [isCreatingLocation, setIsCreatingLocation] = useState(false);
+  const [isEditingLocations, setIsEditingLocations] = useState(false);
 
   const headerHeight = 48;
-  const hasLocations = props.locations.length > 0
+  const hasLocations = props.locations?.length > 0;
   const borderStyle = hasLocations ? "1px solid black" : "1px dashed black";
 
   const lowerCaseLocationType = props.locationType.toLowerCase();
@@ -25,7 +25,7 @@ export const NationalSocietyLocationList = (props) => {
     root: {
       width: "100%",
       maxWidth: 250,
-      marginBottom: 50
+      marginBottom: 50,
     },
     nested: {
       width: "100%",
@@ -44,7 +44,7 @@ export const NationalSocietyLocationList = (props) => {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "#F1F1F1",
+      backgroundColor: theme.palette.background.default,
       width: "100%",
       borderRadius: 2,
     },
@@ -59,21 +59,20 @@ export const NationalSocietyLocationList = (props) => {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      fontSize: "16px"
+      fontSize: "16px",
     },
     button: {
       marginTop: 10,
-      fontSize: "14px"
     },
     icon: {
       marginLeft: 8,
-      marginRight: -8
+      marginRight: -8,
     },
     addLocationField: {
       marginTop: 10,
       marginRight: 5,
       marginLeft: 5,
-    }
+    },
   }));
 
   const classes = useStyles();
@@ -92,7 +91,13 @@ export const NationalSocietyLocationList = (props) => {
           component="div"
           id={`${props.locationType}_list`}
         >
-          <div className={classes.background}>{strings(stringKeys.nationalSociety.structure.locationHeader[props.locationType])}</div>
+          <div className={classes.background}>
+            {strings(
+              stringKeys.nationalSociety.structure.locationHeader[
+                props.locationType
+              ],
+            )}
+          </div>
         </ListSubheader>
       }
     >
@@ -125,23 +130,59 @@ export const NationalSocietyLocationList = (props) => {
             <>
               {hasLocations && (
                 <Grid item>
-                  <Button startIcon={<EditIcon className={`${props.rtl && classes.icon}`} />} className={classes.button} variant="outlined" color="primary" onClick={() => setIsEditingLocations(!isEditingLocations)}>{strings(stringKeys.common.buttons.edit)}</Button>
+                  <Button
+                    startIcon={
+                      <EditIcon className={`${props.rtl && classes.icon}`} />
+                    }
+                    className={classes.button}
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => setIsEditingLocations(!isEditingLocations)}
+                  >
+                    {strings(stringKeys.common.buttons.edit)}
+                  </Button>
                 </Grid>
               )}
               <Grid item>
-                <Button startIcon={<AddIcon className={`${props.rtl && classes.icon}`}/>} className={classes.button} variant="contained" color="primary" onClick={() => setIsCreatingLocation(!isCreatingLocation)}>{props.manageLocation[props.locationType].addLocationLabel}</Button>
+                <Button
+                  startIcon={
+                    <AddIcon className={`${props.rtl && classes.icon}`} />
+                  }
+                  className={classes.button}
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setIsCreatingLocation(!isCreatingLocation)}
+                >
+                  {props.manageLocation[props.locationType].addLocationLabel}
+                </Button>
               </Grid>
             </>
           )}
           {props.canModify && isEditingLocations && (
             <Grid item>
-              <Button className={classes.button} variant="outlined" color="primary" onClick={() => setIsEditingLocations(!isEditingLocations)}>{strings(stringKeys.form.cancel)}</Button>
+              <Button
+                className={classes.button}
+                variant="outlined"
+                color="primary"
+                onClick={() => setIsEditingLocations(!isEditingLocations)}
+              >
+                {strings(stringKeys.form.cancel)}
+              </Button>
             </Grid>
           )}
         </Grid>
         {isCreatingLocation && (
           <div className={classes.addLocationField}>
-            <InlineTextEditor placeholder={props.manageLocation[props.locationType].addLocationLabel} onSave={(name) => createLocation(props.activeParentLocationId, name)} autoFocus setIsModifying={setIsCreatingLocation} />
+            <InlineTextEditor
+              placeholder={
+                props.manageLocation[props.locationType].addLocationLabel
+              }
+              onSave={(name) =>
+                createLocation(props.activeParentLocationId, name)
+              }
+              autoFocus
+              setIsModifying={setIsCreatingLocation}
+            />
           </div>
         )}
       </Grid>

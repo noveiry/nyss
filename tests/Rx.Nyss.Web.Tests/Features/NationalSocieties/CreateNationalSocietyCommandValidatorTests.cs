@@ -1,7 +1,4 @@
-using System;
-using FluentValidation.TestHelper;
 using NSubstitute;
-using RX.Nyss.Web.Features.NationalSocieties.Commands;
 //using RX.Nyss.Web.Features.NationalSocieties.Dto;
 using RX.Nyss.Web.Features.NationalSocieties.Validation;
 using Xunit;
@@ -21,7 +18,7 @@ namespace RX.Nyss.Web.Tests.Features.NationalSocieties
             validationService.NameExistsToOther("Test", 1).Returns(true);
             //CreateValidator = new CreateNationalSocietyCommand.Validator(validationService);
         }
-        
+
         [Fact]
         public void Create_WhenCountryDoesntExists_ShouldHaveError()
         {

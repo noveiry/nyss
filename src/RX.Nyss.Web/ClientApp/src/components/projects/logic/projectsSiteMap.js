@@ -6,9 +6,17 @@ import { nationalSocietyLeftMenuOrder } from "../../nationalSocieties/logic/nati
 export const projectTabMenuOrder = {
   dashboard: 0,
   alerts: 10,
-  dataCollectors: 20,
-  reports: 30,
-  settings: 40
+  reports: 20,
+  dataCollectors: 30,
+  settings: 40,
+};
+
+const projectSubMenuOrder = {
+  general: 0,
+  healthRisks: 1,
+  unhandledAlertRecipients: 2,
+  escalatedAlertRecipients: 3,
+  errorMessages: 4,
 };
 
 export const projectsSiteMap = [
@@ -19,69 +27,102 @@ export const projectsSiteMap = [
     placeholder: placeholders.leftMenu,
     access: accessMap.projects.list,
     placeholderIndex: nationalSocietyLeftMenuOrder.projects,
-    icon: "Project"
+    icon: "Project",
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/projects",
     path: "/nationalsocieties/:nationalSocietyId/projects/add",
     title: () => strings(stringKeys.project.form.creationTitle),
-    access: accessMap.projects.add
+    access: accessMap.projects.add,
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/projects",
     path: "/nationalsocieties/:nationalSocietyId/projects/:projectId",
     title: () => "{projectName}",
-    access: accessMap.projects.get
+    access: accessMap.projects.get,
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/projects/:projectId",
     path: "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
     title: () => strings(stringKeys.project.settingsRootTitle),
     placeholder: placeholders.projectTabMenu,
-    access: accessMap.projects.showOverview,
+    access: accessMap.projects.settings,
     placeholderIndex: projectTabMenuOrder.settings,
+    icon: "Settings",
   },
   {
-    parentPath: "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
+    parentPath:
+      "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
     path: "/nationalsocieties/:nationalSocietyId/projects/:projectId/overview",
     title: () => strings(stringKeys.project.settings),
-    access: accessMap.projects.showOverview,
-    placeholder: placeholders.tabMenu,
+    access: accessMap.projects.overview,
+    placeholder: placeholders.projectSubMenu,
     placeholderIndex: 1,
-    middleStepOnly: true
+    middleStepOnly: true,
   },
   {
-    parentPath: "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
+    parentPath:
+      "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
     path: "/nationalsocieties/:nationalSocietyId/projects/:projectId/edit",
     title: () => strings(stringKeys.project.form.editionTitle),
     access: accessMap.projects.edit,
   },
   {
-    parentPath: "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
-    path: "/projects/:projectId/alertNotifications",
+    parentPath:
+      "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
+    path: "/nationalsocieties/:nationalSocietyId/projects/:projectId/healthrisks",
+    title: () => strings(stringKeys.healthRisk.title),
+    placeholder: placeholders.projectSubMenu,
+    access: accessMap.projects.projectHealthRisks,
+    placeholderIndex: projectSubMenuOrder.healthRisks,
+    middleStepOnly: true,
+    icon: "HealthRisks"
+  },
+  {
+    parentPath:
+      "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
+    path: "/nationalsocieties/:nationalSocietyId/projects/:projectId/editHealthRisks",
+    title: () => strings(stringKeys.project.form.healthRisksEditionTitle),
+    access: accessMap.projects.edit,
+  },
+  {
+    parentPath:
+      "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
+    path: "/projects/:projectId/escalatedAlertNotifications",
     title: () => strings(stringKeys.projectAlertRecipient.title),
-    placeholder: placeholders.tabMenu,
+    placeholder: placeholders.projectSubMenu,
     access: accessMap.projectAlertNotifications.list,
-    placeholderIndex: 3,
+    placeholderIndex: projectSubMenuOrder.escalatedAlertRecipients,
     middleStepOnly: true,
   },
   {
-    parentPath: "/projects/:projectId/alertNotifications",
-    path: "/projects/:projectId/alertNotifications/addRecipient",
+    parentPath:
+      "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
+    path: "/projects/:projectId/unhandledAlertNotifications",
+    title: () => strings(stringKeys.projectAlertNotHandledRecipient.title),
+    placeholder: placeholders.projectSubMenu,
+    access: accessMap.projectAlertNotifications.list,
+    placeholderIndex: projectSubMenuOrder.unhandledAlertRecipients,
+    middleStepOnly: true,
+  },
+  {
+    parentPath: "/projects/:projectId/escalatedAlertNotifications",
+    path: "/projects/:projectId/escalatedAlertNotifications/addRecipient",
     title: () => strings(stringKeys.projectAlertRecipient.form.creationTitle),
-    access: accessMap.projectAlertNotifications.addRecipient
+    access: accessMap.projectAlertNotifications.addRecipient,
   },
   {
-    parentPath: "/projects/:projectId/alertNotifications",
-    path: "/projects/:projectId/alertNotifications/:alertRecipientId/editRecipient",
+    parentPath: "/projects/:projectId/escalatedAlertNotifications",
+    path: "/projects/:projectId/escalatedAlertNotifications/:alertRecipientId/editRecipient",
     title: () => strings(stringKeys.projectAlertRecipient.form.editionTitle),
-    access: accessMap.projectAlertNotifications.editRecipient
+    access: accessMap.projectAlertNotifications.editRecipient,
   },
   {
-    parentPath: "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
+    parentPath:
+      "/nationalsocieties/:nationalSocietyId/projects/:projectId/settings",
     path: "/projects/:projectId/errorMessages",
     title: () => strings(stringKeys.project.errorMessages.title),
-    placeholder: placeholders.tabMenu,
+    placeholder: placeholders.projectSubMenu,
     access: accessMap.projectErrorMessages.list,
     placeholderIndex: 4,
     middleStepOnly: true,

@@ -8,7 +8,7 @@ namespace RX.Nyss.Data.Models
     {
         public int Id { get; set; }
 
-        public string Comments { get; set; }
+        public string? Comments { get; set; }
 
         public AlertStatus Status { get; set; }
 

@@ -47,7 +47,7 @@ namespace RX.Nyss.Web.Tests.Features.DataConsumers
             {
                 new AdministratorUser
                 {
-                    Id = 123,
+                    Id = 1,
                     Role = Role.Administrator
                 }
             });

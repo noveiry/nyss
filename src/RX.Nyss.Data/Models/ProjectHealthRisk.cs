@@ -6,9 +6,9 @@ namespace RX.Nyss.Data.Models
     {
         public int Id { get; set; }
 
-        public string FeedbackMessage { get; set; }
+        public string? FeedbackMessage { get; set; }
 
-        public string CaseDefinition { get; set; }
+        public string? CaseDefinition { get; set; }
 
         public virtual Project Project { get; set; }
 

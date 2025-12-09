@@ -2199,14 +2199,32 @@ namespace RX.Nyss.Data.Migrations
                     b.Property<string>("PhoneNumberDataElementId")
                         .HasColumnType("varchar(256)");
 
-                    b.Property<string>("ReportAgeAtLeastFiveDataElementId")
-                        .HasColumnType("varchar(256)");
+                    b.Property<string>("ReportAgeGroupDataElementId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReportAgeBelowFiveDataElementId")
-                        .HasColumnType("varchar(256)");
+                    b.Property<string>("ReportCaseCountFemaleAgeAtLeastFiveDataElementId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportCaseCountFemaleAgeBelowFiveDataElementId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportCaseCountMaleAgeAtLeastFiveDataElementId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportCaseCountMaleAgeBelowFiveDataElementId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportDataCollectorIdDataElementId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportDateDataElementId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReportGenderDataElementId")
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportGeoLocationDataElementId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReportHealthRiskDataElementId")
                         .HasColumnType("varchar(256)");
@@ -2219,6 +2237,9 @@ namespace RX.Nyss.Data.Migrations
 
                     b.Property<string>("ReportSuspectedDiseaseDataElementId")
                         .HasColumnType("varchar(256)");
+
+                    b.Property<string>("ReportTimeDataElementId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SuspectedDiseaseDataElementId")
                         .HasColumnType("varchar(256)");
@@ -2296,10 +2317,31 @@ namespace RX.Nyss.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("GatewayApiKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GatewayApiKeyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GatewayAuthUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GatewayExtraKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GatewayExtraKeyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GatewaySenderId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("GatewayType")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("GatewayUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IotHubDeviceName")
                         .HasMaxLength(250)

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RX.Nyss.Data.Repositories;
+﻿namespace RX.Nyss.Data.Repositories;
 
 public class EidsrDbReportData
 {
@@ -8,13 +6,13 @@ public class EidsrDbReportData
 
     public string EventDate { get; set; }
 
-    public string Location	{ get; set; }
+    public string Location { get; set; }
 
     public string DateOfOnset { get; set; }
 
     public string PhoneNumber { get; set; }
 
-    public string SuspectedDisease	{ get; set; }
+    public string SuspectedDisease { get; set; }
 
     public string EventType { get; set; }
 

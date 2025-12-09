@@ -51,9 +51,11 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
             };
         }
 
+
         private async Task<ReportByVillageAndDateResponseDto> GroupReportsByVillageAndDay(IQueryable<Report> reports, DateTime startDate, DateTime endDate, int utcOffset)
         {
             var groupedReports = await reports
+                .Where(r => r.ReportedCaseCount > 0) // Filter early for better performance
                 .GroupBy(r => new
                 {
                     Date = r.ReceivedAt.AddHours(utcOffset).Date,
@@ -67,7 +69,7 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                     grouping.Key.VillageId,
                     grouping.Key.VillageName
                 })
-                .Where(g => g.Count > 0)
+                .AsSplitQuery()
                 .ToListAsync();
 
             var reportsGroupedByVillages = groupedReports
@@ -86,26 +88,16 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
 
             var maxVillageCount = _config.View.NumberOfGroupedVillagesInProjectDashboard;
 
-            var truncatedVillagesList = reportsGroupedByVillages
-                .Take(maxVillageCount)
-                .Union(reportsGroupedByVillages
-                    .Skip(maxVillageCount)
-                    .SelectMany(_ => _.Data)
-                    .GroupBy(_ => true)
-                    .Select(g => new
-                    {
-                        Village = new
-                        {
-                            VillageId = 0,
-                            VillageName = "(rest)"
-                        },
-                        Data = g.ToList()
-                    })
-                )
+            var topVillages = reportsGroupedByVillages.Take(maxVillageCount);
+            var restVillages = reportsGroupedByVillages.Skip(maxVillageCount);
+
+            var truncatedVillagesList = topVillages
                 .Select(x => new ReportByVillageAndDateResponseDto.VillageDto
                 {
                     Name = x.Village.VillageName,
-                    Periods = x.Data.GroupBy(v => v.Period).OrderBy(v => v.Key)
+                    Periods = x.Data
+                        .GroupBy(v => v.Period)
+                        .OrderBy(v => v.Key)
                         .Select(g => new PeriodDto
                         {
                             Period = g.Key.ToString("dd/MM/yy", CultureInfo.InvariantCulture),
@@ -114,6 +106,27 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                         .ToList()
                 })
                 .ToList();
+
+            // Add "(rest)" village if there are more villages than the max count
+            if (restVillages.Any())
+            {
+                var restData = restVillages
+                    .SelectMany(v => v.Data)
+                    .GroupBy(d => d.Period)
+                    .OrderBy(g => g.Key)
+                    .Select(g => new PeriodDto
+                    {
+                        Period = g.Key.ToString("dd/MM/yy", CultureInfo.InvariantCulture),
+                        Count = g.Sum(w => w.Count)
+                    })
+                    .ToList();
+
+                truncatedVillagesList.Add(new ReportByVillageAndDateResponseDto.VillageDto
+                {
+                    Name = "(rest)",
+                    Periods = restData
+                });
+            }
 
             var allPeriods = startDate.GetDaysRange(endDate)
                 .Select(i => i.ToString("dd/MM/yy", CultureInfo.InvariantCulture))
@@ -126,9 +139,11 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
             };
         }
 
+
         private async Task<ReportByVillageAndDateResponseDto> GroupReportsByVillageAndWeek(IQueryable<Report> reports, DateTime startDate, DateTime endDate, DayOfWeek epiWeekStartDay)
         {
             var groupedReports = await reports
+                .Where(r => r.ReportedCaseCount > 0) // Filter early for better performance
                 .GroupBy(r => new
                 {
                     r.EpiWeek,
@@ -147,7 +162,6 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                     grouping.Key.VillageId,
                     grouping.Key.VillageName
                 })
-                .Where(g => g.Count > 0)
                 .ToListAsync();
 
             var reportsGroupedByVillages = groupedReports
@@ -166,37 +180,51 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
 
             var maxVillageCount = _config.View.NumberOfGroupedVillagesInProjectDashboard;
 
-            var truncatedVillagesList = reportsGroupedByVillages
-                .Take(maxVillageCount)
-                .Union(reportsGroupedByVillages
-                    .Skip(maxVillageCount)
-                    .SelectMany(_ => _.Data)
-                    .GroupBy(_ => true)
-                    .Select(g => new
-                    {
-                        Village = new
-                        {
-                            VillageId = 0,
-                            VillageName = "(rest)"
-                        },
-                        Data = g.ToList()
-                    })
-                )
+            var topVillages = reportsGroupedByVillages.Take(maxVillageCount);
+            var restVillages = reportsGroupedByVillages.Skip(maxVillageCount);
+
+            var truncatedVillagesList = topVillages
                 .Select(x => new ReportByVillageAndDateResponseDto.VillageDto
                 {
                     Name = x.Village.VillageName,
-                    Periods = x.Data.GroupBy(v => v.Period).OrderBy(g => g.Key.EpiYear).ThenBy(g => g.Key.EpiWeek)
+                    Periods = x.Data
+                        .GroupBy(v => v.Period)
+                        .OrderBy(g => g.Key.EpiYear)
+                        .ThenBy(g => g.Key.EpiWeek)
                         .Select(g => new PeriodDto
                         {
-                            Period = g.Key.EpiWeek.ToString(),
+                            Period = $"{g.Key.EpiYear}/{g.Key.EpiWeek}",
                             Count = g.Sum(w => w.Count)
                         })
                         .ToList()
                 })
                 .ToList();
 
+            // Add "(rest)" village if there are more villages than the max count
+            if (restVillages.Any())
+            {
+                var restData = restVillages
+                    .SelectMany(v => v.Data)
+                    .GroupBy(d => d.Period)
+                    .OrderBy(g => g.Key.EpiYear)
+                    .ThenBy(g => g.Key.EpiWeek)
+                    .Select(g => new PeriodDto
+                    {
+                        Period = $"{g.Key.EpiYear}/{g.Key.EpiWeek}",
+                        Count = g.Sum(w => w.Count)
+                    })
+                    .ToList();
+
+                truncatedVillagesList.Add(new ReportByVillageAndDateResponseDto.VillageDto
+                {
+                    Name = "(rest)",
+                    Periods = restData
+                });
+            }
+
             var allPeriods = _dateTimeProvider.GetEpiDateRange(startDate, endDate, epiWeekStartDay)
-                .Select(day => day.EpiWeek.ToString());
+                .Select(day => $"{day.EpiYear}/{day.EpiWeek}")
+                .ToList();
 
             return new ReportByVillageAndDateResponseDto
             {

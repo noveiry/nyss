@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RX.Nyss.Data;
 using RX.Nyss.Data.Concepts;
-using RX.Nyss.Web.Features.Projects.Access;
 using RX.Nyss.Web.Services.Authorization;
 
 namespace RX.Nyss.Web.Features.Reports.Access
@@ -49,16 +48,6 @@ namespace RX.Nyss.Web.Features.Reports.Access
                     .AnyAsync(uns => uns.User == currentUser && uns.NationalSociety == reportData.NationalSociety);
 
                 return userAndReportInSameNationalSociety;
-            }
-
-            if (currentUser.Role == Role.Supervisor && reportData.Supervisor != currentUser)
-            {
-                return false;
-            }
-
-            if (currentUser.Role == Role.HeadSupervisor && (reportData.Supervisor != currentUser || reportData.Supervisor.HeadSupervisor != currentUser))
-            {
-                return false;
             }
 
             var reportOrganizationId = await _nyssContext.UserNationalSocieties

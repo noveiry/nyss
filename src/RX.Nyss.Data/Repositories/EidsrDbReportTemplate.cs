@@ -6,13 +6,13 @@ public class EidsrDbReportTemplate
 
     public EidsrApiProperties EidsrApiProperties { get; set; }
 
-    public string LocationDataElementId	{ get; set; }
+    public string LocationDataElementId { get; set; }
 
     public string DateOfOnsetDataElementId { get; set; }
 
     public string PhoneNumberDataElementId { get; set; }
 
-    public string SuspectedDiseaseDataElementId	{ get; set; }
+    public string SuspectedDiseaseDataElementId { get; set; }
 
     public string EventTypeDataElementId { get; set; }
 

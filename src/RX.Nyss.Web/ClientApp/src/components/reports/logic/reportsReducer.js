@@ -9,37 +9,99 @@ export function reportsReducer(state = initialState.reports, action) {
       return { ...state, listStale: true, listProjectId: null };
 
     case LOCATION_CHANGE: // cleanup
-      return { ...state, formData: null }
+      return { ...state, formData: null };
 
     case actions.OPEN_CORRECT_REPORTS_LIST.INVOKE:
-      return { ...state, correctReportsListStale: state.correctReportsListStale || action.projectId !== state.listProjectId };
+      return {
+        ...state,
+        correctReportsListStale:
+          state.correctReportsListStale ||
+          action.projectId !== state.listProjectId,
+      };
 
     case actions.OPEN_CORRECT_REPORTS_LIST.SUCCESS:
-      return { ...state, listProjectId: action.projectId, filtersData: action.filtersData };
+      return {
+        ...state,
+        listProjectId: action.projectId,
+        filtersData: action.filtersData,
+      };
 
     case actions.OPEN_INCORRECT_REPORTS_LIST.INVOKE:
-      return { ...state, incorrectReportsListStale: state.incorrectReportsListStale || action.projectId !== state.listProjectId };
+      return {
+        ...state,
+        incorrectReportsListStale:
+          state.incorrectReportsListStale ||
+          action.projectId !== state.listProjectId,
+      };
 
     case actions.OPEN_INCORRECT_REPORTS_LIST.SUCCESS:
-      return { ...state, listProjectId: action.projectId };
+      return {
+        ...state,
+        listProjectId: action.projectId,
+        filtersData: action.filtersData,
+      };
 
     case actions.GET_CORRECT_REPORTS.REQUEST:
-      return { ...state, correctReportsPaginatedListData: state.correctReportsListStale ? null : state.correctReportsPaginatedListData, listFetching: true };
+      return {
+        ...state,
+        correctReportsPaginatedListData: state.correctReportsListStale
+          ? null
+          : state.correctReportsPaginatedListData,
+        listFetching: true,
+      };
 
     case actions.GET_CORRECT_REPORTS.SUCCESS:
-      return { ...state, correctReportsFilters: action.filters, correctReportsSorting: action.sorting, listFetching: false, correctReportsListStale: false, correctReportsPaginatedListData: { data: action.data, page: action.page, rowsPerPage: action.rowsPerPage, totalRows: action.totalRows } };
+      return {
+        ...state,
+        correctReportsFilters: action.filters,
+        correctReportsSorting: action.sorting,
+        listFetching: false,
+        correctReportsListStale: false,
+        correctReportsPaginatedListData: {
+          data: action.data,
+          page: action.page,
+          rowsPerPage: action.rowsPerPage,
+          totalRows: action.totalRows,
+        },
+      };
 
     case actions.GET_CORRECT_REPORTS.FAILURE:
-      return { ...state, listFetching: false, correctReportsPaginatedListData: null };
+      return {
+        ...state,
+        listFetching: false,
+        correctReportsPaginatedListData: null,
+      };
 
     case actions.GET_INCORRECT_REPORTS.REQUEST:
-      return { ...state, incorrectReportsPaginatedListData: state.incorrectReportsListStale ? null : state.incorrectReportsPaginatedListData, listFetching: true };
+      return {
+        ...state,
+        incorrectReportsPaginatedListData: state.incorrectReportsListStale
+          ? null
+          : state.incorrectReportsPaginatedListData,
+        listFetching: true,
+      };
 
     case actions.GET_INCORRECT_REPORTS.SUCCESS:
-      return { ...state, incorrectReportsFilters: action.filters, incorrectReportsSorting: action.sorting, listFetching: false, incorrectReportsListStale: false, incorrectReportsPaginatedListData: { data: action.data, page: action.page, rowsPerPage: action.rowsPerPage, totalRows: action.totalRows } };
+      return {
+        ...state,
+        incorrectReportsFilters: action.filters,
+        incorrectReportsSorting: action.sorting,
+        listFetching: false,
+        incorrectReportsListStale: false,
+        incorrectReportsPaginatedListData: {
+          data: action.data,
+          page: action.page,
+          rowsPerPage: action.rowsPerPage,
+          totalRows: action.totalRows,
+        },
+      };
 
     case actions.GET_INCORRECT_REPORTS.FAILURE:
-      return { ...state, listFetching: false, incorrectReportsPaginatedListData: null };
+      return {
+        ...state,
+        listFetching: false,
+        incorrectReportsPaginatedListData: null,
+      };
 
     case actions.OPEN_REPORT_EDITION.INVOKE:
       return { ...state, formFetching: true, formData: null };
@@ -48,7 +110,15 @@ export function reportsReducer(state = initialState.reports, action) {
       return { ...state, formFetching: true, formData: null };
 
     case actions.OPEN_REPORT_EDITION.SUCCESS:
-      return { ...state, formFetching: false, formData: action.data, editReport: { formHealthRisks: action.healthRisks, formDataCollectors: action.dataCollectors } };
+      return {
+        ...state,
+        formFetching: false,
+        formData: action.data,
+        editReport: {
+          formHealthRisks: action.healthRisks,
+          formDataCollectors: action.dataCollectors,
+        },
+      };
 
     case actions.OPEN_REPORT_EDITION.FAILURE:
       return { ...state, formFetching: false };
@@ -57,7 +127,12 @@ export function reportsReducer(state = initialState.reports, action) {
       return { ...state, formSaving: true };
 
     case actions.EDIT_REPORT.SUCCESS:
-      return { ...state, formSaving: false, correctReportsListStale: true, incorrectReportsListStale: true };
+      return {
+        ...state,
+        formSaving: false,
+        correctReportsListStale: true,
+        incorrectReportsListStale: true,
+      };
 
     case actions.EDIT_REPORT.FAILURE:
       return { ...state, formSaving: false };
@@ -75,7 +150,14 @@ export function reportsReducer(state = initialState.reports, action) {
       return { ...state, formFetching: true };
 
     case actions.OPEN_SEND_REPORT.SUCCESS:
-      return { ...state, formFetching: false, sendReport: { dataCollectors: action.dataCollectors, formData: action.formData } };
+      return {
+        ...state,
+        formFetching: false,
+        sendReport: {
+          dataCollectors: action.dataCollectors,
+          formData: action.formData,
+        },
+      };
 
     case actions.OPEN_SEND_REPORT.FAILURE:
       return { ...state, formFetching: false, message: action.message };
@@ -102,49 +184,47 @@ export function reportsReducer(state = initialState.reports, action) {
       return { ...state, listFetching: true };
 
     case actions.MARK_AS_CORRECTED.FAILURE:
-      return { ...state, listFetching: false };      
+      return { ...state, listFetching: false };
 
     case actions.MARK_AS_CORRECTED.SUCCESS:
-        const itemToCorrect = state
-          .incorrectReportsPaginatedListData
-          .data
-          .find(i => i.id === parseInt(action.reportId));
-        
-        itemToCorrect.isCorrected = true;
-        
-        return {
-          ...state,
-          listFetching: false,
-          incorrectReportsPaginatedListData: {
+      const itemToCorrect = state.incorrectReportsPaginatedListData.data.find(
+        (i) => i.id === parseInt(action.reportId),
+      );
+
+      itemToCorrect.isCorrected = true;
+
+      return {
+        ...state,
+        listFetching: false,
+        incorrectReportsPaginatedListData: {
           ...state.incorrectReportsPaginatedListData,
           itemToCorrect,
         },
       };
 
-      case actions.MARK_AS_NOT_CORRECTED.REQUEST:
-        return { ...state, listFetching: true };
-  
-      case actions.MARK_AS_NOT_CORRECTED.FAILURE:
-        return { ...state, listFetching: false };      
-  
-      case actions.MARK_AS_NOT_CORRECTED.SUCCESS:
-        const itemToNoCorrect = state
-          .incorrectReportsPaginatedListData
-          .data
-          .find(i => i.id === parseInt(action.reportId));
-        
-          itemToNoCorrect.isCorrected = false;
-          
-          return {
-            ...state,
-            listFetching: false,
-            incorrectReportsPaginatedListData: {
-            ...state.incorrectReportsPaginatedListData,
-            itemToNoCorrect,
-          },
-        };       
+    case actions.MARK_AS_NOT_CORRECTED.REQUEST:
+      return { ...state, listFetching: true };
+
+    case actions.MARK_AS_NOT_CORRECTED.FAILURE:
+      return { ...state, listFetching: false };
+
+    case actions.MARK_AS_NOT_CORRECTED.SUCCESS:
+      const itemToNoCorrect = state.incorrectReportsPaginatedListData.data.find(
+        (i) => i.id === parseInt(action.reportId),
+      );
+
+      itemToNoCorrect.isCorrected = false;
+
+      return {
+        ...state,
+        listFetching: false,
+        incorrectReportsPaginatedListData: {
+          ...state.incorrectReportsPaginatedListData,
+          itemToNoCorrect,
+        },
+      };
 
     default:
       return state;
   }
-};
+}

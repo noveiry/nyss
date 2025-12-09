@@ -8,18 +8,18 @@ export const globalCoordinatorsSiteMap = [
     title: () => strings(stringKeys.globalCoordinator.title),
     placeholder: placeholders.generalMenu,
     access: accessMap.globalCoordinators.list,
-    icon: "GlobalCoordinators"
+    icon: "GlobalCoordinators",
   },
   {
     parentPath: "/globalcoordinators",
     path: "/globalcoordinators/add",
     title: () => strings(stringKeys.globalCoordinator.form.creationTitle),
-    access: accessMap.globalCoordinators.add
+    access: accessMap.globalCoordinators.add,
   },
   {
     parentPath: "/globalcoordinators",
     path: "/globalcoordinators/:globalCoordinatorId/edit",
     title: () => strings(stringKeys.globalCoordinator.form.editionTitle),
-    access: accessMap.globalCoordinators.edit
-  }
+    access: accessMap.globalCoordinators.edit,
+  },
 ];

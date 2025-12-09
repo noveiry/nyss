@@ -1,6 +1,6 @@
-import {stringKeys, strings} from "../../../strings";
-import {accessMap} from "../../../authentication/accessMap";
-import {placeholders} from "../../../siteMapPlaceholders";
+import { stringKeys, strings } from "../../../strings";
+import { accessMap } from "../../../authentication/accessMap";
+import { placeholders } from "../../../siteMapPlaceholders";
 
 export const alertEventsSiteMap = [
   {
@@ -9,6 +9,6 @@ export const alertEventsSiteMap = [
     title: () => strings(stringKeys.alerts.eventLog.title),
     placeholder: placeholders.tabMenu,
     access: accessMap.alertEvents.list,
-    middleStepOnly: true
-  }
-]
+    middleStepOnly: true,
+  },
+];

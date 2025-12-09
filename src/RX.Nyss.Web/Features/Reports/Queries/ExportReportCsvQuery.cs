@@ -63,7 +63,7 @@ namespace RX.Nyss.Web.Features.Reports.Queries
                         Village = report.Village,
                         Zone = report.Zone,
                         DataCollectorDisplayName = report.DataCollectorDisplayName,
-                        
+
                         ErrorType = report.ErrorType
 
                     };
@@ -97,12 +97,12 @@ namespace RX.Nyss.Web.Features.Reports.Queries
                         CountMalesAtLeastFive = report.CountMalesAtLeastFive,
                         CountFemalesBelowFive = report.CountFemalesBelowFive,
                         CountFemalesAtLeastFive = report.CountFemalesAtLeastFive,
-                       
+
                         ReferredCount = report.ReferredCount,
                         DeathCount = report.DeathCount,
                         FromOtherVillagesCount = report.FromOtherVillagesCount,
                         DataCollectorDisplayName = report.DataCollectorDisplayName
-                        
+
                     });
 
                     return _excelExportService.ToCsv(dcpReportData, columnLabels);
@@ -126,7 +126,7 @@ namespace RX.Nyss.Web.Features.Reports.Queries
                     CountFemalesBelowFive = report.CountFemalesBelowFive,
                     CountFemalesAtLeastFive = report.CountFemalesAtLeastFive,
                     DataCollectorDisplayName = report.DataCollectorDisplayName
-                   
+
                 });
 
                 return _excelExportService.ToCsv(reportData, columnLabels);

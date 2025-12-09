@@ -157,6 +157,7 @@ namespace RX.Nyss.Web.Features.DataCollectors
                 Regions = regions.Value,
                 Supervisors = await headSupervisorsInProject
                     .Concat(supervisorsInProject)
+                    .AsSplitQuery()
                     .ToListAsync()
             };
 
@@ -194,6 +195,7 @@ namespace RX.Nyss.Web.Features.DataCollectors
             var supervisorsInProject = GetSupervisors(projectId, currentUser, projectData.OrganizationId);
             var supervisors = await headSupervisorsInProject
                 .Concat(supervisorsInProject)
+                .AsSplitQuery()
                 .ToListAsync();
 
             return Success(new DataCollectorFormDataResponse
@@ -264,6 +266,7 @@ namespace RX.Nyss.Web.Features.DataCollectors
                 .OrderBy(dc => dc.Name)
                 .ThenBy(dc => dc.DisplayName)
                 .Page(dataCollectorsFilters.PageNumber, rowsPerPage)
+                .AsSplitQuery()
                 .ToListAsync();
 
             var paginatedDataCollectors = dataCollectors
@@ -316,6 +319,7 @@ namespace RX.Nyss.Web.Features.DataCollectors
                 })
                 .OrderBy(dc => dc.Name)
                 .ThenBy(dc => dc.DisplayName)
+                .AsSplitQuery()
                 .ToListAsync();
 
             return Success(dataCollectors);
@@ -412,6 +416,7 @@ namespace RX.Nyss.Web.Features.DataCollectors
                     CountReportingCorrectly = dc.ValidReports,
                     CountReportingWithErrors = dc.InvalidReports
                 })
+                .AsSplitQuery()
                 .ToListAsync();
 
             locations.ForEach(dc => dc.CountNotReporting = dc.CountReportingCorrectly == 0 && dc.CountReportingWithErrors == 0
@@ -455,6 +460,7 @@ namespace RX.Nyss.Web.Features.DataCollectors
                         ? dc.ReportsInTimeRange.All(r => r.Report != null) ? ReportingStatus.ReportingCorrectly : ReportingStatus.ReportingWithErrors
                         : ReportingStatus.NotReporting
                 })
+                .AsSplitQuery()
                 .ToListAsync();
 
             return Success(result);

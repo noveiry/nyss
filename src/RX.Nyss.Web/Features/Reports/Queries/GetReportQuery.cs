@@ -53,8 +53,6 @@ public class GetReportQuery : IRequest<Result<ReportResponseDto>>
                     CountFemalesAtLeastFive = r.Report.ReportedCase.CountFemalesAtLeastFive,
                     CountUnspecifiedSexAndAge = r.Report.ReportedCase.CountUnspecifiedSexAndAge,
                     ReferredCount = r.Report.DataCollectionPointCase.ReferredCount,
-                    DeathCount = r.Report.DataCollectionPointCase.DeathCount,
-                    FromOtherVillagesCount = r.Report.DataCollectionPointCase.FromOtherVillagesCount,
                     IsActivityReport = r.Report.IsActivityReport(),
                 })
                 .FirstOrDefaultAsync(r => r.Id == query.ReportId, cancellationToken);

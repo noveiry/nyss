@@ -7,13 +7,13 @@ namespace RX.Nyss.Data.Models
     {
         public int Id { get; set; }
 
-        public string Sender { get; set; }
+        public string? Sender { get; set; }
 
-        public string Timestamp { get; set; }
+        public string? Timestamp { get; set; }
 
         public DateTime ReceivedAt { get; set; }
 
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         public int? IncomingMessageId { get; set; }
 
@@ -29,7 +29,7 @@ namespace RX.Nyss.Data.Models
 
         public DateTime? MarkedAsCorrectedAtUtc { get; set; }
 
-        public string MarkedAsCorrectedBy { get; set; }
+        public string? MarkedAsCorrectedBy { get; set; }
 
         public ReportErrorType? ErrorType { get; set; }
 

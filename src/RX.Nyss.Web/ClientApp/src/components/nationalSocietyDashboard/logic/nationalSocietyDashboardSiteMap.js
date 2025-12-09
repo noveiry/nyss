@@ -11,6 +11,6 @@ export const nationalSocietyDashboardSiteMap = [
     access: accessMap.nationalSocieties.showDashboard,
     placeholder: placeholders.leftMenu,
     placeholderIndex: nationalSocietyLeftMenuOrder.dashboard,
-    icon: "Dashboard"
-  }
+    icon: "Dashboard",
+  },
 ];

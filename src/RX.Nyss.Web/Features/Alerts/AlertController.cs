@@ -110,7 +110,7 @@ namespace RX.Nyss.Web.Features.Alerts
         [NeedsRole(Role.Administrator, Role.Manager, Role.Supervisor, Role.HeadSupervisor, Role.TechnicalAdvisor)]
         [NeedsPolicy(Policy.AlertAccess)]
         public async Task<Result> Escalate(int alertId, [FromBody] EscalateAlertRequestDto dto) =>
-            await Sender.Send(new EscalateCommand(alertId,  dto.SendNotification));
+            await Sender.Send(new EscalateCommand(alertId, dto.SendNotification));
 
         /// <summary>
         /// Dismisses the alert
@@ -143,7 +143,7 @@ namespace RX.Nyss.Web.Features.Alerts
         [NeedsPolicy(Policy.ProjectAccess)]
         public async Task<IActionResult> Export(int projectId, [FromBody] AlertListFilterRequestDto alertListFilterRequestDto)
         {
-            var excelSheetBytes =  await Sender.Send(new ExportQuery(projectId, alertListFilterRequestDto));;
+            var excelSheetBytes = await Sender.Send(new ExportQuery(projectId, alertListFilterRequestDto)); ;
             return File(excelSheetBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 

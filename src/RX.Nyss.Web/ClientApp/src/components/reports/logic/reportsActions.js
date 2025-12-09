@@ -42,9 +42,10 @@ export const openIncorrectReportsList = {
     projectId,
   }),
   request: () => ({ type: OPEN_INCORRECT_REPORTS_LIST.REQUEST }),
-  success: (projectId) => ({
+  success: (projectId, filtersData) => ({
     type: OPEN_INCORRECT_REPORTS_LIST.SUCCESS,
     projectId,
+    filtersData,
   }),
   failure: (message) => ({
     type: OPEN_INCORRECT_REPORTS_LIST.FAILURE,
@@ -189,4 +190,9 @@ export const markAsNotCorrected = {
   failure: (message) => ({ type: MARK_AS_NOT_CORRECTED.FAILURE, message }),
 };
 
-export const trackReportExport = (page, fileType, projectId) => ({ type: TRACK_REPORT_EXPORT.INVOKE, page, fileType, projectId });
+export const trackReportExport = (page, fileType, projectId) => ({
+  type: TRACK_REPORT_EXPORT.INVOKE,
+  page,
+  fileType,
+  projectId,
+});

@@ -1,6 +1,8 @@
 import { action } from "../../../utils/actions";
 
-export const OPEN_NATIONAL_SOCIETY_STRUCTURE = action("OPEN_NATIONAL_SOCIETY_STRUCTURE");
+export const OPEN_NATIONAL_SOCIETY_STRUCTURE = action(
+  "OPEN_NATIONAL_SOCIETY_STRUCTURE",
+);
 
 export const CREATE_REGION = action("CREATE_REGION");
 export const EDIT_REGION = action("EDIT_REGION");

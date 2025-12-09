@@ -1,142 +1,194 @@
-import styles from "./AlertsFilters.module.scss";
-import { useState, useEffect } from 'react';
-import { Grid, TextField, MenuItem, Card, CardContent } from '@material-ui/core';
+import {
+  Grid,
+  TextField,
+  MenuItem,
+  Card,
+  CardContent,
+  useMediaQuery,
+  useTheme,
+  Typography,
+  makeStyles,
+} from "@material-ui/core";
 import LocationFilter from "../../common/filters/LocationFilter";
 import { strings, stringKeys } from "../../../strings";
-import {alertStatusFilters} from "../logic/alertsConstants";
-import { renderFilterLabel } from "../../common/filters/logic/locationFilterService";
-import {DatePicker} from "../../forms/DatePicker";
-import {convertToLocalDate, convertToUtc} from "../../../utils/date";
+import { alertStatusFilters } from "../logic/alertsConstants";
+import { DatePicker } from "../../forms/DatePicker";
+import { convertToLocalDate, convertToUtc } from "../../../utils/date";
+import useLocalFilters from "../../common/filters/useLocalFilters";
+import useLocationFilter from "../../common/filters/useLocationFilter";
+import { DrawerFilter } from "../../common/filters/DrawerFilter";
+import { useEffect } from "react";
 
+const useStyles = makeStyles((theme) => ({
+  selectFilterItem: {
+    width: "150px",
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+      maxWidth: "220px",
+    },
+  },
+  filters: {
+    boxShadow: "#fff 0px 5px 5px 5px",
+  },
+}));
 
-export const AlertsFilters = ({ filters, filtersData, onChange, rtl }) => {
-  const [value, setValue] = useState(null);
-  const [locationsFilterLabel, setLocationsFilterLabel] = useState(strings(stringKeys.filters.area.all));
-  const [healthRisks, setHealthRisks] = useState(null);
-  const [locations, setLocations] = useState([]);
+export const AlertsFilters = ({
+  filters,
+  locations,
+  healthRisks,
+  onChange,
+  rtl,
+}) => {
+  const theme = useTheme();
+  const classes = useStyles();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xs"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  //Reducer for local filters state
+  const [localFilters, updateLocalFilters] = useLocalFilters(filters);
 
-
-  useEffect(() => {
-    filters && setValue(filters);
-  }, [filters]);
-
-  useEffect(() => {
-    filtersData && setHealthRisks(filtersData.healthRisks);
-    filtersData && setLocations(filtersData.locations);
-
-  }, [filtersData]);
-
-  useEffect(() => {
-    const label = !value || !locations ? strings(stringKeys.filters.area.all) : renderFilterLabel(value.locations, locations.regions, false);
-    setLocationsFilterLabel(label);
-  }, [value, locations]);
-
-  const updateValue = (change) => {
-    const newValue = {
-      ...value,
-      ...change
-    }
-
-    setValue(newValue);
-    return newValue;
+  //Fetches new data based on changes in filters
+  const handleFiltersChange = (filters) => {
+    onChange(updateLocalFilters(filters));
   };
 
+  useEffect(() => {
+    updateLocalFilters(filters);
+  }, [filters]);
+
+  //Syncs locations from redux store with filter state and sets label for location filter to 'All' or "Region (+n)"
+  //Neccecary if locations are added, edited or removed, to make all filters checked
+  const [locationsFilterLabel] = useLocationFilter(
+    locations,
+    localFilters,
+    updateLocalFilters,
+  );
+
   const handleLocationChange = (newValue) => {
-    onChange(updateValue({ locations: newValue }));
-  }
+    handleFiltersChange({ locations: newValue });
+  };
 
   const handleHealthRiskChange = (event) => {
-    onChange(updateValue({ healthRiskId: event.target.value > 0 ? event.target.value : null }));
-  }
+    handleFiltersChange({
+      healthRiskId: event.target.value > 0 ? event.target.value : null,
+    });
+  };
 
   const handleStatusChange = (event) => {
-    onChange(updateValue({ status: event.target.value }));
-  }
+    handleFiltersChange({ status: event.target.value });
+  };
 
   const handleDateFromChange = (date) =>
-    onChange(updateValue({ startDate: convertToUtc(date) }));
+    handleFiltersChange({ startDate: convertToUtc(date) });
 
   const handleDateToChange = (date) =>
-    onChange(updateValue({ endDate: convertToUtc(date) }));
+    handleFiltersChange({ endDate: convertToUtc(date) });
 
-  if (!value || !healthRisks) {
+  if (!localFilters || !healthRisks) {
     return null;
   }
 
-  return (
-    <Card className={styles.filters}>
-      <CardContent>
-        <Grid container spacing={2}>
-          <Grid item>
-            <DatePicker
-              select
-              label={strings(stringKeys.dashboard.filters.startDate)}
-              value={convertToLocalDate(value.startDate)}
-              onChange={handleDateFromChange}
-              className={styles.filterItem}
-              InputLabelProps={{ shrink: true }}
-            >
-            </DatePicker>
-          </Grid>
-          <Grid item>
-            <DatePicker
-              select
-              label={strings(stringKeys.dashboard.filters.endDate)}
-              value={convertToLocalDate(value.endDate)}
-              onChange={handleDateToChange}
-              className={styles.filterItem}
-              InputLabelProps={{ shrink: true }}
-            >
-            </DatePicker>
-          </Grid>
-          <Grid item>
-            <LocationFilter
-              filteredLocations={value.locations}
-              allLocations={locations}
-              filterLabel={locationsFilterLabel}
-              onChange={handleLocationChange}
-              rtl={rtl}
-            />
-          </Grid>
-
-          <Grid item>
-            <TextField
-              select
-              label={strings(stringKeys.alerts.filters.healthRisks)}
-              onChange={handleHealthRiskChange}
-              value={value.healthRiskId || 0}
-              className={styles.filterItem}
-              InputLabelProps={{ shrink: true }}
-            >
-              <MenuItem value={0}>{strings(stringKeys.alerts.filters.healthRisksAll)}</MenuItem>
-
-              {healthRisks.map(hr => (
-                <MenuItem key={`filter_healthRisk_${hr.id}`} value={hr.id}>
-                  {hr.name}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-
-          <Grid item>
-            <TextField
-              select
-              label={strings(stringKeys.alerts.filters.status)}
-              value={value.status || 'All'}
-              onChange={handleStatusChange}
-              className={styles.filterItem}
-              InputLabelProps={{ shrink: true }}
-            >
-              {Object.values(alertStatusFilters).map(status => (
-                <MenuItem key={`filter_status_${status}`} value={status}>
-                  {strings(stringKeys.alerts.constants.alertStatus[status])}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-
+  const Filter = () => {
+    return (
+      <Grid container spacing={2} direction={"row"} alignItems={"flex-start"}>
+        <Grid item xs={isSmallScreen ? 6 : null}>
+          <DatePicker
+            select
+            label={strings(stringKeys.dashboard.filters.startDate)}
+            value={convertToLocalDate(localFilters.startDate)}
+            onChange={handleDateFromChange}
+            className={classes.selectFilterItem}
+            InputLabelProps={{ shrink: true }}
+          ></DatePicker>
         </Grid>
+        <Grid item xs={isSmallScreen ? 6 : null}>
+          <DatePicker
+            select
+            label={strings(stringKeys.dashboard.filters.endDate)}
+            value={convertToLocalDate(localFilters.endDate)}
+            onChange={handleDateToChange}
+            className={classes.selectFilterItem}
+            InputLabelProps={{ shrink: true }}
+          ></DatePicker>
+        </Grid>
+        <Grid item xs={isSmallScreen ? 6 : null}>
+          <LocationFilter
+            filteredLocations={localFilters.locations}
+            allLocations={locations}
+            filterLabel={locationsFilterLabel}
+            onChange={handleLocationChange}
+            rtl={rtl}
+          />
+        </Grid>
+
+        <Grid item xs={isSmallScreen ? 6 : null}>
+          <TextField
+            select
+            label={strings(stringKeys.alerts.filters.healthRisks)}
+            onChange={handleHealthRiskChange}
+            value={localFilters.healthRiskId || 0}
+            className={classes.selectFilterItem}
+            InputLabelProps={{ shrink: true }}
+            SelectProps={{
+              MenuProps: {
+                PaperProps: {
+                  style: {
+                    maxWidth: "90%",
+                  },
+                },
+              },
+            }}
+          >
+            <MenuItem value={0}>
+              {strings(stringKeys.alerts.filters.healthRisksAll)}
+            </MenuItem>
+
+            {healthRisks.map((hr) => (
+              <MenuItem key={`filter_healthRisk_${hr.id}`} value={hr.id}>
+                <Typography style={{ maxWidth: "100%", whiteSpace: "normal" }}>
+                  {hr.name}
+                </Typography>
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid item xs={isSmallScreen ? 6 : null}>
+          <TextField
+            select
+            label={strings(stringKeys.alerts.filters.status)}
+            value={localFilters.status || "All"}
+            onChange={handleStatusChange}
+            className={classes.selectFilterItem}
+            InputLabelProps={{ shrink: true }}
+          >
+            {Object.values(alertStatusFilters).map((status) => (
+              <MenuItem key={`filter_status_${status}`} value={status}>
+                {strings(stringKeys.alerts.constants.alertStatus[status])}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+      </Grid>
+    );
+  };
+
+  if (isMediumScreen) {
+    return (
+      <Grid container justifyContent="center" style={{ marginBottom: 20 }}>
+        <DrawerFilter
+          title={strings(stringKeys.alerts.title)}
+          children={<Filter />}
+          showResults={handleFiltersChange}
+        />
+      </Grid>
+    );
+  }
+
+  return (
+    <Card className={classes.filters}>
+      <CardContent>
+        <Filter />
       </CardContent>
     </Card>
   );
-}
+};

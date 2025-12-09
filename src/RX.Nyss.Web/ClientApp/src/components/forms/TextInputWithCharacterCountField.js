@@ -4,7 +4,19 @@ import { createFieldComponent } from "./FieldBase";
 import { Typography, Grid, TextField } from "@material-ui/core";
 import { strings, stringKeys } from "../../strings";
 
-const TextInputWithCharacterCount = ({ error, name, label, value, controlProps, multiline, rows, autoWidth, autoFocus, disabled, type }) => {
+const TextInputWithCharacterCount = ({
+  error,
+  name,
+  label,
+  value,
+  controlProps,
+  multiline,
+  rows,
+  autoWidth,
+  autoFocus,
+  disabled,
+  type,
+}) => {
   return (
     <Fragment>
       <TextField
@@ -24,21 +36,26 @@ const TextInputWithCharacterCount = ({ error, name, label, value, controlProps, 
       />
       <Grid container>
         <Grid item xs={6}>
-          <Typography variant="subtitle2">{`${strings(stringKeys.translations.smsCharacters)} ${value.length}`}</Typography>
+          <Typography variant="subtitle2">{`${strings(
+            stringKeys.translations.smsCharacters,
+          )} ${value.length}`}</Typography>
         </Grid>
         <Grid item xs={6}>
-          <Typography variant="subtitle2">{`${strings(stringKeys.translations.smsParts)} ${parseInt(value.length / 160) + 1}`}</Typography>
+          <Typography variant="subtitle2">{`${strings(
+            stringKeys.translations.smsParts,
+          )} ${parseInt(value.length / 160) + 1}`}</Typography>
         </Grid>
       </Grid>
-
     </Fragment>
   );
 };
 
 TextInputWithCharacterCount.propTypes = {
   controlProps: PropTypes.object,
-  name: PropTypes.string
+  name: PropTypes.string,
 };
 
-export const TextInputWithCharacterCountField = createFieldComponent(TextInputWithCharacterCount);
+export const TextInputWithCharacterCountField = createFieldComponent(
+  TextInputWithCharacterCount,
+);
 export default TextInputWithCharacterCountField;

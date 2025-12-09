@@ -55,24 +55,15 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
         private static async Task<IList<ReportByFeaturesAndDateResponseDto>> GroupReportsByFeaturesAndDay(IQueryable<Report> reports, DateTime startDate, DateTime endDate, int utcOffset)
         {
             var groupedReports = await reports
-                .Select(r => new
-                {
-                    Date = r.ReceivedAt.AddHours(utcOffset).Date,
-                    r.ReportedCase.CountFemalesAtLeastFive,
-                    r.ReportedCase.CountFemalesBelowFive,
-                    r.ReportedCase.CountMalesAtLeastFive,
-                    r.ReportedCase.CountMalesBelowFive,
-                    r.ReportedCase.CountUnspecifiedSexAndAge
-                })
-                .GroupBy(r => r.Date)
+                .GroupBy(r => r.ReceivedAt.AddHours(utcOffset).Date)
                 .Select(grouping => new
                 {
                     Period = grouping.Key,
-                    CountFemalesAtLeastFive = (int)grouping.Sum(g => g.CountFemalesAtLeastFive),
-                    CountFemalesBelowFive = (int)grouping.Sum(g => g.CountFemalesBelowFive),
-                    CountMalesAtLeastFive = (int)grouping.Sum(g => g.CountMalesAtLeastFive),
-                    CountMalesBelowFive = (int)grouping.Sum(g => g.CountMalesBelowFive),
-                    CountUnspecifiedSexAndAge = (int)grouping.Sum(g => g.CountUnspecifiedSexAndAge)
+                    CountFemalesAtLeastFive = grouping.Sum(g => g.ReportedCase.CountFemalesAtLeastFive ?? 0),
+                    CountFemalesBelowFive = grouping.Sum(g => g.ReportedCase.CountFemalesBelowFive ?? 0),
+                    CountMalesAtLeastFive = grouping.Sum(g => g.ReportedCase.CountMalesAtLeastFive ?? 0),
+                    CountMalesBelowFive = grouping.Sum(g => g.ReportedCase.CountMalesBelowFive ?? 0),
+                    CountUnspecifiedSexAndAge = grouping.Sum(g => g.ReportedCase.CountUnspecifiedSexAndAge ?? 0)
                 })
                 .ToListAsync();
 
@@ -106,16 +97,6 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
         private async Task<IList<ReportByFeaturesAndDateResponseDto>> GroupReportsByFeaturesAndWeek(IQueryable<Report> reports, DateTime startDate, DateTime endDate, DayOfWeek epiWeekStartDay)
         {
             var groupedReports = await reports
-                .Select(r => new
-                {
-                    r.EpiYear,
-                    r.EpiWeek,
-                    r.ReportedCase.CountFemalesAtLeastFive,
-                    r.ReportedCase.CountFemalesBelowFive,
-                    r.ReportedCase.CountMalesAtLeastFive,
-                    r.ReportedCase.CountMalesBelowFive,
-                    r.ReportedCase.CountUnspecifiedSexAndAge
-                })
                 .GroupBy(r => new
                 {
                     r.EpiYear,
@@ -124,11 +105,11 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                 .Select(grouping => new
                 {
                     EpiPeriod = grouping.Key,
-                    CountFemalesAtLeastFive = (int)grouping.Sum(g => g.CountFemalesAtLeastFive),
-                    CountFemalesBelowFive = (int)grouping.Sum(g => g.CountFemalesBelowFive),
-                    CountMalesAtLeastFive = (int)grouping.Sum(g => g.CountMalesAtLeastFive),
-                    CountMalesBelowFive = (int)grouping.Sum(g => g.CountMalesBelowFive),
-                    CountUnspecifiedSexAndAge = (int)grouping.Sum(g => g.CountUnspecifiedSexAndAge)
+                    CountFemalesAtLeastFive = grouping.Sum(g => g.ReportedCase.CountFemalesAtLeastFive ?? 0),
+                    CountFemalesBelowFive = grouping.Sum(g => g.ReportedCase.CountFemalesBelowFive ?? 0),
+                    CountMalesAtLeastFive = grouping.Sum(g => g.ReportedCase.CountMalesAtLeastFive ?? 0),
+                    CountMalesBelowFive = grouping.Sum(g => g.ReportedCase.CountMalesBelowFive ?? 0),
+                    CountUnspecifiedSexAndAge = grouping.Sum(g => g.ReportedCase.CountUnspecifiedSexAndAge ?? 0)
                 })
                 .ToListAsync();
 
@@ -154,7 +135,7 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                 .ThenBy(r => r.EpiPeriod.EpiWeek)
                 .Select(x => new ReportByFeaturesAndDateResponseDto
                 {
-                    Period = x.EpiPeriod.EpiWeek.ToString(),
+                    Period = $"{x.EpiPeriod.EpiYear}/{x.EpiPeriod.EpiWeek}",
                     CountFemalesAtLeastFive = x.CountFemalesAtLeastFive,
                     CountFemalesBelowFive = x.CountFemalesBelowFive,
                     CountMalesAtLeastFive = x.CountMalesAtLeastFive,

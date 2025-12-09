@@ -17,6 +17,7 @@ namespace RX.Nyss.ReportApi.Features.Common.Extensions
                 ReportErrorType.FormatError => SmsContentKey.ReportError.FormatError,
                 ReportErrorType.HealthRiskNotFound => SmsContentKey.ReportError.HealthRiskNotFound,
                 ReportErrorType.Gateway => null,
+                ReportErrorType.Timestamp => null,
                 ReportErrorType.TooLong => null,
                 _ => SmsContentKey.ReportError.Other
             };

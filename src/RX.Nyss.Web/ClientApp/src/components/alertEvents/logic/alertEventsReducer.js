@@ -1,6 +1,6 @@
 import * as actions from "./alertEventsConstants";
 import { initialState } from "../../../initialState";
-import {setProperty} from "../../../utils/immutable";
+import { setProperty } from "../../../utils/immutable";
 
 export function alertEventsReducer(state = initialState.alertEvents, action) {
   switch (action.type) {
@@ -26,37 +26,64 @@ export function alertEventsReducer(state = initialState.alertEvents, action) {
       return { ...state, formFetching: true };
 
     case actions.OPEN_ALERT_EVENT_CREATION.SUCCESS:
-      return { ...state, formFetching: false, eventTypes: action.alertEventTypes, eventSubtypes: action.alertEventSubtypes };
+      return {
+        ...state,
+        formFetching: false,
+        eventTypes: action.alertEventTypes,
+        eventSubtypes: action.alertEventSubtypes,
+      };
 
     case actions.OPEN_ALERT_EVENT_CREATION.FAILURE:
       return { ...state, formFetching: false, formError: action.message };
 
     case actions.CREATE_ALERT_EVENT.REQUEST:
-      return { ...state, formSaving: true, formError: null};
+      return { ...state, formSaving: true, formError: null };
 
     case actions.CREATE_ALERT_EVENT.SUCCESS:
-      return { ...state, formSaving: false, listStale: true};
+      return { ...state, formSaving: false, listStale: true };
 
     case actions.CREATE_ALERT_EVENT.FAILURE:
-      return { ...state, formSaving: false, formError: action.error};
+      return { ...state, formSaving: false, formError: action.error };
 
     case actions.EDIT_ALERT_EVENT.REQUEST:
-      return { ...state, formSaving: true, formError: null};
+      return { ...state, formSaving: true, formError: null };
 
     case actions.EDIT_ALERT_EVENT.SUCCESS:
-      return { ...state, formSaving: false, listStale: true};
+      return { ...state, formSaving: false, listStale: true };
 
     case actions.EDIT_ALERT_EVENT.FAILURE:
-      return { ...state, formSaving: false, formError: action.error};
+      return { ...state, formSaving: false, formError: action.error };
 
     case actions.DELETE_ALERT_EVENT.REQUEST:
-      return { ...state, logRemoving: setProperty(state.logRemoving, action.alertEventLogId, true) };
+      return {
+        ...state,
+        logRemoving: setProperty(
+          state.logRemoving,
+          action.alertEventLogId,
+          true,
+        ),
+      };
 
     case actions.DELETE_ALERT_EVENT.SUCCESS:
-      return {  ...state, logRemoving: setProperty(state.logRemoving, action.alertEventLogId, undefined), listStale: true };
+      return {
+        ...state,
+        logRemoving: setProperty(
+          state.logRemoving,
+          action.alertEventLogId,
+          undefined,
+        ),
+        listStale: true,
+      };
 
     case actions.DELETE_ALERT_EVENT.FAILURE:
-      return {  ...state, logRemoving: setProperty(state.logRemoving, action.alertEventLogId, undefined) };
+      return {
+        ...state,
+        logRemoving: setProperty(
+          state.logRemoving,
+          action.alertEventLogId,
+          undefined,
+        ),
+      };
 
     default:
       return state;

@@ -1,13 +1,13 @@
-﻿import React from 'react';
-import PropTypes from 'prop-types';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import { useTheme } from '@material-ui/core/styles';
-import { VariableSizeList } from 'react-window';
-import {CircularProgress, Typography} from "@material-ui/core";
-import styles from './VirtualizedAutocomplete.module.scss';
+﻿import React from "react";
+import PropTypes from "prop-types";
+import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import { useTheme } from "@material-ui/core/styles";
+import { VariableSizeList } from "react-window";
+import { CircularProgress, Typography } from "@material-ui/core";
+import styles from "./VirtualizedAutocomplete.module.scss";
 
 const LISTBOX_PADDING = 8; // px
 
@@ -39,51 +39,53 @@ function useResetCache(data) {
 }
 
 // Adapter for react-window
-const ListboxComponent = React.forwardRef(function ListboxComponent(props, ref) {
-  const { children, ...other } = props;
-  const itemData = React.Children.toArray(children);
-  const theme = useTheme();
-  const smUp = useMediaQuery(theme.breakpoints.up('sm'), { noSsr: true });
-  const itemCount = itemData.length;
-  const itemSize = smUp ? 36 : 48;
+const ListboxComponent = React.forwardRef(
+  function ListboxComponent(props, ref) {
+    const { children, ...other } = props;
+    const itemData = React.Children.toArray(children);
+    const theme = useTheme();
+    const smUp = useMediaQuery(theme.breakpoints.up("sm"), { noSsr: true });
+    const itemCount = itemData.length;
+    const itemSize = smUp ? 36 : 48;
 
-  const getChildSize = (child) => {
-    if (React.isValidElement(child) && child.type === ListSubheader) {
-      return 48;
-    }
+    const getChildSize = (child) => {
+      if (React.isValidElement(child) && child.type === ListSubheader) {
+        return 48;
+      }
 
-    return itemSize;
-  };
+      return itemSize;
+    };
 
-  const getHeight = () => {
-    if (itemCount > 8) {
-      return 8 * itemSize;
-    }
-    return itemData.map(getChildSize).reduce((a, b) => a + b, 0);
-  };
+    const getHeight = () => {
+      if (itemCount > 8) {
+        return 8 * itemSize;
+      }
+      return itemData.map(getChildSize).reduce((a, b) => a + b, 0);
+    };
 
-  const gridRef = useResetCache(itemCount);
+    const gridRef = useResetCache(itemCount);
 
-  return (
-    <div ref={ref}>
-      <OuterElementContext.Provider value={other}>
-        <VariableSizeList
-          itemData={itemData}
-          height={getHeight() + 2 * LISTBOX_PADDING}
-          width="100%"
-          ref={gridRef}
-          outerElementType={OuterElementType}
-          innerElementType="div"
-          itemSize={(index) => getChildSize(itemData[index])}
-          overscanCount={5}
-          itemCount={itemCount}
-        >
-          {renderRow}
-        </VariableSizeList>
-      </OuterElementContext.Provider>
-    </div>
-  );
-});
+    return (
+      <div ref={ref}>
+        <OuterElementContext.Provider value={other}>
+          <VariableSizeList
+            itemData={itemData}
+            height={getHeight() + 2 * LISTBOX_PADDING}
+            width="100%"
+            ref={gridRef}
+            outerElementType={OuterElementType}
+            innerElementType="div"
+            itemSize={(index) => getChildSize(itemData[index])}
+            overscanCount={5}
+            itemCount={itemCount}
+          >
+            {renderRow}
+          </VariableSizeList>
+        </OuterElementContext.Provider>
+      </div>
+    );
+  },
+);
 
 ListboxComponent.propTypes = {
   children: PropTypes.node,
@@ -103,15 +105,23 @@ const cleanUpOptions = (array) => {
   }
 
   // sort by first character
-  array.sort(function(a, b) {
+  array.sort(function (a, b) {
     let textA = a.display.toUpperCase();
     let textB = b.display.toUpperCase();
-    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+    return textA < textB ? -1 : textA > textB ? 1 : 0;
   });
-}
+};
 
 // options prop is an array of objects {id, display}
-export const VirtualizedAutocomplete = ({id, label, options, optionsLoading, loadingText, noOptionsText, handleChangeValue}) => {
+export const VirtualizedAutocomplete = ({
+  id,
+  label,
+  options,
+  optionsLoading,
+  loadingText,
+  noOptionsText,
+  handleChangeValue,
+}) => {
   let value = "";
 
   cleanUpOptions(options);
@@ -127,9 +137,9 @@ export const VirtualizedAutocomplete = ({id, label, options, optionsLoading, loa
       renderGroup={renderGroup}
       options={options}
       loading={optionsLoading}
-      loadingText = {loadingText}
-      noOptionsText = {noOptionsText}
-      getOptionLabel={(option) => `${option.display} (${option.id})` }
+      loadingText={loadingText}
+      noOptionsText={noOptionsText}
+      getOptionLabel={(option) => `${option.display} (${option.id})`}
       groupBy={(option) => option.display[0].toUpperCase()}
       size="small"
       renderInput={(params) => (
@@ -141,7 +151,9 @@ export const VirtualizedAutocomplete = ({id, label, options, optionsLoading, loa
             ...params.InputProps,
             endAdornment: (
               <React.Fragment>
-                {optionsLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                {optionsLoading ? (
+                  <CircularProgress color="inherit" size={20} />
+                ) : null}
                 {params.InputProps.endAdornment}
               </React.Fragment>
             ),
@@ -149,9 +161,13 @@ export const VirtualizedAutocomplete = ({id, label, options, optionsLoading, loa
         />
       )}
       onChange={(event, value) => handleChangeValue(value)}
-      renderOption={(option) => <span>
-        <Typography>{option.display} ({option.id}) </Typography>
-      </span>}
+      renderOption={(option) => (
+        <span>
+          <Typography>
+            {option.display} ({option.id}){" "}
+          </Typography>
+        </span>
+      )}
     />
   );
-}
+};

@@ -1,6 +1,4 @@
-import styles from "./LocationFilter.module.scss";
-import { Fragment, useEffect, useState } from "react";
-import { Popover, TextField } from "@material-ui/core";
+import { useEffect, useState } from "react";
 import {
   cascadeSelectDistrict,
   cascadeSelectRegion,
@@ -10,10 +8,11 @@ import {
   mapToSelectedLocations,
   toggleSelectedStatus,
 } from "./logic/locationFilterService";
-import ArrowDropDown from "@material-ui/icons/ArrowDropDown";
 import { stringKeys, strings } from "../../../strings";
 import LocationItem from "./LocationItem";
 import { SelectAll } from "../../common/selectAll/SelectAll";
+import { DropdownPopover } from "./DropdownPopover";
+import { useMount } from "../../../utils/lifecycle";
 
 const LocationFilter = ({
   filteredLocations,
@@ -23,16 +22,20 @@ const LocationFilter = ({
   showUnknownLocation,
   rtl,
 }) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [includeUnknownLocation, setIncludeUnknownLocation] = useState(false);
   const [selectAll, setSelectAll] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  
+  useMount(() => {
+    showUnknownLocation && setIncludeUnknownLocation(true);
+  });
 
   useEffect(() => {
     if (!allLocations) return;
-    setSelectedLocations(mapToSelectedLocations(filteredLocations, allLocations.regions));
-    setIncludeUnknownLocation(!!filteredLocations ? filteredLocations.includeUnknownLocation : showUnknownLocation);
+    setSelectedLocations(
+      mapToSelectedLocations(filteredLocations, allLocations.regions),
+    );
   }, [allLocations, filteredLocations, showUnknownLocation]);
 
   useEffect(() => {
@@ -43,9 +46,9 @@ const LocationFilter = ({
           (d) =>
             !d.selected ||
             d.villages.some(
-              (v) => !v.selected || v.zones.some((z) => !z.selected)
-            )
-        )
+              (v) => !v.selected || v.zones.some((z) => !z.selected),
+            ),
+        ),
     );
     setSelectAll(
       !anyUnselected && (!showUnknownLocation || includeUnknownLocation)
@@ -59,14 +62,14 @@ const LocationFilter = ({
 
     updatedSelectedLocations[index] = cascadeSelectRegion(
       region,
-      !region.selected
+      !region.selected,
     );
     setSelectedLocations(updatedSelectedLocations);
   };
 
   const setSelectedStatusOfDistrict = (id) => {
     const regionIndex = selectedLocations.findIndex((r) =>
-      r.districts.some((d) => d.id === id)
+      r.districts.some((d) => d.id === id),
     );
     const region = selectedLocations[regionIndex];
     const districtIndex = region.districts.findIndex((d) => d.id === id);
@@ -76,18 +79,18 @@ const LocationFilter = ({
     updatedSelectedLocations[regionIndex] = cascadeSelectDistrict(
       region,
       district.id,
-      !district.selected
+      !district.selected,
     );
     setSelectedLocations(updatedSelectedLocations);
   };
 
   const setSelectedStatusOfVillage = (id) => {
     const regionIndex = selectedLocations.findIndex((r) =>
-      r.districts.some((d) => d.villages.some((v) => v.id === id))
+      r.districts.some((d) => d.villages.some((v) => v.id === id)),
     );
     const region = selectedLocations[regionIndex];
     const districtIndex = region.districts.findIndex((d) =>
-      d.villages.some((v) => v.id === id)
+      d.villages.some((v) => v.id === id),
     );
     const district = region.districts[districtIndex];
     const villageIndex = district.villages.findIndex((v) => v.id === id);
@@ -98,7 +101,7 @@ const LocationFilter = ({
       region,
       district.id,
       village.id,
-      !village.selected
+      !village.selected,
     );
     setSelectedLocations(updatedSelectedLocations);
   };
@@ -106,16 +109,16 @@ const LocationFilter = ({
   const setSelectedStatusOfZone = (id) => {
     const regionIndex = selectedLocations.findIndex((r) =>
       r.districts.some((d) =>
-        d.villages.some((v) => v.zones.some((z) => z.id === id))
-      )
+        d.villages.some((v) => v.zones.some((z) => z.id === id)),
+      ),
     );
     const region = selectedLocations[regionIndex];
     const districtIndex = region.districts.findIndex((d) =>
-      d.villages.some((v) => v.zones.some((z) => z.id === id))
+      d.villages.some((v) => v.zones.some((z) => z.id === id)),
     );
     const district = region.districts[districtIndex];
     const villageIndex = district.villages.findIndex((v) =>
-      v.zones.some((z) => z.id === id)
+      v.zones.some((z) => z.id === id),
     );
     const village = district.villages[villageIndex];
     const zoneIndex = village.zones.findIndex((z) => z.id === id);
@@ -127,7 +130,7 @@ const LocationFilter = ({
       district.id,
       village.id,
       zone.id,
-      !zone.selected
+      !zone.selected,
     );
     setSelectedLocations(updatedSelectedLocations);
   };
@@ -158,15 +161,9 @@ const LocationFilter = ({
     setDialogOpen(false);
     const filterValue = extractSelectedValues(
       selectedLocations,
-      includeUnknownLocation
+      includeUnknownLocation,
     );
     onChange(filterValue);
-  };
-
-  const handleDropdownClick = (event) => {
-    event.preventDefault();
-    setAnchorEl(event.currentTarget);
-    setDialogOpen(true);
   };
 
   const toggleSelectAll = () => {
@@ -176,67 +173,42 @@ const LocationFilter = ({
   };
 
   return (
-    <Fragment>
-      <TextField
-        className={styles.field}
-        label={strings(stringKeys.common.location)}
-        InputProps={{
-          readOnly: true,
-          endAdornment: <ArrowDropDown className={styles.arrow} />,
-        }}
-        value={filterLabel}
-        inputProps={{
-          className: styles.clickable,
-        }}
-        onClick={handleDropdownClick}
+    <DropdownPopover
+      label={strings(stringKeys.common.location)}
+      filterLabel={filterLabel}
+      showResults={showResults}
+      rtl={rtl}
+      dialogOpen={dialogOpen}
+      setDialogOpen={setDialogOpen}
+    >
+      <SelectAll
+        isSelectAllEnabled={selectAll}
+        showResults={showResults}
+        toggleSelectAll={toggleSelectAll}
       />
-
-      <Popover
-        open={dialogOpen}
-        onClose={showResults}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: rtl ? "right" : "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: rtl ? "right" : "left",
-        }}
-        PaperProps={{
-          className: styles.filterContainer,
-        }}
-        style={{maxHeight: 400}}
-      >
-        <SelectAll
-          isSelectAllEnabled={selectAll}
-          showResults={showResults}
-          toggleSelectAll={toggleSelectAll}
+      {showUnknownLocation && (
+        <LocationItem
+          type="unknown"
+          data={{
+            name: strings(stringKeys.filters.area.unknown),
+            selected: includeUnknownLocation,
+          }}
+          isVisible
+          onChange={handleChange}
+          rtl={rtl}
         />
-        {showUnknownLocation && (
-          <LocationItem
-            type="unknown"
-            data={{
-              name: strings(stringKeys.filters.area.unknown),
-              selected: includeUnknownLocation,
-            }}
-            isVisible
-            onChange={handleChange}
-            rtl={rtl}
-          />
-        )}
-        {selectedLocations.map((r) => (
-          <LocationItem
-            key={`region_${r.id}`}
-            type="region"
-            data={r}
-            isVisible
-            onChange={handleChange}
-            rtl={rtl}
-          />
-        ))}
-      </Popover>
-    </Fragment>
+      )}
+      {selectedLocations.map((r) => (
+        <LocationItem
+          key={`region_${r.id}`}
+          type="region"
+          data={r}
+          isVisible
+          onChange={handleChange}
+          rtl={rtl}
+        />
+      ))}
+    </DropdownPopover>
   );
 };
 

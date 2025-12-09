@@ -74,47 +74,46 @@ namespace RX.Nyss.Web.Features.NationalSocietyReports
                 .FilterByErrorType(filter.ErrorType);
 
             var result = await baseQuery.Select(r => new NationalSocietyReportListResponseDto
-                {
-                    Id = r.Id,
-                    DateTime = r.ReceivedAt.AddHours(filter.UtcOffset),
-                    HealthRiskName = r.Report.ProjectHealthRisk.HealthRisk.LanguageContents
+            {
+                Id = r.Id,
+                DateTime = r.ReceivedAt.AddHours(filter.UtcOffset),
+                HealthRiskName = r.Report.ProjectHealthRisk.HealthRisk.LanguageContents
                         .Where(lc => lc.ContentLanguage.LanguageCode == userApplicationLanguageCode)
                         .Select(lc => lc.Name)
                         .SingleOrDefault(),
-                    IsValid = r.Report != null,
-                    IsAnonymized = currentUser.Role != Role.Administrator && !r.NationalSociety.NationalSocietyUsers.Any(
+                IsValid = r.Report != null,
+                IsAnonymized = currentUser.Role != Role.Administrator && !r.NationalSociety.NationalSocietyUsers.Any(
                         nsu => nsu.UserId == r.DataCollector.Supervisor.Id && nsu.OrganizationId == currentUserOrganizationId),
-                    OrganizationName = r.NationalSociety.NationalSocietyUsers
+                OrganizationName = r.NationalSociety.NationalSocietyUsers
                         .Where(nsu => nsu.UserId == r.DataCollector.Supervisor.Id)
                         .Select(nsu => nsu.Organization.Name)
                         .FirstOrDefault(),
-                    ProjectName = r.Report != null
+                ProjectName = r.Report != null
                         ? r.Report.ProjectHealthRisk.Project.Name
                         : r.DataCollector.Project.Name,
-                    Region = r.Village.District.Region.Name,
-                    District = r.Village.District.Name,
-                    Village = r.Village.Name,
-                    Zone = r.Zone.Name,
-                    DataCollectorDisplayName = r.DataCollector.DataCollectorType == DataCollectorType.CollectionPoint
+                Region = r.Village.District.Region.Name,
+                District = r.Village.District.Name,
+                Village = r.Village.Name,
+                Zone = r.Zone.Name,
+                DataCollectorDisplayName = r.DataCollector.DataCollectorType == DataCollectorType.CollectionPoint
                         ? r.DataCollector.Name
                         : r.DataCollector.DisplayName,
-                    PhoneNumber = r.Sender,
-                    Message = r.Text,
-                    CountMalesBelowFive = r.Report.ReportedCase.CountMalesBelowFive,
-                    CountMalesAtLeastFive = r.Report.ReportedCase.CountMalesAtLeastFive,
-                    CountFemalesBelowFive = r.Report.ReportedCase.CountFemalesBelowFive,
-                    CountFemalesAtLeastFive = r.Report.ReportedCase.CountFemalesAtLeastFive,
-                    ReferredCount = r.Report.DataCollectionPointCase.ReferredCount,
-                    DeathCount = r.Report.DataCollectionPointCase.DeathCount,
-                    FromOtherVillagesCount = r.Report.DataCollectionPointCase.FromOtherVillagesCount,
-                    Status = r.Report.Status != null
+                PhoneNumber = r.Sender,
+                Message = r.Text,
+                CountMalesBelowFive = r.Report.ReportedCase.CountMalesBelowFive,
+                CountMalesAtLeastFive = r.Report.ReportedCase.CountMalesAtLeastFive,
+                CountFemalesBelowFive = r.Report.ReportedCase.CountFemalesBelowFive,
+                CountFemalesAtLeastFive = r.Report.ReportedCase.CountFemalesAtLeastFive,
+                ReferredCount = r.Report.DataCollectionPointCase.ReferredCount,
+                Status = r.Report.Status != null
                         ? r.Report.Status
                         : ReportStatus.New,
-                    ErrorType = r.ErrorType
-                })
+                ErrorType = r.ErrorType
+            })
                 //ToDo: order base on filter.OrderBy property
                 .OrderBy(r => r.DateTime, filter.SortAscending)
                 .Page(pageNumber, rowsPerPage)
+                .AsSplitQuery()
                 .ToListAsync();
 
             foreach (var report in result)

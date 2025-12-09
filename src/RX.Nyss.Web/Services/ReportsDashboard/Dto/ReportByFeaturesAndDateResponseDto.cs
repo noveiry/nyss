@@ -2,7 +2,7 @@
 {
     public class ReportByFeaturesAndDateResponseDto
     {
-        public string Period { get; set; }
+        public string? Period { get; set; }
 
         public int CountFemalesAtLeastFive { get; set; }
 

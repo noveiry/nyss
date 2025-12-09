@@ -41,25 +41,42 @@ namespace RX.Nyss.Web.Features.NationalSocietyDashboard
 
             var nationalSocietyId = filters.NationalSocietyId.Value;
 
+            // Keep as IQueryable for methods that need it
             var dashboardReports = _reportService.GetDashboardHealthRiskEventReportsQuery(filters);
-            var rawReportsWithDataCollector = _reportService.GetRawReportsWithDataCollectorQuery(filters);
+            var rawReportsWithDataCollectorAndActivityReports = _reportService.GetRawReportsWithDataCollectorAndActivityReportsQuery(filters);
 
-            return await _nyssContext.NationalSocieties
-                .Where(ns => ns.Id == nationalSocietyId)
-                .Select(ns => new
-                {
-                    activeDataCollectorCount = rawReportsWithDataCollector.Select(r => r.DataCollector.Id).Distinct().Count()
-                })
-                .Select(data => new NationalSocietySummaryResponseDto
-                {
-                    TotalReportCount = dashboardReports.Sum(r => r.ReportedCaseCount),
-                    ActiveDataCollectorCount = data.activeDataCollectorCount,
-                    DataCollectionPointSummary = _reportsDashboardSummaryService.DataCollectionPointsSummary(dashboardReports),
-                    AlertsSummary = _reportsDashboardSummaryService.AlertsSummary(filters),
-                    NumberOfDistricts = rawReportsWithDataCollector.Select(r => r.Village.District).Distinct().Count(),
-                    NumberOfVillages = rawReportsWithDataCollector.Select(r => r.Village).Distinct().Count()
-                })
-                .FirstOrDefaultAsync();
+            // Check if national society exists
+            var nationalSocietyExists = await _nyssContext.NationalSocieties
+                .AnyAsync(ns => ns.Id == nationalSocietyId);
+
+            if (!nationalSocietyExists)
+            {
+                return null;
+            }
+
+            // Execute the queries that need to be materialized
+            var dashboardReportsList = await dashboardReports.ToListAsync();
+            var rawReportsList = await rawReportsWithDataCollectorAndActivityReports.ToListAsync();
+
+            // Perform calculations
+            return new NationalSocietySummaryResponseDto
+            {
+                TotalReportCount = dashboardReportsList.Sum(r => r.ReportedCaseCount),
+                ActiveDataCollectorCount = rawReportsList
+                    .Select(r => r.DataCollector.Id)
+                    .Distinct()
+                    .Count(),
+                DataCollectionPointSummary = _reportsDashboardSummaryService.DataCollectionPointsSummary(dashboardReports),
+                AlertsSummary = _reportsDashboardSummaryService.AlertsSummary(filters),
+                NumberOfDistricts = rawReportsList
+                    .Select(r => r.Village.District)
+                    .Distinct()
+                    .Count(),
+                NumberOfVillages = rawReportsList
+                    .Select(r => r.Village)
+                    .Distinct()
+                    .Count()
+            };
         }
     }
 }

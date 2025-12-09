@@ -18,6 +18,7 @@ namespace RX.Nyss.Web.Utils.Extensions
                 ReportErrorType.HealthRiskNotFound => SmsContentKey.ReportError.HealthRiskNotFound,
                 ReportErrorType.Gateway => null,
                 ReportErrorType.TooLong => null,
+                ReportErrorType.Timestamp => SmsContentKey.ReportError.TimestampError,
                 _ => SmsContentKey.ReportError.Other
             };
     }

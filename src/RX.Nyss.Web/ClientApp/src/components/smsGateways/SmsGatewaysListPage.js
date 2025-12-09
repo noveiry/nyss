@@ -1,23 +1,29 @@
-import React, { Fragment } from 'react';
+import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import { connect, useSelector } from "react-redux";
-import * as smsGatewaysActions from './logic/smsGatewaysActions';
-import { withLayout } from '../../utils/layout';
-import Layout from '../layout/Layout';
-import TableActions from '../common/tableActions/TableActions';
-import SmsGatewaysTable from './SmsGatewaysTable';
-import { useMount } from '../../utils/lifecycle';
-import { strings, stringKeys } from '../../strings';
-import { TableActionsButton } from '../common/buttons/tableActionsButton/TableActionsButton';
-import { accessMap } from '../../authentication/accessMap';
-import * as roles from '../../authentication/roles';
+import * as smsGatewaysActions from "./logic/smsGatewaysActions";
+import { withLayout } from "../../utils/layout";
+import Layout from "../layout/Layout";
+import TableActions from "../common/tableActions/TableActions";
+import SmsGatewaysTable from "./SmsGatewaysTable";
+import { useMount } from "../../utils/lifecycle";
+import { strings, stringKeys } from "../../strings";
+import { TableActionsButton } from "../common/buttons/tableActionsButton/TableActionsButton";
+import { accessMap } from "../../authentication/accessMap";
+import * as roles from "../../authentication/roles";
+import { trackPageView } from "../../utils/appInsightsHelper";
 
 const SmsGatewaysListPageComponent = (props) => {
   useMount(() => {
     props.openSmsGatewaysList(props.nationalSocietyId);
+
+    // Track page view
+    trackPageView("SmsGatewaysListPage");
   });
 
-  const useRtlDirection = useSelector(state => state.appData.user.languageCode === 'ar');
+  const useRtlDirection = useSelector(
+    (state) => state.appData.user.languageCode === "ar",
+  );
 
   return (
     <Fragment>
@@ -26,9 +32,14 @@ const SmsGatewaysListPageComponent = (props) => {
           <TableActionsButton
             onClick={() => props.goToCreation(props.nationalSocietyId)}
             roles={accessMap.smsGateways.add}
-            condition={!props.nationalSocietyHasCoordinator || props.callingUserRoles.some(r => r === roles.Coordinator || r === roles.Administrator)}
+            condition={
+              !props.nationalSocietyHasCoordinator ||
+              props.callingUserRoles.some(
+                (r) => r === roles.Coordinator || r === roles.Administrator,
+              )
+            }
             add
-            variant='contained'
+            variant="contained"
             rtl={useRtlDirection}
           >
             {strings(stringKeys.common.buttons.add)}
@@ -44,13 +55,12 @@ const SmsGatewaysListPageComponent = (props) => {
         isRemoving={props.isRemoving}
         remove={props.remove}
         nationalSocietyId={props.nationalSocietyId}
-        nationalSocietyHasCoordinator={props.nationalSocietyHasCoordinator}
         callingUserRoles={props.callingUserRoles}
         rtl={useRtlDirection}
       />
     </Fragment>
   );
-}
+};
 
 SmsGatewaysListPageComponent.propTypes = {
   getSmsGateways: PropTypes.func,
@@ -58,7 +68,7 @@ SmsGatewaysListPageComponent.propTypes = {
   goToEdition: PropTypes.func,
   remove: PropTypes.func,
   isFetching: PropTypes.bool,
-  list: PropTypes.array
+  list: PropTypes.array,
 };
 
 const mapStateToProps = (state, ownProps) => ({
@@ -67,18 +77,20 @@ const mapStateToProps = (state, ownProps) => ({
   isListFetching: state.smsGateways.listFetching,
   isRemoving: state.smsGateways.listRemoving,
   callingUserRoles: state.appData.user.roles,
-  nationalSocietyIsArchived: state.appData.siteMap.parameters.nationalSocietyIsArchived,
-  nationalSocietyHasCoordinator: state.appData.siteMap.parameters.nationalSocietyHasCoordinator
+  nationalSocietyIsArchived:
+    state.appData.siteMap.parameters.nationalSocietyIsArchived,
+  nationalSocietyHasCoordinator:
+    state.appData.siteMap.parameters.nationalSocietyHasCoordinator,
 });
 
 const mapDispatchToProps = {
   openSmsGatewaysList: smsGatewaysActions.openList.invoke,
   goToCreation: smsGatewaysActions.goToCreation,
   goToEdition: smsGatewaysActions.goToEdition,
-  remove: smsGatewaysActions.remove.invoke
+  remove: smsGatewaysActions.remove.invoke,
 };
 
 export const SmsGatewaysListPage = withLayout(
   Layout,
-  connect(mapStateToProps, mapDispatchToProps)(SmsGatewaysListPageComponent)
+  connect(mapStateToProps, mapDispatchToProps)(SmsGatewaysListPageComponent),
 );

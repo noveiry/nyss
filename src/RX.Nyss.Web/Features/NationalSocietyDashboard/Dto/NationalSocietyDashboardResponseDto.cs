@@ -18,5 +18,8 @@ namespace RX.Nyss.Web.Features.NationalSocietyDashboard.Dto
 
         public ReportByFeaturesAndDateResponseDto ReportsGroupedByFeatures { get; set; } = new ReportByFeaturesAndDateResponseDto();
 
+        public ReportHistogramResponseDto KeptReportsInEscalatedAlertsHistogramData { get; set; } =
+            new ReportHistogramResponseDto();
+
     }
 }

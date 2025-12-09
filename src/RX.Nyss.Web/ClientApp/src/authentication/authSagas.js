@@ -21,7 +21,12 @@ export const authSagas = () => [
 function* login({ userName, password, redirectUrl }) {
   yield put(authActions.login.request());
   try {
-    const data = yield call(http.post, "/api/authentication/login", { userName, password }, true);
+    const data = yield call(
+      http.post,
+      "/api/authentication/login",
+      { userName, password },
+      true,
+    );
 
     if (!data.isSuccess) {
       throw new Error(stringKey(data.message.key));
@@ -29,9 +34,15 @@ function* login({ userName, password, redirectUrl }) {
 
     yield put(authActions.login.success());
 
-    const agreementStatusResponse = yield call(http.get, "/api/agreement/listPending");
+    const agreementStatusResponse = yield call(
+      http.get,
+      "/api/agreement/listPending",
+    );
 
-    if (agreementStatusResponse.value.pendingSocieties.length > 0 || agreementStatusResponse.value.staleSocieties.length > 0) {
+    if (
+      agreementStatusResponse.value.pendingSocieties.length > 0 ||
+      agreementStatusResponse.value.staleSocieties.length > 0
+    ) {
       auth.redirectTo("/agreements");
     } else {
       auth.redirectToRoot();
@@ -39,7 +50,7 @@ function* login({ userName, password, redirectUrl }) {
   } catch (error) {
     yield put(authActions.login.failure(error.message));
   }
-};
+}
 
 function* logout() {
   yield put(authActions.logout.request());
@@ -51,43 +62,58 @@ function* logout() {
   } catch (error) {
     yield put(authActions.logout.failure(error.message));
   }
-};
+}
 
 function* verifyEmail({ password, email, token }) {
   yield put(authActions.verifyEmail.request());
   try {
-    yield call(http.post, "/api/userverification/verifyEmailAndAddPassword", { password, email, token }, true);
+    yield call(
+      http.post,
+      "/api/userverification/verifyEmailAndAddPassword",
+      { password, email, token },
+      true,
+    );
     yield put(authActions.verifyEmail.success());
     yield put(authActions.login.invoke(email, password));
   } catch (error) {
     yield put(authActions.verifyEmail.failure(error.message));
   }
-};
+}
 
 function* resetPassword({ email }) {
   yield put(authActions.resetPassword.request());
   try {
-    yield call(http.post, "/api/userverification/resetPassword", { email }, true);
+    yield call(
+      http.post,
+      "/api/userverification/resetPassword",
+      { email },
+      true,
+    );
     yield put(authActions.resetPassword.success());
     yield put(appActions.showMessage(stringKeys.user.resetPassword.emailSent));
   } catch (error) {
     yield put(authActions.resetPassword.failure(error.message));
   }
-};
+}
 
 function* resetPasswordCallback({ password, email, token }) {
   yield put(authActions.resetPasswordCallback.request());
   try {
-    yield call(http.post, "/api/userverification/resetPasswordCallback", { password, email, token }, true);
+    yield call(
+      http.post,
+      "/api/userverification/resetPasswordCallback",
+      { password, email, token },
+      true,
+    );
     yield put(authActions.resetPasswordCallback.success());
     yield put(authActions.login.invoke(email, password));
   } catch (error) {
     yield put(authActions.resetPasswordCallback.failure(error.message));
   }
-};
+}
 
 function* pageFocused() {
-  const user = yield select(state => state.appData.user);
+  const user = yield select((state) => state.appData.user);
   const userId = user ? user.id.toString() : null;
   const storageUserId = localStorage.get(consts.localStorageUserIdKey) || null;
 

@@ -72,7 +72,7 @@ namespace RX.Nyss.Data.Migrations
 
             migrationBuilder.Sql("INSERT INTO [nyss].[AlertNotificationRecipients] ([Role], [Organization], [Email], [ProjectId]) SELECT 'Role not set','Organization not set',[EmailAddress], [ProjectId] FROM [nyss].[EmailAlertRecipients]");
             migrationBuilder.Sql("INSERT INTO [nyss].[AlertNotificationRecipients] ([Role], [Organization], [PhoneNumber], [ProjectId]) SELECT 'Role not set','Organization not set',[PhoneNumber], [ProjectId] FROM [nyss].[SmsAlertRecipients]");
-                        
+
             migrationBuilder.Sql(@"
                 INSERT INTO [nyss].SupervisorUserAlertRecipients (SupervisorId, AlertNotificationRecipientId)
                 SELECT users.Id, alertRecipient.Id FROM [nyss].[Users] as users

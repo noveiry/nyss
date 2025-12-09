@@ -49,7 +49,7 @@ namespace RX.Nyss.ReportApi.Tests.Features.Stats
             // Assert
             var result = new NyssStats
             {
-                ActiveProjects = 2,
+                ActiveProjects = 1,
                 EscalatedAlerts = 1,
                 TotalProjects = 3,
                 ActiveDataCollectors = 1
@@ -111,14 +111,19 @@ namespace RX.Nyss.ReportApi.Tests.Features.Stats
             {
                 new RawReport
                 {
+                    // Should be included
+                    ReceivedAt = DateTime.UtcNow.AddMonths(-1).AddSeconds(1),
                     DataCollector = new DataCollector { Project = new Project { Id = 1 } },
                 },
                 new RawReport
                 {
+                    // Should not be included
+                    ReceivedAt = DateTime.UtcNow.AddMonths(-1).AddSeconds(-1),
                     DataCollector = new DataCollector { Project = new Project { Id = 2 } },
                 },
                 new RawReport
                 {
+                    ReceivedAt = DateTime.UtcNow.AddMonths(-1).AddSeconds(1),
                     DataCollector = new DataCollector { Project = new Project { Id = 3 } },
                 },
             };

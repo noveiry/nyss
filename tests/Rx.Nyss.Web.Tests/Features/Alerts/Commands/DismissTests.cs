@@ -26,12 +26,12 @@ public class DismissTests : AlertFeatureBase
         result.Message.Key.ShouldBe(ResultKey.Alert.DismissAlert.WrongStatus);
     }
 
-            [Fact]
-        public async Task DismissAlert_WhenAlertAcceptedReportAndPendingReportCountIsGreaterOrEqualToThreshold_ShouldReturnError()
-        {
-            Alerts.First().Status = AlertStatus.Open;
+    [Fact]
+    public async Task DismissAlert_WhenAlertAcceptedReportAndPendingReportCountIsGreaterOrEqualToThreshold_ShouldReturnError()
+    {
+        Alerts.First().Status = AlertStatus.Open;
 
-            Alerts.First().AlertReports = new List<AlertReport>
+        Alerts.First().AlertReports = new List<AlertReport>
             {
                 new AlertReport
                 {
@@ -91,21 +91,21 @@ public class DismissTests : AlertFeatureBase
                 }
             };
 
-            Alerts.First().ProjectHealthRisk.AlertRule.CountThreshold = 3;
+        Alerts.First().ProjectHealthRisk.AlertRule.CountThreshold = 3;
 
-            var handler = new DismissCommand.Handler(NyssContext, AlertService, AuthorizationService, DateTimeProvider);
-            var result = await handler.Handle(new DismissCommand(TestData.AlertId), CancellationToken.None);
+        var handler = new DismissCommand.Handler(NyssContext, AlertService, AuthorizationService, DateTimeProvider);
+        var result = await handler.Handle(new DismissCommand(TestData.AlertId), CancellationToken.None);
 
-            result.IsSuccess.ShouldBeFalse();
-            result.Message.Key.ShouldBe(ResultKey.Alert.DismissAlert.PossibleEscalation);
-        }
+        result.IsSuccess.ShouldBeFalse();
+        result.Message.Key.ShouldBe(ResultKey.Alert.DismissAlert.PossibleEscalation);
+    }
 
-        [Fact]
-        public async Task DismissAlert_WhenAlertMeetsTheCriteria_ChangesAlertStatus()
-        {
-            Alerts.First().Status = AlertStatus.Open;
+    [Fact]
+    public async Task DismissAlert_WhenAlertMeetsTheCriteria_ChangesAlertStatus()
+    {
+        Alerts.First().Status = AlertStatus.Open;
 
-            Alerts.First().AlertReports = new List<AlertReport>
+        Alerts.First().AlertReports = new List<AlertReport>
             {
                 new AlertReport
                 {
@@ -117,15 +117,15 @@ public class DismissTests : AlertFeatureBase
                 }
             };
 
-            Alerts.First().ProjectHealthRisk.AlertRule.CountThreshold = 1;
+        Alerts.First().ProjectHealthRisk.AlertRule.CountThreshold = 1;
 
-            var handler = new DismissCommand.Handler(NyssContext, AlertService, AuthorizationService, DateTimeProvider);
-            var result = await handler.Handle(new DismissCommand(TestData.AlertId), CancellationToken.None);
+        var handler = new DismissCommand.Handler(NyssContext, AlertService, AuthorizationService, DateTimeProvider);
+        var result = await handler.Handle(new DismissCommand(TestData.AlertId), CancellationToken.None);
 
-            Alerts.First().Status.ShouldBe(AlertStatus.Dismissed);
-            Alerts.First().DismissedAt.ShouldBe(Now);
-            Alerts.First().DismissedBy.ShouldBe(CurrentUser);
-            await NyssContext.Received(1).SaveChangesAsync();
-            result.IsSuccess.ShouldBeTrue();
-        }
+        Alerts.First().Status.ShouldBe(AlertStatus.Dismissed);
+        Alerts.First().DismissedAt.ShouldBe(Now);
+        Alerts.First().DismissedBy.ShouldBe(CurrentUser);
+        await NyssContext.Received(1).SaveChangesAsync();
+        result.IsSuccess.ShouldBeTrue();
+    }
 }

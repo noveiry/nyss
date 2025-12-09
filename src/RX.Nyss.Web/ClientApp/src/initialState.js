@@ -1,3 +1,5 @@
+import { projectSetupInitialState } from "./components/projectSetup/logic/projectSetupReducer";
+
 export const initialState = {
   appData: {
     appReady: false,
@@ -9,10 +11,10 @@ export const initialState = {
       generalMenu: [],
       tabMenu: [],
       projectTabMenu: [],
-      sideMenu: []
+      sideMenu: [],
     },
     mobile: {
-      sideMenuOpen: false
+      sideMenuOpen: false,
     },
     isSideMenuExpanded: true,
     message: null,
@@ -22,16 +24,16 @@ export const initialState = {
       isSending: false,
       result: "",
     },
-    direction: 'ltr'
+    direction: "ltr",
   },
   requests: {
     isFetching: false,
     errorMessage: null,
-    pending: {}
+    pending: {},
   },
   auth: {
     loginResponse: null,
-    isFetching: false
+    isFetching: false,
   },
   nationalSocieties: {
     listFetching: false,
@@ -48,8 +50,8 @@ export const initialState = {
     dashboard: {
       name: null,
       filters: null,
-      isFetching: false
-    }
+      isFetching: false,
+    },
   },
   nationalSocietyDashboard: {
     name: null,
@@ -58,11 +60,11 @@ export const initialState = {
     isGeneratingPdf: false,
     filtersData: {
       healthRisks: [],
-      organizations: []
+      organizations: [],
     },
     filters: null,
     reportsGroupedByLocationDetails: null,
-    reportsGroupedByLocationDetailsFetching: false
+    reportsGroupedByLocationDetailsFetching: false,
   },
   nationalSocietyStructure: {
     regions: [],
@@ -70,7 +72,7 @@ export const initialState = {
     districts: [],
     villages: [],
     zones: [],
-    expandedItems: []
+    expandedItems: [],
   },
   smsGateways: {
     listNationalSocietyId: null,
@@ -82,33 +84,39 @@ export const initialState = {
     formSaving: false,
     formData: null,
     pinging: {},
-    availableIoTDevices: []
+    availableIoTDevices: [],
   },
   eidsrIntegration: {
     isFetching: true,
     formSaving: false,
     formError: null,
-    data:
-      {
-        id: null,
-        userName: null,
-        apiBaseUrl: null,
-        password: null,
-        trackerProgramId: null,
-        locationDataElementId: null,
-        dateOfOnsetDataElementId: null,
-        phoneNumberDataElementId: null,
-        suspectedDiseaseDataElementId: null,
-        eventTypeDataElementId: null,
-        genderDataElementId: null,
-        reportLocationDataElementId: null,
-        reportHealthRiskDataElementId: null,
-        reportSuspectedDiseaseDataElementId: null,
-        reportStatusDataElementId: null,
-        reportGenderDataElementId: null,
-        reportAgeAtLeastFiveDataElementId: null,
-        reportAgeBelowFiveDataElementId: null
-      },
+    data: {
+      id: null,
+      userName: null,
+      apiBaseUrl: null,
+      password: null,
+      trackerProgramId: null,
+      locationDataElementId: null,
+      dateOfOnsetDataElementId: null,
+      phoneNumberDataElementId: null,
+      suspectedDiseaseDataElementId: null,
+      eventTypeDataElementId: null,
+      genderDataElementId: null,
+      reportLocationDataElementId: null,
+      reportGeoLocationDataElementId: null,
+      reportHealthRiskDataElementId: null,
+      reportSuspectedDiseaseDataElementId: null,
+      reportStatusDataElementId: null,
+      reportGenderDataElementId: null,
+      reportAgeGroupDataElementId: null,
+      reportCaseCountFemaleAgeAtLeastFiveDataElementId: null,
+      reportCaseCountMaleAgeAtLeastFiveDataElementId: null,
+      reportCaseCountFemaleAgeBelowFiveDataElementId: null,
+      reportCaseCountMaleAgeBelowFiveDataElementId: null,
+      reportDateDataElementId: null,
+      reportTimeDataElementId: null,
+      reportDataCollectorIdDataElementId: null
+    },
     organisationUnits: [],
     organisationUnitsIsFetching: false,
     program: null,
@@ -122,7 +130,7 @@ export const initialState = {
     listData: [],
     formFetching: false,
     formSaving: false,
-    formData: null
+    formData: null,
   },
   projectOrganizations: {
     listProjectId: null,
@@ -132,7 +140,7 @@ export const initialState = {
     listData: [],
     formFetching: false,
     formSaving: false,
-    formData: null
+    formData: null,
   },
   projectAlertRecipients: {
     listProjectId: null,
@@ -144,7 +152,7 @@ export const initialState = {
     formSaving: false,
     formData: null,
     recipient: null,
-    countryCode: null
+    countryCode: null,
   },
   projectAlertNotHandledRecipients: {
     projectId: null,
@@ -153,7 +161,7 @@ export const initialState = {
     listData: [],
     users: [],
     formDataFetching: false,
-    saving: false
+    saving: false,
   },
   projects: {
     listFetching: false,
@@ -170,9 +178,10 @@ export const initialState = {
     dashboard: {
       name: null,
       projectSummary: null,
-      isFetching: false
+      isFetching: false,
     },
   },
+  projectDashboard: {},
   projectDashboard: {
     name: null,
     projectSummary: null,
@@ -180,12 +189,12 @@ export const initialState = {
     isGeneratingPdf: false,
     filtersData: {
       organizations: [],
-      healthRisks: []
+      healthRisks: [],
     },
     filters: null,
     reportsGroupedByLocationDetails: null,
     reportsGroupedByLocationDetailsFetching: false,
-    dataCollectionPointsReportData: false
+    dataCollectionPointsReportData: false,
   },
   globalCoordinators: {
     listFetching: false,
@@ -193,7 +202,7 @@ export const initialState = {
     listData: [],
     formFetching: false,
     formSaving: false,
-    formData: null
+    formData: null,
   },
   healthRisks: {
     listFetching: false,
@@ -202,7 +211,7 @@ export const initialState = {
     formFetching: false,
     formSaving: false,
     formError: null,
-    formData: null
+    formData: null,
   },
   suspectedDiseases: {
     listFetching: false,
@@ -211,7 +220,7 @@ export const initialState = {
     formFetching: false,
     formSaving: false,
     formError: null,
-    formData: null
+    formData: null,
   },
   nationalSocietyUsers: {
     listFetching: false,
@@ -235,7 +244,7 @@ export const initialState = {
       data: [],
       page: null,
       rowsPerPage: null,
-      totalRows: null
+      totalRows: null,
     },
     listSelectedAll: false,
     formRegions: [],
@@ -255,36 +264,36 @@ export const initialState = {
       data: [],
       page: null,
       rowsPerPage: null,
-      totalRows: null
+      totalRows: null,
     },
     completeness: null,
     performanceListFetching: false,
     performanceListFilters: {
       projectId: null,
       locations: null,
-      name: '',
+      name: "",
       supervisorId: null,
-      trainingStatus: 'Trained',
-      pageNumber: 1
+      trainingStatus: "Trained",
+      pageNumber: 1,
     },
     filtersData: {
       supervisors: [],
-      nationalSocietyId: null
+      nationalSocietyId: null,
     },
     filters: {
       supervisorId: null,
       locations: null,
       sex: null,
-      trainingStatus: 'All',
-      deployedMode: 'Deployed',
-      name: null,
-      pageNumber: 1
-    }
+      trainingStatus: "All",
+      deployedMode: "Deployed",
+      name: "",
+      pageNumber: 1,
+    },
   },
   agreements: {
     pendingSocieties: [],
     staleSocieties: [],
-    agreementDocuments: []
+    agreementDocuments: [],
   },
   reports: {
     listFetching: false,
@@ -294,16 +303,16 @@ export const initialState = {
     listProjectId: null,
     markingAsError: false,
     filtersData: {
-      healthRisks: []
+      healthRisks: [],
     },
     filters: null,
     sorting: null,
     editReport: {
       formHealthRisks: [],
-      formDataCollectors: []
+      formDataCollectors: [],
     },
     sendReport: {
-      dataCollectors: []
+      dataCollectors: [],
     },
     correctReportsPaginatedListData: null,
     correctReportsFilters: null,
@@ -311,7 +320,7 @@ export const initialState = {
     incorrectReportsPaginatedListData: null,
     incorrectReportsFilters: null,
     incorrectReportsSorting: null,
-    countryCode: null
+    countryCode: null,
   },
   nationalSocietyReports: {
     listFetching: false,
@@ -321,14 +330,14 @@ export const initialState = {
     listNationalSocietyId: null,
     paginatedListData: null,
     filtersData: {
-      healthRisks: []
+      healthRisks: [],
     },
     correctReportsPaginatedListData: null,
     correctReportsFilters: null,
     correctReportsSorting: null,
     incorrectReportsPaginatedListData: null,
     incorrectReportsFilters: null,
-    incorrectReportsSorting: null
+    incorrectReportsSorting: null,
   },
   alerts: {
     listFetching: false,
@@ -341,7 +350,10 @@ export const initialState = {
     notificationPhoneNumbers: [],
     notificationEmails: [],
     filters: null,
-    filtersData: null,
+    filtersData: {
+      healthRisks: null,
+      locations: null,
+    },
     isLoadingValidateEidsr: false,
   },
   alertEvents: {
@@ -353,7 +365,7 @@ export const initialState = {
     logItems: null,
     formFetching: false,
     formSaving: false,
-    formError: null
+    formError: null,
   },
   translations: {
     listFetching: false,
@@ -362,9 +374,12 @@ export const initialState = {
     emailLanguages: [],
     emailTranslations: [],
     smsLanguages: [],
-    smsTranslations: []
+    smsTranslations: [],
   },
   tracking: {
     appInsights: null,
-  }
+  },
+  projectSetup: {
+    ...projectSetupInitialState,
+  },
 };

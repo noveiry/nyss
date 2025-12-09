@@ -1,13 +1,12 @@
-import styles from './NationalSocietyReportsTable.module.scss';
+import styles from "./NationalSocietyReportsTable.module.scss";
 
-import { useState } from 'react';
-import PropTypes from 'prop-types';
-import { TableContainer } from '../common/table/TableContainer';
-import { Loading } from '../common/loading/Loading';
-import { strings, stringKeys } from '../../strings';
-import dayjs from 'dayjs';
-import TablePager from '../common/tablePagination/TablePager';
-import { DateColumnName } from './logic/nationalSocietyReportsConstants';
+import { useState } from "react";
+import PropTypes from "prop-types";
+import { Loading } from "../common/loading/Loading";
+import { strings, stringKeys } from "../../strings";
+import dayjs from "dayjs";
+import TablePager from "../common/tablePagination/TablePager";
+import { DateColumnName } from "./logic/nationalSocietyReportsConstants";
 import {
   Typography,
   Table,
@@ -16,91 +15,121 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-} from '@material-ui/core';
-import { renderDataCollectorDisplayName } from '../reports/logic/reportsService';
+  TableContainer
+} from "@material-ui/core";
+import { renderDataCollectorDisplayName } from "../reports/logic/reportsService";
 
-export const NationalSocietyIncorrectReportsTable = ({ isListFetching, list, page, onChangePage, rowsPerPage, totalRows, sorting, onSort, rtl }) => {
-
+export const NationalSocietyIncorrectReportsTable = ({
+  isListFetching,
+  list,
+  page,
+  onChangePage,
+  rowsPerPage,
+  totalRows,
+  sorting,
+  onSort,
+  rtl,
+}) => {
   const [value, setValue] = useState(sorting);
 
   const updateValue = (change) => {
     const newValue = {
       ...value,
-      ...change
-    }
+      ...change,
+    };
 
     setValue(newValue);
     return newValue;
   };
 
   const dashIfEmpty = (text, ...args) => {
-    return [text || '-', ...args].filter(x => !!x).join(', ');
+    return [text || "-", ...args].filter((x) => !!x).join(", ");
   };
 
-  const createSortHandler = column => event => {
+  const createSortHandler = (column) => (event) => {
     handleSortChange(event, column);
   };
 
   const handleSortChange = (event, column) => {
     const isAscending = sorting.orderBy === column && sorting.sortAscending;
     onSort(updateValue({ orderBy: column, sortAscending: !isAscending }));
-  }
+  };
 
   const handlePageChange = (event, page) => {
     onChangePage(page);
-  }
+  };
 
   return (
-    <TableContainer sticky>
+    <TableContainer>
       {isListFetching && <Loading absolute />}
-      <Table>
+      <Table stickyHeader>
         <TableHead>
           <TableRow>
-            <TableCell style={{ width: '6%', minWidth: '80px' }}>
+            <TableCell style={{ width: "6%", minWidth: "80px" }}>
               <TableSortLabel
                 active={sorting.orderBy === DateColumnName}
-                direction={sorting.sortAscending ? 'asc' : 'desc'}
+                direction={sorting.sortAscending ? "asc" : "desc"}
                 onClick={createSortHandler(DateColumnName)}
               >
                 {strings(stringKeys.reports.list.date)}
               </TableSortLabel>
             </TableCell>
-            <TableCell style={{ width: '40%' }}>{strings(stringKeys.reports.list.errorType)}</TableCell>
-            <TableCell style={{ width: '11%' }}>{strings(stringKeys.reports.list.message)}</TableCell>
-            <TableCell style={{ width: '11%' }}>{strings(stringKeys.reports.list.project)}</TableCell>
-            <TableCell style={{ width: '11%' }}>{strings(stringKeys.reports.list.dataCollectorDisplayName)}</TableCell>
-            <TableCell style={{ width: '14%' }}>{strings(stringKeys.common.location)}</TableCell>
+            <TableCell style={{ width: "40%" }}>
+              {strings(stringKeys.reports.list.errorType)}
+            </TableCell>
+            <TableCell style={{ width: "11%" }}>
+              {strings(stringKeys.reports.list.message)}
+            </TableCell>
+            <TableCell style={{ width: "11%" }}>
+              {strings(stringKeys.reports.list.project)}
+            </TableCell>
+            <TableCell style={{ width: "11%" }}>
+              {strings(stringKeys.reports.list.dataCollectorDisplayName)}
+            </TableCell>
+            <TableCell style={{ width: "14%" }}>
+              {strings(stringKeys.common.location)}
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {list.map(row => (
+          {list.map((row) => (
             <TableRow key={row.id} hover>
               <TableCell>
-                <span>{dayjs(row.dateTime).format('YYYY-MM-DD HH:mm')}</span>
+                <span>{dayjs(row.dateTime).format("YYYY-MM-DD HH:mm")}</span>
               </TableCell>
               <TableCell>
                 {strings(stringKeys.reports.errorTypes[row.errorType])}
               </TableCell>
               <TableCell>
-                <Typography className={styles.message} title={row.message}>{dashIfEmpty(row.message)}</Typography>
+                <Typography className={styles.message} title={row.message}>
+                  {dashIfEmpty(row.message)}
+                </Typography>
               </TableCell>
               <TableCell>{dashIfEmpty(row.projectName)}</TableCell>
               <TableCell className={styles.phoneNumber}>
                 {renderDataCollectorDisplayName(row)}
               </TableCell>
-              <TableCell>{dashIfEmpty(row.region, row.district, row.village, row.zone)}</TableCell>
+              <TableCell>
+                {dashIfEmpty(row.region, row.district, row.village, row.zone)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <TablePager totalRows={totalRows} rowsPerPage={rowsPerPage} page={page} onChangePage={handlePageChange} rtl={rtl} />
+      <TablePager
+        totalRows={totalRows}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onChangePage={handlePageChange}
+        rtl={rtl}
+      />
     </TableContainer>
   );
-}
+};
 
 NationalSocietyIncorrectReportsTable.propTypes = {
   isFetching: PropTypes.bool,
-  list: PropTypes.array
+  list: PropTypes.array,
 };
 
 export default NationalSocietyIncorrectReportsTable;

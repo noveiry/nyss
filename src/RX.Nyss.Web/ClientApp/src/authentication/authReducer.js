@@ -7,13 +7,13 @@ export function authReducer(state = initialState.auth, action) {
       return { ...state, isFetching: true };
 
     case actions.LOGIN.FAILURE:
-      return { ...state, isFetching:false, loginResponse: action.message };
+      return { ...state, isFetching: false, loginResponse: action.message };
 
     case actions.VERIFY_EMAIL.FAILURE:
       return { ...state, verifyEmailErrorMessage: action.message };
 
     case actions.RESET_PASSWORD.REQUEST:
-      return { ...state, resetPasswordErrorMessage: null }
+      return { ...state, resetPasswordErrorMessage: null };
 
     case actions.RESET_PASSWORD.FAILURE:
       return { ...state, resetPasswordErrorMessage: action.message };
@@ -24,4 +24,4 @@ export function authReducer(state = initialState.auth, action) {
     default:
       return state;
   }
-};
+}

@@ -10,12 +10,12 @@ export const eidsrIntegrationSiteMap = [
     placeholder: placeholders.tabMenu,
     access: accessMap.eidsrIntegration.get,
     placeholderIndex: 4,
-    middleStepOnly: true
+    middleStepOnly: true,
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/eidsrintegration",
     path: "/nationalsocieties/:nationalSocietyId/eidsrintegration/edit",
     title: () => strings(stringKeys.eidsrIntegration.form.editionTitle),
-    access: accessMap.eidsrIntegration.edit
+    access: accessMap.eidsrIntegration.edit,
   },
 ];

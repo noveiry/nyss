@@ -5,13 +5,13 @@ namespace RX.Nyss.Web.Features.Common.Dto
 {
     public class AreaDto
     {
-        public IEnumerable<int> RegionIds { get; set; }
+        public IEnumerable<int> RegionIds { get; set; } = new List<int>();
 
-        public IEnumerable<int> DistrictIds { get; set; }
+        public IEnumerable<int> DistrictIds { get; set; } = new List<int>();
 
-        public IEnumerable<int> VillageIds { get; set; }
+        public IEnumerable<int> VillageIds { get; set; } = new List<int>();
 
-        public IEnumerable<int> ZoneIds { get; set; }
+        public IEnumerable<int> ZoneIds { get; set; } = new List<int>();
 
         public bool IncludeUnknownLocation { get; set; }
 

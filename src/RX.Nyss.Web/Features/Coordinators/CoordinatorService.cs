@@ -118,7 +118,7 @@ namespace RX.Nyss.Web.Features.Coordinators
                     user.PhoneNumber = editCoordinatorRequestDto.PhoneNumber;
                     user.Organization = editCoordinatorRequestDto.Organization;
                     user.AdditionalPhoneNumber = editCoordinatorRequestDto.AdditionalPhoneNumber;
-                    user.IsFirstLogin = oldEmail != editCoordinatorRequestDto.Email ?  true : false;
+                    user.IsFirstLogin = oldEmail != editCoordinatorRequestDto.Email ? true : false;
                     var organization = await _dataContext.Organizations.FindAsync(editCoordinatorRequestDto.OrganizationId);
 
                     var userLink = await _dataContext.UserNationalSocieties

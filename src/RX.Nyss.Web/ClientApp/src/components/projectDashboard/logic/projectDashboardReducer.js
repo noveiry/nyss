@@ -2,19 +2,30 @@ import * as actions from "./projectDashboardConstants";
 import { initialState } from "../../../initialState";
 import { LOCATION_CHANGE } from "connected-react-router";
 
-export function projectDashboardReducer(state = initialState.projectDashboard, action) {
+export function projectDashboardReducer(
+  state = initialState.projectDashboard,
+  action,
+) {
   switch (action.type) {
     case LOCATION_CHANGE: // cleanup
-      return { ...state, formData: null }
+      return { ...state, formData: null };
 
     case actions.OPEN_PROJECT_DASHBOARD.INVOKE:
-      return { ...state, filters: action.projectId === state.projectId ? state.filters : null };
+      return {
+        ...state,
+        filters: action.projectId === state.projectId ? state.filters : null,
+      };
 
     case actions.OPEN_PROJECT_DASHBOARD.REQUEST:
       return { ...state, isFetching: true };
 
     case actions.OPEN_PROJECT_DASHBOARD.SUCCESS:
-      return { ...state, projectId: action.projectId, filtersData: action.filtersData, isFetching: false };
+      return {
+        ...state,
+        projectId: action.projectId,
+        filtersData: action.filtersData,
+        isFetching: false,
+      };
 
     case actions.GENERATE_PDF.REQUEST:
       return { ...state, isGeneratingPdf: true };
@@ -35,23 +46,34 @@ export function projectDashboardReducer(state = initialState.projectDashboard, a
         name: action.name,
         filters: action.filters,
         projectSummary: action.summary,
-        reportsGroupedByHealthRiskAndDate: action.reportsGroupedByHealthRiskAndDate,
+        reportsGroupedByHealthRiskAndDate:
+          action.reportsGroupedByHealthRiskAndDate,
         reportsGroupedByFeaturesAndDate: action.reportsGroupedByFeaturesAndDate,
         reportsGroupedByVillageAndDate: action.reportsGroupedByVillageAndDate,
         reportsGroupedByFeatures: action.reportsGroupedByFeatures,
         reportsGroupedByLocation: action.reportsGroupedByLocation,
         dataCollectionPointsReportData: action.dataCollectionPointReports,
-        isFetching: false
+        keptReportsInEscalatedAlertsHistogramData:
+          action.keptReportsInEscalatedAlertsHistogramData,
+        isFetching: false,
       };
 
     case actions.GET_PROJECT_DASHBOARD_DATA.FAILURE:
       return { ...state, isFetching: false };
 
     case actions.GET_PROJECT_DASHBOARD_REPORT_HEALTH_RISKS.REQUEST:
-      return { ...state, reportsGroupedByLocationDetails: null, reportsGroupedByLocationDetailsFetching: true };
+      return {
+        ...state,
+        reportsGroupedByLocationDetails: null,
+        reportsGroupedByLocationDetailsFetching: true,
+      };
 
     case actions.GET_PROJECT_DASHBOARD_REPORT_HEALTH_RISKS.SUCCESS:
-      return { ...state, reportsGroupedByLocationDetails: action.data, reportsGroupedByLocationDetailsFetching: false };
+      return {
+        ...state,
+        reportsGroupedByLocationDetails: action.data,
+        reportsGroupedByLocationDetailsFetching: false,
+      };
 
     case actions.GET_PROJECT_DASHBOARD_REPORT_HEALTH_RISKS.FAILURE:
       return { ...state, reportsGroupedByLocationDetailsFetching: false };
@@ -59,4 +81,4 @@ export function projectDashboardReducer(state = initialState.projectDashboard, a
     default:
       return state;
   }
-};
+}

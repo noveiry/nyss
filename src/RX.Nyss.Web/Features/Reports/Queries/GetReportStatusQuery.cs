@@ -5,7 +5,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RX.Nyss.Common.Services.StringsResources;
 using RX.Nyss.Data;
-using RX.Nyss.Data.Concepts;
 using RX.Nyss.Web.Features.Reports.Dto;
 using RX.Nyss.Web.Services.Authorization;
 using RX.Nyss.Web.Utils.Extensions;

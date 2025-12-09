@@ -1,4 +1,4 @@
-import styles from './DisplayField.module.scss';
+import styles from "./DisplayField.module.scss";
 import React from "react";
 
 export const DisplayField = ({ label, value, children }) => {

@@ -4,7 +4,14 @@ import { CircularProgress } from "@material-ui/core";
 import ConfirmationAction from "../confirmationAction/ConfirmationAction";
 import { withAccessRestriction } from "../hasAccess/HasAccess";
 
-const TableRowActionComponent = ({ icon, onClick, title, isFetching, confirmationText, directionRtl }) => {
+const TableRowActionComponent = ({
+  icon,
+  onClick,
+  title,
+  isFetching,
+  confirmationText,
+  directionRtl,
+}) => {
   const handleClick = (e) => {
     e.stopPropagation();
     onClick();
@@ -12,25 +19,37 @@ const TableRowActionComponent = ({ icon, onClick, title, isFetching, confirmatio
 
   if (confirmationText) {
     return (
-      <div className={`${styles.tableRowAction} ${(isFetching ? styles.fetching : "")} ${directionRtl ? styles.rtl : ""}`} title={title}>
-        <ConfirmationAction confirmationText={confirmationText} onClick={onClick}>
-          {isFetching && <CircularProgress size={20} className={styles.loader} />}
-          <div className={styles.icon}>
-            {icon}
-          </div>
+      <div
+        className={`${styles.tableRowAction} ${
+          isFetching ? styles.fetching : ""
+        } ${directionRtl ? styles.rtl : ""}`}
+        title={title}
+      >
+        <ConfirmationAction
+          confirmationText={confirmationText}
+          onClick={onClick}
+        >
+          {isFetching && (
+            <CircularProgress size={20} className={styles.loader} />
+          )}
+          <div className={styles.icon}>{icon}</div>
         </ConfirmationAction>
       </div>
     );
   }
 
   return (
-    <div className={`${styles.tableRowAction} ${(isFetching ? styles.fetching : "")} ${directionRtl ? styles.rtl : ""}`} title={title} onClick={handleClick}>
+    <div
+      className={`${styles.tableRowAction} ${
+        isFetching ? styles.fetching : ""
+      } ${directionRtl ? styles.rtl : ""}`}
+      title={title}
+      onClick={handleClick}
+    >
       {isFetching && <CircularProgress size={20} className={styles.loader} />}
-      <div className={styles.icon}>
-        {icon}
-      </div>
+      <div className={styles.icon}>{icon}</div>
     </div>
   );
-}
+};
 
-export const TableRowAction = withAccessRestriction(TableRowActionComponent)
+export const TableRowAction = withAccessRestriction(TableRowActionComponent);

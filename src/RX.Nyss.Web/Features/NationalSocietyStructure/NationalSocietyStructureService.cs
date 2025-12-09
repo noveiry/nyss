@@ -70,6 +70,7 @@ namespace RX.Nyss.Web.Features.NationalSocietyStructure
                             })
                         })
                     })
+                    .AsSplitQuery()
                     .ToListAsync()
             };
 
@@ -358,6 +359,7 @@ namespace RX.Nyss.Web.Features.NationalSocietyStructure
                     Id = n.Id,
                     Name = n.Name
                 })
+                .AsSplitQuery()
                 .ToListAsync();
             return Success(regions);
         }
@@ -371,6 +373,7 @@ namespace RX.Nyss.Web.Features.NationalSocietyStructure
                     Id = n.Id,
                     Name = n.Name
                 })
+                .AsSplitQuery()
                 .ToListAsync();
             return Success(regions);
         }
@@ -384,6 +387,7 @@ namespace RX.Nyss.Web.Features.NationalSocietyStructure
                     Id = n.Id,
                     Name = n.Name
                 })
+                .AsSplitQuery()
                 .ToListAsync();
             return Success(regions);
         }
@@ -397,6 +401,7 @@ namespace RX.Nyss.Web.Features.NationalSocietyStructure
                     Id = n.Id,
                     Name = n.Name
                 })
+                .AsSplitQuery()
                 .ToListAsync();
             return Success(regions);
         }

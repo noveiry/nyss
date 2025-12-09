@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using RX.Nyss.Common.Utils;
 using RX.Nyss.Data.Models;
 using RX.Nyss.Web.Features.Common.Dto;
@@ -69,7 +68,7 @@ namespace RX.Nyss.Web.Features.DataCollectors
                     ReportsInTimeRange = dc.RawReports.Where(r => r.IsTraining.HasValue && r.IsTraining.Value == IsDataCollectorInTraining(dataCollectorTrainingStatus))
                         .Select(r => new RawReportData
                         {
-                            IsValid =  r.ReportId.HasValue,
+                            IsValid = r.ReportId.HasValue,
                             ReceivedAt = r.ReceivedAt,
                             EpiDate = _dateTimeProvider.GetEpiDate(r.ReceivedAt, r.DataCollector.Project.NationalSociety.EpiWeekStartDay)
                         }),
@@ -152,7 +151,7 @@ namespace RX.Nyss.Web.Features.DataCollectors
 
         private ReportingStatus GetDataCollectorStatus(IGrouping<EpiDate, RawReportData> grouping) =>
             grouping != null && grouping.Any()
-                ? grouping.All(x => x.IsValid ) ? ReportingStatus.ReportingCorrectly : ReportingStatus.ReportingWithErrors
+                ? grouping.All(x => x.IsValid) ? ReportingStatus.ReportingCorrectly : ReportingStatus.ReportingWithErrors
                 : ReportingStatus.NotReporting;
 
         private bool DataCollectorExistedInWeek(EpiDate date, DateTime dataCollectorCreated, DayOfWeek epiWeekStartDay)

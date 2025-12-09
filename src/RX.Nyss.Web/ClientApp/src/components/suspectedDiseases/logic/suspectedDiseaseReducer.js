@@ -1,12 +1,15 @@
 import * as actions from "./suspectedDiseaseConstants";
 import { initialState } from "../../../initialState";
 import { setProperty } from "../../../utils/immutable";
-import { LOCATION_CHANGE } from 'connected-react-router'
+import { LOCATION_CHANGE } from "connected-react-router";
 
-export function suspectedDiseaseReducer(state = initialState.suspectedDiseases, action) {
+export function suspectedDiseaseReducer(
+  state = initialState.suspectedDiseases,
+  action,
+) {
   switch (action.type) {
-    case LOCATION_CHANGE: 
-      return { ...state, formData: null, formError: null }
+    case LOCATION_CHANGE:
+      return { ...state, formData: null, formError: null };
 
     case actions.GET_SUSPECTED_DISEASE.REQUEST:
       return { ...state, listFetching: true, listData: [] };
@@ -48,13 +51,19 @@ export function suspectedDiseaseReducer(state = initialState.suspectedDiseases, 
       return { ...state, formSaving: false, formError: action.error };
 
     case actions.REMOVE_SUSPECTED_DISEASE.REQUEST:
-      return { ...state, listRemoving: setProperty(state.listRemoving, action.id, true) };
+      return {
+        ...state,
+        listRemoving: setProperty(state.listRemoving, action.id, true),
+      };
 
     case actions.REMOVE_SUSPECTED_DISEASE.SUCCESS:
     case actions.REMOVE_SUSPECTED_DISEASE.FAILURE:
-      return { ...state, listRemoving: setProperty(state.listRemoving, action.id, undefined) };
+      return {
+        ...state,
+        listRemoving: setProperty(state.listRemoving, action.id, undefined),
+      };
 
     default:
       return state;
   }
-};
+}

@@ -13,6 +13,7 @@ using RX.Nyss.Data.Models;
 using RX.Nyss.Web.Features.Organizations;
 using RX.Nyss.Web.Features.TechnicalAdvisors;
 using RX.Nyss.Web.Features.TechnicalAdvisors.Dto;
+using RX.Nyss.Web.Features.Users;
 using RX.Nyss.Web.Services;
 using RX.Nyss.Web.Services.Authorization;
 using Shouldly;
@@ -31,6 +32,7 @@ namespace RX.Nyss.Web.Tests.Features.TechnicalAdvisors
         private readonly IDeleteUserService _deleteUserService;
         private readonly IAuthorizationService _authorizationService;
         private readonly IOrganizationService _organizationService;
+        private readonly IUserService _userService;
 
         public TechnicalAdvisorServiceTests()
         {
@@ -40,6 +42,7 @@ namespace RX.Nyss.Web.Tests.Features.TechnicalAdvisors
             _verificationEmailServiceMock = Substitute.For<IVerificationEmailService>();
             _nationalSocietyUserService = Substitute.For<INationalSocietyUserService>();
             _deleteUserService = Substitute.For<IDeleteUserService>();
+            _userService = Substitute.For<IUserService>();
 
             var applicationLanguages = new List<ApplicationLanguage>();
             var applicationLanguagesDbSet = applicationLanguages.AsQueryable().BuildMockDbSet();
@@ -48,7 +51,7 @@ namespace RX.Nyss.Web.Tests.Features.TechnicalAdvisors
             _authorizationService = Substitute.For<IAuthorizationService>();
             _organizationService = Substitute.For<IOrganizationService>();
             _technicalAdvisorService = new TechnicalAdvisorService(_identityUserRegistrationServiceMock, _nationalSocietyUserService, _nyssContext, _loggerAdapter, _verificationEmailServiceMock,
-                _deleteUserService, _authorizationService, _organizationService);
+                _deleteUserService, _authorizationService, _organizationService, _userService);
 
             _identityUserRegistrationServiceMock.CreateIdentityUser(Arg.Any<string>(), Arg.Any<Role>()).Returns(ci => new IdentityUser
             {
@@ -484,7 +487,7 @@ namespace RX.Nyss.Web.Tests.Features.TechnicalAdvisors
             await _technicalAdvisorService.Edit(123, editRequest);
 
             var editedUser = _nyssContext.Users.Single(u => u.Id == 123) as TechnicalAdvisorUser;
-            editedUser.EmailAddress= existingUserEmail;
+            editedUser.EmailAddress = existingUserEmail;
 
             editedUser.ShouldNotBeNull();
             editedUser.Name.ShouldBe(editRequest.Name);

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
@@ -80,7 +79,7 @@ public class ValidateEidsrReportsQuery : IRequest<Result<ValidateEidsrReportsRes
                     }
                 }
             }
-            catch (Exception e)
+            catch
             {
                 res.IsEidsrApiConnectionRunning = false;
                 res.IsIntegrationConfigValid = false;

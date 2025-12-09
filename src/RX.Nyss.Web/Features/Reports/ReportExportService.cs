@@ -8,9 +8,9 @@ using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Data;
 using RX.Nyss.Data.Concepts;
 using RX.Nyss.Data.Models;
+using RX.Nyss.Web.Features.Common.Dto;
 using RX.Nyss.Web.Features.Common.Extensions;
 using RX.Nyss.Web.Features.Reports.Dto;
-using RX.Nyss.Web.Features.Common.Dto;
 using RX.Nyss.Web.Features.Users;
 using RX.Nyss.Web.Services;
 using RX.Nyss.Web.Services.Authorization;
@@ -108,8 +108,6 @@ namespace RX.Nyss.Web.Features.Reports
                 CountFemalesBelowFive = r.Report.ReportedCase.CountFemalesBelowFive,
                 CountFemalesAtLeastFive = r.Report.ReportedCase.CountFemalesAtLeastFive,
                 ReferredCount = r.Report.DataCollectionPointCase.ReferredCount,
-                DeathCount = r.Report.DataCollectionPointCase.DeathCount,
-                FromOtherVillagesCount = r.Report.DataCollectionPointCase.FromOtherVillagesCount,
                 EpiWeek = r.Report != null ? r.Report.EpiWeek : _dateTimeProvider.GetEpiWeek(r.ReceivedAt, epiWeekStartDay),
                 EpiYear = r.Report != null ? r.Report.EpiYear : _dateTimeProvider.GetEpiDate(r.ReceivedAt, epiWeekStartDay).EpiYear,
                 ReportAlertId = r.Report.ReportAlerts
@@ -117,6 +115,7 @@ namespace RX.Nyss.Web.Features.Reports
                         .Select(ar => ar.AlertId)
                         .FirstOrDefault(),
                 ErrorType = GetReportErrorTypeString(strings, r.ErrorType),
+                Message = r.Text,
             })
                 //ToDo: order base on filter.OrderBy property
                 .OrderBy(r => r.DateTime, filter.SortAscending);
@@ -154,6 +153,7 @@ namespace RX.Nyss.Web.Features.Reports
                 ReportErrorType.GenderAndAgeNonHumanHealthRisk => strings[ResultKey.Report.ErrorType.GenderAndAgeNonHumanHealthRisk],
                 ReportErrorType.TooLong => strings[ResultKey.Report.ErrorType.TooLong],
                 ReportErrorType.Gateway => strings[ResultKey.Report.ErrorType.Gateway],
+                ReportErrorType.Timestamp => strings[ResultKey.Report.ErrorType.Timestamp],
                 ReportErrorType.Other => strings[ResultKey.Report.ErrorType.Other],
                 _ => null
             };
@@ -176,6 +176,7 @@ namespace RX.Nyss.Web.Features.Reports
                     .FilterByHealthRisks(filter.HealthRisks)
                     .FilterByErrorType(filter.ErrorType)
                     .FilterByArea(filter.Locations)
+                    .FilterByDate(filter.StartDate, filter.EndDate.AddDays(1))
                     .FilterByReportStatus(filter.ReportStatus)
                     .FilterByTrainingMode(filter.TrainingStatus);
             }
@@ -188,6 +189,7 @@ namespace RX.Nyss.Web.Features.Reports
                 .FilterByHealthRisks(filter.HealthRisks)
                 .FilterByDataCollectorType(filter.DataCollectorType)
                 .FilterByArea(filter.Locations)
+                .FilterByDate(filter.StartDate, filter.EndDate.AddDays(1))
                 .FilterByErrorType(filter.ErrorType)
                 .FilterByReportStatus(filter.ReportStatus)
                 .FilterByTrainingMode(filter.TrainingStatus);

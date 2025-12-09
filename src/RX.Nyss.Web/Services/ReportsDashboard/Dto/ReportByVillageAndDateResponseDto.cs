@@ -10,9 +10,9 @@ namespace RX.Nyss.Web.Services.ReportsDashboard.Dto
 
         public class VillageDto
         {
-            public string Name { get; set; }
+            public string? Name { get; set; }
 
-            public IEnumerable<PeriodDto> Periods { get; set; }
+            public IEnumerable<PeriodDto>? Periods { get; set; }
         }
     }
 }

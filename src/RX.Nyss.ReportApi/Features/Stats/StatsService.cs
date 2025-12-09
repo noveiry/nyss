@@ -59,6 +59,22 @@ namespace RX.Nyss.ReportApi.Features.Stats
                 .Where(a => a.EscalatedAt.HasValue)
                 .CountAsync();
 
+            var activeProjectIds = await _nyssContext.RawReports
+                .AsNoTracking()
+                // Only include reports received within the last month
+                .Where(rr => rr.ReceivedAt > DateTime.UtcNow.AddMonths(-1))
+                .Include(r => r.DataCollector)
+                .ThenInclude(dc => dc.Project)
+                .Where(r => r.DataCollector != null)
+                .Select(r => r.DataCollector.Project.Id)
+                .ToListAsync();
+
+            var activeProjects = (await _nyssContext.Projects
+                .AsNoTracking()
+                .Where(p => p.State == ProjectState.Open)
+                .Where(p => !_nationalSocietiesToExclude.Contains(p.NationalSocietyId) && activeProjectIds.Contains(p.Id))
+                .ToListAsync()).Count;
+
             var withReportsProjectIds = await _nyssContext.RawReports
                 .AsNoTracking()
                 .Include(r => r.DataCollector)
@@ -67,18 +83,17 @@ namespace RX.Nyss.ReportApi.Features.Stats
                 .Select(r => r.DataCollector.Project.Id)
                 .ToListAsync();
 
-            var allProjects = await _nyssContext.Projects
+            var totalProjects = (await _nyssContext.Projects
                 .AsNoTracking()
                 .Where(p => !_nationalSocietiesToExclude.Contains(p.NationalSocietyId) && withReportsProjectIds.Contains(p.Id))
-                .Select(p => p.State)
-                .ToListAsync();
+                .ToListAsync()).Count;
 
             var stats = new NyssStats
             {
                 EscalatedAlerts = escalatedAlerts,
                 ActiveDataCollectors = activeDataCollectors,
-                ActiveProjects = allProjects.Count(state => state == ProjectState.Open),
-                TotalProjects = allProjects.Count,
+                ActiveProjects = activeProjects,
+                TotalProjects = totalProjects,
             };
 
             await _dataBlobService.StorePublicStats(JsonConvert.SerializeObject(stats));

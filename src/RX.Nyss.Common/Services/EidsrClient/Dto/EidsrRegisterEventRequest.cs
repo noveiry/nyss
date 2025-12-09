@@ -17,9 +17,11 @@ public class EidsrRegisterEventRequest
         EidsrRegisterEventRequestTemplate template,
         EidsrRegisterEventRequestData data)
     {
-        var res = new EidsrRegisterEventRequest {
+        var res = new EidsrRegisterEventRequest
+        {
             EidsrApiProperties = template.EidsrApiProperties,
-            EidsrRegisterEventRequestBody = new EidsrRegisterEventRequestBody {
+            EidsrRegisterEventRequestBody = new EidsrRegisterEventRequestBody
+            {
                 Program = template.Program,
                 EventDate = data.EventDate,
                 OrgUnit = data.OrgUnit,

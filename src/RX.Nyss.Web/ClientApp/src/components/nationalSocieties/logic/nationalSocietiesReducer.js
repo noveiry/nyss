@@ -3,10 +3,13 @@ import { initialState } from "../../../initialState";
 import { setProperty } from "../../../utils/immutable";
 import { LOCATION_CHANGE } from "connected-react-router";
 
-export function nationalSocietiesReducer(state = initialState.nationalSocieties, action) {
+export function nationalSocietiesReducer(
+  state = initialState.nationalSocieties,
+  action,
+) {
   switch (action.type) {
     case LOCATION_CHANGE: // cleanup
-      return { ...state, formData: null, formError: null }
+      return { ...state, formData: null, formError: null };
 
     case actions.GET_NATIONAL_SOCIETIES.REQUEST:
       return { ...state, listFetching: true, listData: [] };
@@ -57,18 +60,30 @@ export function nationalSocietiesReducer(state = initialState.nationalSocieties,
       return { ...state, formSaving: false, formError: action.error };
 
     case actions.ARCHIVE_NATIONAL_SOCIETY.REQUEST:
-      return { ...state, listArchiving: setProperty(state.listArchiving, action.id, true) };
+      return {
+        ...state,
+        listArchiving: setProperty(state.listArchiving, action.id, true),
+      };
     case actions.ARCHIVE_NATIONAL_SOCIETY.SUCCESS:
     case actions.ARCHIVE_NATIONAL_SOCIETY.FAILURE:
-      return { ...state, listArchiving: setProperty(state.listArchiving, action.id, undefined) };
+      return {
+        ...state,
+        listArchiving: setProperty(state.listArchiving, action.id, undefined),
+      };
 
     case actions.REOPEN_NATIONAL_SOCIETY.REQUEST:
-      return { ...state, listReopening: setProperty(state.listReopening, action.id, true) };
+      return {
+        ...state,
+        listReopening: setProperty(state.listReopening, action.id, true),
+      };
     case actions.REOPEN_NATIONAL_SOCIETY.SUCCESS:
     case actions.REOPEN_NATIONAL_SOCIETY.FAILURE:
-      return { ...state, listReopening: setProperty(state.listReopening, action.id, undefined) };
+      return {
+        ...state,
+        listReopening: setProperty(state.listReopening, action.id, undefined),
+      };
 
     default:
       return state;
   }
-};
+}

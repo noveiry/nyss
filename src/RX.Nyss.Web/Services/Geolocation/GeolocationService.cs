@@ -21,7 +21,7 @@ namespace RX.Nyss.Web.Services.Geolocation
 
     public class GeolocationService : IGeolocationService
     {
-        private const string CustomUserAgent = "Geo";
+        private const string _customUserAgent = "Geo";
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILoggerAdapter _loggerAdapter;
         private readonly INyssWebConfig _config;
@@ -73,10 +73,10 @@ namespace RX.Nyss.Web.Services.Geolocation
                 }
 
                 var location = value.Select(g => new LocationDto
-                    {
-                        Longitude = double.Parse(g.Longitude, CultureInfo.InvariantCulture),
-                        Latitude = double.Parse(g.Latitude, CultureInfo.InvariantCulture)
-                    })
+                {
+                    Longitude = double.Parse(g.Longitude, CultureInfo.InvariantCulture),
+                    Latitude = double.Parse(g.Latitude, CultureInfo.InvariantCulture)
+                })
                     .First();
 
                 return Success(location);
@@ -96,13 +96,40 @@ namespace RX.Nyss.Web.Services.Geolocation
             var requestUri = new Uri(baseUri, new Uri($"/search/?country={country}&format=json", UriKind.Relative));
 
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
-            httpRequestMessage.Headers.Add("User-Agent", CustomUserAgent); // needed for Nominatim to not get 403 code
+            httpRequestMessage.Headers.Add("User-Agent", _customUserAgent);
 
             var responseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            await using var responseStream = await responseMessage.Content.ReadAsStreamAsync();
+            // Check if the response was successful
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                var errorContent = await responseMessage.Content.ReadAsStringAsync();
+                throw new HttpRequestException(
+                    $"Nominatim API request failed with status {responseMessage.StatusCode}. Response: {errorContent}");
+            }
 
-            return await JsonSerializer.DeserializeAsync<List<NominatimGeolocationResponseDto>>(responseStream);
+            // Read response content as string first for debugging
+            var responseContent = await responseMessage.Content.ReadAsStringAsync();
+            
+            // Log the response for debugging (optional but helpful)
+            _loggerAdapter.Info($"Nominatim response: {responseContent}");
+
+            // Handle empty results
+            if (string.IsNullOrWhiteSpace(responseContent) || responseContent == "[]")
+            {
+                return new List<NominatimGeolocationResponseDto>();
+            }
+
+            try
+            {
+                return JsonSerializer.Deserialize<List<NominatimGeolocationResponseDto>>(responseContent) 
+                    ?? new List<NominatimGeolocationResponseDto>();
+            }
+            catch (JsonException ex)
+            {
+                throw new JsonException(
+                    $"Failed to deserialize Nominatim response. Content: {responseContent}", ex);
+            }
         }
     }
 }

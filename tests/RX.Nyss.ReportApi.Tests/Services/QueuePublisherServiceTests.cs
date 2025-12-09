@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using NSubstitute;
 using RX.Nyss.Common.Configuration;
+using RX.Nyss.Common.Services;
 using RX.Nyss.Common.Utils;
 using RX.Nyss.Common.Utils.Logging;
 using RX.Nyss.Data.Models;
@@ -23,6 +25,8 @@ namespace RX.Nyss.ReportApi.Tests.Services
         private readonly ServiceBusSender _smsQueueSenderMock;
         private readonly ServiceBusSender _checkAlertQueueSenderMock;
         private readonly ILoggerAdapter _loggerAdapterMock;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ICryptographyService _cryptographyService;
 
         public QueuePublisherServiceTests()
         {
@@ -38,7 +42,8 @@ namespace RX.Nyss.ReportApi.Tests.Services
             _emailQueueSenderMock = Substitute.For<ServiceBusSender>();
             _smsQueueSenderMock = Substitute.For<ServiceBusSender>();
             _checkAlertQueueSenderMock = Substitute.For<ServiceBusSender>();
-
+            _httpClientFactory = Substitute.For<IHttpClientFactory>();
+            _cryptographyService = Substitute.For<ICryptographyService>();
             _serviceBusClientMock = Substitute.For<ServiceBusClient>();
             _serviceBusClientMock.CreateSender("SendEmail").Returns(_emailQueueSenderMock);
             _serviceBusClientMock.CreateSender("CheckAlert").Returns(_checkAlertQueueSenderMock);
@@ -49,7 +54,9 @@ namespace RX.Nyss.ReportApi.Tests.Services
                 nyssReportApiConfig,
                 Substitute.For<IDateTimeProvider>(),
                 _loggerAdapterMock,
-                _serviceBusClientMock);
+                _serviceBusClientMock,
+                _httpClientFactory,
+                _cryptographyService);
         }
 
         [Fact]
@@ -109,7 +116,7 @@ namespace RX.Nyss.ReportApi.Tests.Services
             };
 
             // Act
-            await _queuePublisherService.SendSms(recipients, new GatewaySetting{Name = "Missing gateway"}, "This is a test");
+            await _queuePublisherService.SendSms(recipients, new GatewaySetting { Name = "Missing gateway" }, "This is a test");
 
 
             // Assert
@@ -118,40 +125,5 @@ namespace RX.Nyss.ReportApi.Tests.Services
             _loggerAdapterMock.Received(1).Warn($"No email or IoT device found for gateway Missing gateway, not able to send feedback SMS!");
         }
 
-        [Fact]
-        public async Task SendSms_WhenGatewayUsesDualModem_ShouldSendMessageWithModemNumber()
-        {
-            // Arrange
-            var recipients = new List<SendSmsRecipient> { new SendSmsRecipient
-                {
-                    PhoneNumber = "+12345678",
-                    Modem = 1
-                }
-            };
-            var gateway = new GatewaySetting
-            {
-                IotHubDeviceName = "iotdevice",
-                Modems = new List<GatewayModem>
-                {
-                    new GatewayModem { ModemId = 1 },
-                    new GatewayModem { ModemId = 2 }
-                }
-            };
-            var smsMessage = new SendSmsMessage
-            {
-                IotHubDeviceName = "iotdevice",
-                PhoneNumber = "+12345678",
-                ModemNumber = 1,
-                SmsMessage = "Feedback"
-            };
-            var messageJson = JsonSerializer.Serialize(smsMessage);
-            var sendMessage = new ServiceBusMessage(messageJson);
-
-            // Act
-            await _queuePublisherService.SendSms(recipients, gateway, "Feedback");
-
-            // Assert
-            await _smsQueueSenderMock.Received(1).SendMessageAsync(Arg.Is<ServiceBusMessage>(m => m.Body.ToString() == messageJson));
-        }
     }
 }

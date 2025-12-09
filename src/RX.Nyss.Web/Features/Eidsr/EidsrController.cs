@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Data.Concepts;
-using RX.Nyss.Web.Features.Common;
 using RX.Nyss.Web.Features.Eidsr.Dto;
 using RX.Nyss.Web.Features.Eidsr.Queries;
 using RX.Nyss.Web.Services.EidsrClient.Dto;

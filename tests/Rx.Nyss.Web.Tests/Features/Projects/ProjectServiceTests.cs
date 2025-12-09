@@ -467,7 +467,58 @@ namespace RX.Nyss.Web.Tests.Features.Projects
         }
 
         [Fact]
-        public async Task UpdateProject_WhenProjectExists_ShouldReturnSuccess()
+        public async Task UpdateProject_GeneralSettings_WhenProjectExists_ShouldReturnSuccess()
+        {
+            // Arrange
+            const int projectId = 1;
+
+            var nationalSocieties = new[]
+            {
+                new NationalSociety
+                {
+                    Id = 1,
+                    Name = "National Society",
+                    Organizations = new List<Organization>(),
+                    NationalSocietyUsers = new List<UserNationalSociety>()
+                }
+            };
+
+            var nationalSocietiesMockDbSet = nationalSocieties.AsQueryable().BuildMockDbSet();
+            _nyssContextMock.NationalSocieties.Returns(nationalSocietiesMockDbSet);
+
+            var project = new[]
+            {
+                new Project
+                {
+                    Id = projectId,
+                    Name = "Name",
+                    NationalSocietyId = 1,
+                    State = ProjectState.Open
+                }
+            };
+
+            var projectsMockDbSet = project.AsQueryable().BuildMockDbSet();
+            _nyssContextMock.Projects.Returns(projectsMockDbSet);
+            _nyssContextMock.Projects.FindAsync(projectId).Returns(project[0]);
+
+            var projectHealthRisksMockDbSet = project.SelectMany(p => p.ProjectHealthRisks).AsQueryable().BuildMockDbSet();
+            _nyssContextMock.ProjectHealthRisks.Returns(projectHealthRisksMockDbSet);
+
+            var projectRequestDto = new EditProjectRequestDto
+            {
+                Name = "Updated Project"
+            };
+
+            // Act
+            var result = await _projectService.Edit(projectId, projectRequestDto);
+
+            // Assert
+            await _nyssContextMock.Received(1).SaveChangesAsync();
+            result.IsSuccess.ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task UpdateProject_HealthRisks_WhenProjectExists_ShouldReturnSuccess()
         {
             // Arrange
             const int projectId = 1;
@@ -535,9 +586,8 @@ namespace RX.Nyss.Web.Tests.Features.Projects
             var projectHealthRisksMockDbSet = project.SelectMany(p => p.ProjectHealthRisks).AsQueryable().BuildMockDbSet();
             _nyssContextMock.ProjectHealthRisks.Returns(projectHealthRisksMockDbSet);
 
-            var projectRequestDto = new EditProjectRequestDto
+            var healthRisksRequestDto = new EditHealthRisksRequestDto
             {
-                Name = "Updated Project",
                 HealthRisks = new List<ProjectHealthRiskRequestDto>
                 {
                     new ProjectHealthRiskRequestDto
@@ -564,7 +614,7 @@ namespace RX.Nyss.Web.Tests.Features.Projects
             };
 
             // Act
-            var result = await _projectService.Edit(projectId, projectRequestDto);
+            var result = await _projectService.EditProjectHealthRisks(projectId, healthRisksRequestDto);
 
             // Assert
             await _nyssContextMock.Received(1).SaveChangesAsync();
@@ -572,7 +622,7 @@ namespace RX.Nyss.Web.Tests.Features.Projects
         }
 
         [Fact]
-        public async Task UpdateProject_WhenProjectDoesNotExist_ShouldReturnError()
+        public async Task UpdateProject_GeneralSettings_WhenProjectDoesNotExist_ShouldReturnError()
         {
             // Arrange
             const int nonExistentProjectId = 0;
@@ -611,6 +661,65 @@ namespace RX.Nyss.Web.Tests.Features.Projects
 
             // Act
             var result = await _projectService.Edit(nonExistentProjectId, projectRequestDto);
+
+            // Assert
+            await _nyssContextMock.DidNotReceive().SaveChangesAsync();
+            result.IsSuccess.ShouldBeFalse();
+            result.Message.Key.ShouldBe(ResultKey.Project.ProjectDoesNotExist);
+        }
+
+        [Fact]
+        public async Task UpdateProject_HealthRisks_WhenProjectDoesNotExist_ShouldReturnError()
+        {
+            // Arrange
+            const int nonExistentProjectId = 0;
+
+            var nationalSocieties = new[]
+            {
+                new NationalSociety
+                {
+                    Id = 1,
+                    Name = "National Society"
+                }
+            };
+
+            var nationalSocietiesMockDbSet = nationalSocieties.AsQueryable().BuildMockDbSet();
+            _nyssContextMock.NationalSocieties.Returns(nationalSocietiesMockDbSet);
+
+            var project = new[]
+            {
+                new Project
+                {
+                    Id = 1,
+                    Name = "Name",
+                    NationalSocietyId = 1,
+                    State = ProjectState.Open
+                }
+            };
+
+            var projectsMockDbSet = project.AsQueryable().BuildMockDbSet();
+            _nyssContextMock.Projects.Returns(projectsMockDbSet);
+            _nyssContextMock.Projects.FindAsync(nonExistentProjectId).ReturnsNull();
+
+            var healthRisksRequestDto = new EditHealthRisksRequestDto
+            {
+                HealthRisks = new List<ProjectHealthRiskRequestDto>
+                {
+                    new ProjectHealthRiskRequestDto
+                    {
+                        Id = 2,
+                        HealthRiskId = 1,
+                        CaseDefinition = "Updated Case Definition 2",
+                        FeedbackMessage = "Updated Feedback Message 2",
+                        AlertRuleCountThreshold = 2,
+                        AlertRuleDaysThreshold = 3,
+                        AlertRuleKilometersThreshold = 4
+                    }
+                }
+            };
+
+            // Act
+            var result = await _projectService.EditProjectHealthRisks(nonExistentProjectId, healthRisksRequestDto);
 
             // Assert
             await _nyssContextMock.DidNotReceive().SaveChangesAsync();
@@ -673,14 +782,10 @@ namespace RX.Nyss.Web.Tests.Features.Projects
             var projectHealthRisksMockDbSet = project.SelectMany(p => p.ProjectHealthRisks).AsQueryable().BuildMockDbSet();
             _nyssContextMock.ProjectHealthRisks.Returns(projectHealthRisksMockDbSet);
 
-            var projectRequestDto = new EditProjectRequestDto
-            {
-                Name = "Updated Project",
-                HealthRisks = new List<ProjectHealthRiskRequestDto>()
-            };
+            var healthRisksRequestDto = new EditHealthRisksRequestDto { HealthRisks = new List<ProjectHealthRiskRequestDto>() };
 
             // Act
-            var result = await _projectService.Edit(projectId, projectRequestDto);
+            var result = await _projectService.EditProjectHealthRisks(projectId, healthRisksRequestDto);
 
             // Assert
             await _nyssContextMock.DidNotReceive().SaveChangesAsync();
@@ -689,7 +794,7 @@ namespace RX.Nyss.Web.Tests.Features.Projects
         }
 
         [Fact(Skip = "Currently, UpdateProject does not throw ResultException")]
-        public async Task UpdateProject_WhenExceptionIsThrown_ShouldReturnError()
+        public async Task UpdateProject_GeneralSettings_WhenExceptionIsThrown_ShouldReturnError()
         {
             // Arrange
             const int projectId = 1;
@@ -728,6 +833,65 @@ namespace RX.Nyss.Web.Tests.Features.Projects
 
             // Act
             var result = await _projectService.Edit(projectId, projectRequestDto);
+
+            // Assert
+            await _nyssContextMock.DidNotReceive().SaveChangesAsync();
+            result.IsSuccess.ShouldBeFalse();
+            result.Message.Key.ShouldBe(ResultKey.UnexpectedError);
+        }
+
+        [Fact(Skip = "Currently, UpdateProject does not throw ResultException")]
+        public async Task UpdateProject_HealthRisks_WhenExceptionIsThrown_ShouldReturnError()
+        {
+            // Arrange
+            const int projectId = 1;
+
+            var nationalSocieties = new[]
+            {
+                new NationalSociety
+                {
+                    Id = 1,
+                    Name = "National Society"
+                }
+            };
+
+            var nationalSocietiesMockDbSet = nationalSocieties.AsQueryable().BuildMockDbSet();
+            _nyssContextMock.NationalSocieties.Returns(nationalSocietiesMockDbSet);
+
+            var project = new[]
+            {
+                new Project
+                {
+                    Id = projectId,
+                    Name = "Name",
+                    NationalSocietyId = 1,
+                    State = ProjectState.Open
+                }
+            };
+
+            var projectsMockDbSet = project.AsQueryable().BuildMockDbSet();
+            _nyssContextMock.Projects.Returns(projectsMockDbSet);
+            _nyssContextMock.Projects.FindAsync(projectId).Returns(project[0]);
+
+            var healthRisksRequestDto = new EditHealthRisksRequestDto
+            {
+                HealthRisks = new List<ProjectHealthRiskRequestDto>
+                {
+                    new ProjectHealthRiskRequestDto
+                    {
+                        Id = 2,
+                        HealthRiskId = 1,
+                        CaseDefinition = "Updated Case Definition 2",
+                        FeedbackMessage = "Updated Feedback Message 2",
+                        AlertRuleCountThreshold = 2,
+                        AlertRuleDaysThreshold = 3,
+                        AlertRuleKilometersThreshold = 4
+                    }
+                }
+            };
+
+            // Act
+            var result = await _projectService.EditProjectHealthRisks(projectId, healthRisksRequestDto);
 
             // Assert
             await _nyssContextMock.DidNotReceive().SaveChangesAsync();

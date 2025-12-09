@@ -32,7 +32,7 @@ namespace RX.Nyss.Web.Features.ProjectDashboard
             _reportsDashboardSummaryService = reportsDashboardSummaryService;
         }
 
-        public async Task<ProjectSummaryResponseDto> GetData(ReportsFilter filters)
+        /*public async Task<ProjectSummaryResponseDto> GetData(ReportsFilter filters)
         {
             if (!filters.ProjectId.HasValue)
             {
@@ -40,14 +40,14 @@ namespace RX.Nyss.Web.Features.ProjectDashboard
             }
 
             var dashboardReports = _reportService.GetDashboardHealthRiskEventReportsQuery(filters);
-            var rawReportsWithDataCollector = _reportService.GetRawReportsWithDataCollectorQuery(filters);
+            var rawReportsWithDataCollectorAndActivityReports = _reportService.GetRawReportsWithDataCollectorAndActivityReportsQuery(filters);
 
             return await _nyssContext.Projects
                 .AsNoTracking()
                 .Where(p => p.Id == filters.ProjectId.Value)
                 .Select(p => new
                 {
-                    ActiveDataCollectorCount = rawReportsWithDataCollector.Select(r => r.DataCollector.Id).Distinct().Count()
+                    ActiveDataCollectorCount = rawReportsWithDataCollectorAndActivityReports.Select(r => r.DataCollector.Id).Distinct().Count()
                 })
                 .Select(data => new ProjectSummaryResponseDto
                 {
@@ -55,10 +55,58 @@ namespace RX.Nyss.Web.Features.ProjectDashboard
                     ActiveDataCollectorCount = data.ActiveDataCollectorCount,
                     DataCollectionPointSummary = _reportsDashboardSummaryService.DataCollectionPointsSummary(dashboardReports),
                     AlertsSummary = _reportsDashboardSummaryService.AlertsSummary(filters),
-                    NumberOfDistricts = rawReportsWithDataCollector.Select(r => r.Village.District).Distinct().Count(),
-                    NumberOfVillages = rawReportsWithDataCollector.Select(r => r.Village).Distinct().Count()
+                    NumberOfDistricts = rawReportsWithDataCollectorAndActivityReports.Select(r => r.Village.District).Distinct().Count(),
+                    NumberOfVillages = rawReportsWithDataCollectorAndActivityReports.Select(r => r.Village).Distinct().Count()
                 })
                 .FirstOrDefaultAsync();
+        }*/
+
+        public async Task<ProjectSummaryResponseDto> GetData(ReportsFilter filters)
+        {
+            if (!filters.ProjectId.HasValue)
+            {
+                throw new InvalidOperationException("ProjectId was not supplied");
+            }
+
+            var projectId = filters.ProjectId.Value;
+
+            // Check if project exists
+            var projectExists = await _nyssContext.Projects
+                .AsNoTracking()
+                .AnyAsync(p => p.Id == projectId);
+
+            if (!projectExists)
+            {
+                return null;
+            }
+
+            // Keep as IQueryable for methods that need it
+            var dashboardReports = _reportService.GetDashboardHealthRiskEventReportsQuery(filters);
+            var rawReportsWithDataCollectorAndActivityReports = _reportService.GetRawReportsWithDataCollectorAndActivityReportsQuery(filters);
+
+            // Execute the queries that need to be materialized
+            var dashboardReportsList = await dashboardReports.ToListAsync();
+            var rawReportsList = await rawReportsWithDataCollectorAndActivityReports.ToListAsync();
+
+            // Perform calculations in memory
+            return new ProjectSummaryResponseDto
+            {
+                TotalReportCount = dashboardReportsList.Sum(r => r.ReportedCaseCount),
+                ActiveDataCollectorCount = rawReportsList
+                    .Select(r => r.DataCollector.Id)
+                    .Distinct()
+                    .Count(),
+                DataCollectionPointSummary = _reportsDashboardSummaryService.DataCollectionPointsSummary(dashboardReports),
+                AlertsSummary = _reportsDashboardSummaryService.AlertsSummary(filters),
+                NumberOfDistricts = rawReportsList
+                    .Select(r => r.Village.District)
+                    .Distinct()
+                    .Count(),
+                NumberOfVillages = rawReportsList
+                    .Select(r => r.Village)
+                    .Distinct()
+                    .Count()
+            };
         }
     }
 }

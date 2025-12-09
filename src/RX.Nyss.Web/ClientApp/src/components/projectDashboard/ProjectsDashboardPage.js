@@ -5,7 +5,7 @@ import { connect, useSelector } from "react-redux";
 import * as projectDashboardActions from "./logic/projectDashboardActions";
 import { withLayout } from "../../utils/layout";
 import Layout from "../layout/Layout";
-import { Grid } from "@material-ui/core";
+import { Grid, useMediaQuery } from "@material-ui/core";
 import { Loading } from "../common/loading/Loading";
 import { useMount } from "../../utils/lifecycle";
 import { ProjectsDashboardFilters } from "./components/ProjectsDashboardFilters";
@@ -18,6 +18,10 @@ import { DashboardDataCollectionPointChart } from "../dashboardCharts/DashboardD
 import { strings, stringKeys } from "../../strings";
 import { DashboardReportVillageChart } from "../dashboardCharts/DashboardReportVillageChart";
 import SubmitButton from "../common/buttons/submitButton/SubmitButton";
+import { trackEvent, trackPageView } from "../../utils/appInsightsHelper";
+import { MapAndDashboardNumbers } from "../dashboard/MapAndDashboardNumbers";
+import { DashboardReportSexAgePyramidChart } from "../dashboardCharts/DashboardReportsSexAgePyramidChart";
+import { DashboardKeptReportByHealthRiskChart } from "../dashboardCharts/DashboardKeptReportByHealthRiskChart";
 
 const ProjectDashboardPageComponent = ({
   openDashboard,
@@ -31,12 +35,19 @@ const ProjectDashboardPageComponent = ({
 }) => {
   useMount(() => {
     openDashboard(props.match.params.projectId);
+
+    // Track page view
+    trackPageView("ProjectDashboardPage");
   });
 
-  const useRtlDirection = useSelector(state => state.appData.direction === 'rtl');
+  const useRtlDirection = useSelector(
+    (state) => state.appData.direction === "rtl",
+  );
 
   const dashboardElement = useRef(null);
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+  const [isMapExpanded, setIsMapExpanded] = useState(false);
+  const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   const handleFiltersChange = (filters) => getDashboardData(projectId, filters);
 
@@ -45,6 +56,8 @@ const ProjectDashboardPageComponent = ({
   }
 
   const handleGeneratePdf = () => {
+    trackEvent("exportProjectDashboardPdf", { exportFileType: "Pdf" });
+
     const initialState = isFilterExpanded;
     setIsFilterExpanded(true);
     const timer = setTimeout(() => {
@@ -56,7 +69,11 @@ const ProjectDashboardPageComponent = ({
 
   return (
     <Grid container spacing={2} ref={dashboardElement}>
-      <Grid item xs={12} className={styles.filtersGrid}>
+      <Grid
+        item
+        xs={12}
+        className={!isSmallScreen ? styles.filtersGrid : undefined}
+      >
         <ProjectsDashboardFilters
           healthRisks={props.healthRisks}
           organizations={props.organizations}
@@ -76,38 +93,56 @@ const ProjectDashboardPageComponent = ({
         <Loading />
       ) : (
         <Fragment>
-          <Grid item xs={12}>
-            <ProjectsDashboardNumbers
-              projectSummary={props.projectSummary}
-              reportsType={props.filters.reportsType}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <DashboardReportsMap
-              data={props.reportsGroupedByLocation}
-              detailsFetching={props.reportsGroupedByLocationDetailsFetching}
-              details={props.reportsGroupedByLocationDetails}
-              getReportHealthRisks={(lat, long) => props.getReportHealthRisks(projectId, lat, long)}
-            />
-          </Grid>
+          <MapAndDashboardNumbers
+            DashboardNumbers={
+              <ProjectsDashboardNumbers
+                projectSummary={props.projectSummary}
+                reportsType={props.filters.reportsType}
+                isMapExpanded={isMapExpanded}
+              />
+            }
+            DashboardReportsMap={
+              <DashboardReportsMap
+                data={props.reportsGroupedByLocation}
+                detailsFetching={props.reportsGroupedByLocationDetailsFetching}
+                details={props.reportsGroupedByLocationDetails}
+                getReportHealthRisks={(lat, long) =>
+                  props.getReportHealthRisks(projectId, lat, long)
+                }
+              />
+            }
+            isMapExpanded={isMapExpanded}
+            setIsMapExpanded={setIsMapExpanded}
+          />
           <Grid item xs={12}>
             <DashboardReportChart
               data={props.reportsGroupedByHealthRiskAndDate}
+              groupingType={props.filters.groupingType}
             />
           </Grid>
           <Grid item xs={12}>
             <DashboardReportVillageChart
               data={props.reportsGroupedByVillageAndDate}
+              groupingType={props.filters.groupingType}
             />
           </Grid>
           <Grid item xs={12}>
             <DashboardReportSexAgeChart
               data={props.reportsGroupedByFeaturesAndDate}
+              groupingType={props.filters.groupingType}
             />
           </Grid>
-          <Grid item sm={6} xs={12}>
-            <DashboardReportSexAgeTable
-              data={props.reportsGroupedByFeatures}
+          <Grid item xs={12} sm={6}>
+            <DashboardReportSexAgeTable data={props.reportsGroupedByFeatures} />
+          </Grid>
+          <Grid item xs={12}>
+            <DashboardReportSexAgePyramidChart
+              data={props.reportsGroupedByFeaturesAndDate}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <DashboardKeptReportByHealthRiskChart
+              data={props.keptReportsInEscalatedAlertsHistogramData}
             />
           </Grid>
 
@@ -156,6 +191,8 @@ const mapStateToProps = (state) => ({
     state.projectDashboard.reportsGroupedByLocationDetailsFetching,
   dataCollectionPointsReportData:
     state.projectDashboard.dataCollectionPointsReportData,
+  keptReportsInEscalatedAlertsHistogramData:
+    state.projectDashboard.keptReportsInEscalatedAlertsHistogramData,
   isGeneratingPdf: state.projectDashboard.isGeneratingPdf,
   isFetching: state.projectDashboard.isFetching,
   userRoles: state.appData.user.roles,
@@ -170,5 +207,5 @@ const mapDispatchToProps = {
 
 export const ProjectDashboardPage = withLayout(
   Layout,
-  connect(mapStateToProps, mapDispatchToProps)(ProjectDashboardPageComponent)
+  connect(mapStateToProps, mapDispatchToProps)(ProjectDashboardPageComponent),
 );

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -101,12 +102,19 @@ public class EditEidsrIntegrationCommand : IRequest<Result>
                 NationalSocietyId = request.Id,
 
                 ReportLocationDataElementId = request.Body.ReportLocationDataElementId,
+                ReportGeoLocationDataElementId = request.Body.ReportGeoLocationDataElementId,
                 ReportHealthRiskDataElementId = request.Body.ReportHealthRiskDataElementId,
                 ReportSuspectedDiseaseDataElementId = request.Body.ReportSuspectedDiseaseDataElementId,
                 ReportStatusDataElementId = request.Body.ReportStatusDataElementId,
                 ReportGenderDataElementId = request.Body.ReportGenderDataElementId,
-                ReportAgeAtLeastFiveDataElementId = request.Body.ReportAgeAtLeastFiveDataElementId,
-                ReportAgeBelowFiveDataElementId = request.Body.ReportAgeBelowFiveDataElementId,
+                ReportAgeGroupDataElementId = request.Body.ReportAgeGroupDataElementId,
+                ReportCaseCountFemaleAgeAtLeastFiveDataElementId = request.Body.ReportCaseCountFemaleAgeAtLeastFiveDataElementId,
+                ReportCaseCountMaleAgeAtLeastFiveDataElementId = request.Body.ReportCaseCountMaleAgeAtLeastFiveDataElementId,
+                ReportCaseCountFemaleAgeBelowFiveDataElementId = request.Body.ReportCaseCountFemaleAgeBelowFiveDataElementId,
+                ReportCaseCountMaleAgeBelowFiveDataElementId = request.Body.ReportCaseCountMaleAgeBelowFiveDataElementId,
+                ReportDateDataElementId = request.Body.ReportDateDataElementId,
+                ReportTimeDataElementId = request.Body.ReportTimeDataElementId,
+                ReportDataCollectorIdDataElementId = request.Body.ReportDataCollectorIdDataElementId
             };
 
             await _nyssContext.AddAsync(newEidsrConfiguration, cancellationToken);
@@ -134,12 +142,19 @@ public class EditEidsrIntegrationCommand : IRequest<Result>
             eidsrConfiguration.GenderDataElementId = request.Body.GenderDataElementId;
 
             eidsrConfiguration.ReportLocationDataElementId = request.Body.ReportLocationDataElementId;
+            eidsrConfiguration.ReportGeoLocationDataElementId = request.Body.ReportGeoLocationDataElementId;
             eidsrConfiguration.ReportHealthRiskDataElementId = request.Body.ReportHealthRiskDataElementId;
             eidsrConfiguration.ReportSuspectedDiseaseDataElementId = request.Body.ReportSuspectedDiseaseDataElementId;
             eidsrConfiguration.ReportStatusDataElementId = request.Body.ReportStatusDataElementId;
             eidsrConfiguration.ReportGenderDataElementId = request.Body.ReportGenderDataElementId;
-            eidsrConfiguration.ReportAgeAtLeastFiveDataElementId = request.Body.ReportAgeAtLeastFiveDataElementId;
-            eidsrConfiguration.ReportAgeBelowFiveDataElementId = request.Body.ReportAgeBelowFiveDataElementId;
+            eidsrConfiguration.ReportAgeGroupDataElementId = request.Body.ReportAgeGroupDataElementId;
+            eidsrConfiguration.ReportCaseCountFemaleAgeAtLeastFiveDataElementId = request.Body.ReportCaseCountFemaleAgeAtLeastFiveDataElementId;
+            eidsrConfiguration.ReportCaseCountMaleAgeAtLeastFiveDataElementId = request.Body.ReportCaseCountMaleAgeAtLeastFiveDataElementId;
+            eidsrConfiguration.ReportCaseCountFemaleAgeBelowFiveDataElementId = request.Body.ReportCaseCountFemaleAgeBelowFiveDataElementId;
+            eidsrConfiguration.ReportCaseCountMaleAgeBelowFiveDataElementId = request.Body.ReportCaseCountMaleAgeBelowFiveDataElementId;
+            eidsrConfiguration.ReportDateDataElementId = request.Body.ReportDateDataElementId;
+            eidsrConfiguration.ReportTimeDataElementId = request.Body.ReportTimeDataElementId;
+            eidsrConfiguration.ReportDataCollectorIdDataElementId = request.Body.ReportDataCollectorIdDataElementId;
 
             await UpdateEidsrOrganisationUnits(request.Id, request.Body.DistrictsWithOrganizationUnits, cancellationToken);
 
@@ -154,7 +169,7 @@ public class EditEidsrIntegrationCommand : IRequest<Result>
             var nationalSocietyDistricts = await _districtsOrgUnitsService.GetNationalSocietyDistricts(nationalSocietyId);
 
             var dbEidsrOrganisationUnits = await _nyssContext.EidsrOrganisationUnits.Where(eidsrOrganisationUnit =>
-                nationalSocietyDistricts.Select(x=>x.Id).Contains(eidsrOrganisationUnit.DistrictId)
+                nationalSocietyDistricts.Select(x => x.Id).Contains(eidsrOrganisationUnit.DistrictId)
             ).ToListAsync(cancellationToken: cancellationToken);
 
             foreach (var nationalSocietyDistrict in nationalSocietyDistricts)
@@ -162,7 +177,7 @@ public class EditEidsrIntegrationCommand : IRequest<Result>
                 var reqEidsrOrganisationUnit = newDistrictsWithOrganizationUnits
                     .FirstOrDefault(x => x.DistrictId == nationalSocietyDistrict.Id);
 
-                if(reqEidsrOrganisationUnit == default)
+                if (reqEidsrOrganisationUnit == default)
                     continue;
 
                 var dbEidsrOrganisationUnit = dbEidsrOrganisationUnits
@@ -196,19 +211,21 @@ public class EditEidsrIntegrationCommand : IRequest<Result>
 
         public string TrackerProgramId { get; set; }
 
-        public string LocationDataElementId	{ get; set; }
+        public string LocationDataElementId { get; set; }
 
         public string DateOfOnsetDataElementId { get; set; }
 
         public string PhoneNumberDataElementId { get; set; }
 
-        public string SuspectedDiseaseDataElementId	{ get; set; }
+        public string SuspectedDiseaseDataElementId { get; set; }
 
         public string EventTypeDataElementId { get; set; }
 
         public string GenderDataElementId { get; set; }
 
         public string ReportLocationDataElementId { get; set; }
+
+        public string ReportGeoLocationDataElementId { get; set; }
 
         public string ReportHealthRiskDataElementId { get; set; }
 
@@ -218,9 +235,21 @@ public class EditEidsrIntegrationCommand : IRequest<Result>
 
         public string ReportGenderDataElementId { get; set; }
 
-        public string ReportAgeAtLeastFiveDataElementId { get; set; }
+        public string ReportAgeGroupDataElementId { get; set; }
 
-        public string ReportAgeBelowFiveDataElementId { get; set; }
+        public string ReportCaseCountFemaleAgeAtLeastFiveDataElementId { get; set; }
+
+        public string ReportCaseCountMaleAgeAtLeastFiveDataElementId { get; set; }
+
+        public string ReportCaseCountFemaleAgeBelowFiveDataElementId { get; set; }
+
+        public string ReportCaseCountMaleAgeBelowFiveDataElementId { get; set; }
+
+        public string ReportDateDataElementId { get; set; }
+
+        public string ReportTimeDataElementId { get; set; }
+
+        public string ReportDataCollectorIdDataElementId { get; set; }
 
         public List<DistrictsWithOrganizationUnits> DistrictsWithOrganizationUnits { get; set; }
     }

@@ -11,11 +11,11 @@ export const healthRisksSagas = () => [
   takeEvery(consts.OPEN_CREATION_HEALTH_RISK.INVOKE, openHealthRiskCreation),
   takeEvery(consts.EDIT_HEALTH_RISK.INVOKE, editHealthRisk),
   takeEvery(consts.CREATE_HEALTH_RISK.INVOKE, createHealthRisk),
-  takeEvery(consts.REMOVE_HEALTH_RISK.INVOKE, removeHealthRisk)
+  takeEvery(consts.REMOVE_HEALTH_RISK.INVOKE, removeHealthRisk),
 ];
 
 function* getHealthRisks(force) {
-  const currentData = yield select(state => state.healthRisks.listData)
+  const currentData = yield select((state) => state.healthRisks.listData);
   if (!force && currentData.length) {
     return;
   }
@@ -27,7 +27,7 @@ function* getHealthRisks(force) {
   } catch (error) {
     yield put(actions.getList.failure(error.message));
   }
-};
+}
 
 //Added to handle the list of suspected diseases in helth risk creation
 function* openHealthRiskCreation() {
@@ -38,23 +38,28 @@ function* openHealthRiskCreation() {
   } catch (error) {
     yield put(actions.openCreation.failure(error));
   }
-};
+}
 
 //Changed to handle the list of suspected diseases in helth risk edition
 function* openHealthRiskEdition({ path, params }) {
   yield put(actions.openEdition.request());
   try {
-    const response = yield call(http.get, `/api/healthrisk/${params.healthRiskId}/get`);
+    const response = yield call(
+      http.get,
+      `/api/healthrisk/${params.healthRiskId}/get`,
+    );
     const formData = yield call(http.get, "/api/suspecteddisease/list");
-    yield put(appActions.openModule.invoke(path, {
-      healthRiskCode: response.value.healthRiskCode
-    }));
+    yield put(
+      appActions.openModule.invoke(path, {
+        healthRiskCode: response.value.healthRiskCode,
+      }),
+    );
     response.value.suspectedDiseasesList = formData.value;
     yield put(actions.openEdition.success(response.value));
   } catch (error) {
     yield put(actions.openEdition.failure(error.message));
   }
-};
+}
 
 function* createHealthRisk({ data }) {
   yield put(actions.create.request());
@@ -66,7 +71,7 @@ function* createHealthRisk({ data }) {
   } catch (error) {
     yield put(actions.create.failure(error));
   }
-};
+}
 
 function* editHealthRisk({ id, data }) {
   yield put(actions.edit.request());
@@ -78,7 +83,7 @@ function* editHealthRisk({ id, data }) {
   } catch (error) {
     yield put(actions.edit.failure(error));
   }
-};
+}
 
 function* removeHealthRisk({ id }) {
   yield put(actions.remove.request(id));
@@ -90,4 +95,4 @@ function* removeHealthRisk({ id }) {
   } catch (error) {
     yield put(actions.remove.failure(id, error.message));
   }
-};
+}

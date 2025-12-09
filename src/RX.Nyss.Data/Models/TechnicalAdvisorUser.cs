@@ -4,6 +4,6 @@ namespace RX.Nyss.Data.Models
 {
     public class TechnicalAdvisorUser : User
     {
-        public virtual ICollection<TechnicalAdvisorUserGatewayModem> TechnicalAdvisorUserGatewayModems { get; set; }
+        public virtual ICollection<TechnicalAdvisorUserGatewayModem>? TechnicalAdvisorUserGatewayModems { get; set; }
     }
 }

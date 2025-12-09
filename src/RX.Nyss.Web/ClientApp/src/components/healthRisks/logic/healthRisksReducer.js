@@ -1,12 +1,12 @@
 import * as actions from "./healthRisksConstants";
 import { initialState } from "../../../initialState";
 import { setProperty } from "../../../utils/immutable";
-import { LOCATION_CHANGE } from 'connected-react-router'
+import { LOCATION_CHANGE } from "connected-react-router";
 
 export function healthRisksReducer(state = initialState.healthRisks, action) {
   switch (action.type) {
-    case LOCATION_CHANGE: 
-      return { ...state, formData: null, formError: null }
+    case LOCATION_CHANGE:
+      return { ...state, formData: null, formError: null };
 
     case actions.GET_HEALTH_RISKS.REQUEST:
       return { ...state, listFetching: true, listData: [] };
@@ -60,13 +60,19 @@ export function healthRisksReducer(state = initialState.healthRisks, action) {
       return { ...state, formSaving: false, formError: action.error };
 
     case actions.REMOVE_HEALTH_RISK.REQUEST:
-      return { ...state, listRemoving: setProperty(state.listRemoving, action.id, true) };
+      return {
+        ...state,
+        listRemoving: setProperty(state.listRemoving, action.id, true),
+      };
 
     case actions.REMOVE_HEALTH_RISK.SUCCESS:
     case actions.REMOVE_HEALTH_RISK.FAILURE:
-      return { ...state, listRemoving: setProperty(state.listRemoving, action.id, undefined) };
+      return {
+        ...state,
+        listRemoving: setProperty(state.listRemoving, action.id, undefined),
+      };
 
     default:
       return state;
   }
-};
+}

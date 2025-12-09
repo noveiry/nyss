@@ -25,12 +25,12 @@ namespace RX.Nyss.Web.Features.Common.Extensions
             };
 
         public static IQueryable<DataCollector> FilterByArea(this IQueryable<DataCollector> dataCollectors, AreaDto area) =>
-            area != null
+            area != null && area.RegionIds.Any()
                 ? dataCollectors.Where(dc => dc.DataCollectorLocations.Any(dcl =>
                         area.VillageIds.Contains(dcl.Village.Id)
-                        || area.ZoneIds.Contains(dcl.Zone.Id)
-                        || area.DistrictIds.Contains(dcl.Village.District.Id)
-                        || area.RegionIds.Contains(dcl.Village.District.Region.Id))
+                        && (dcl.Zone == null || area.ZoneIds.Contains(dcl.Zone.Id))
+                        && area.DistrictIds.Contains(dcl.Village.District.Id)
+                        && area.RegionIds.Contains(dcl.Village.District.Region.Id))
                     || (area.IncludeUnknownLocation && !dc.DataCollectorLocations.Any()))
                 : dataCollectors;
 
@@ -63,7 +63,7 @@ namespace RX.Nyss.Web.Features.Common.Extensions
             dataCollectors.Where(dc => !dc.DeletedAt.HasValue);
 
         public static IQueryable<DataCollector> FilterBySupervisor(this IQueryable<DataCollector> dataCollectors, int? supervisorId) =>
-            dataCollectors.Where(dc => !supervisorId.HasValue || dc.HeadSupervisor.Id == supervisorId || dc.Supervisor.Id == supervisorId );
+            dataCollectors.Where(dc => !supervisorId.HasValue || dc.HeadSupervisor.Id == supervisorId || dc.Supervisor.Id == supervisorId);
 
         public static IQueryable<DataCollector> FilterBySex(this IQueryable<DataCollector> dataCollectors, SexDto? sexDto) =>
             sexDto switch

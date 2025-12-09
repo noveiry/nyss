@@ -15,10 +15,13 @@
 
 .chip {
   margin: 4px 2px;
+  background-color: #cddde7 !important;
+  min-height: 32px;
+  height: auto !important;
 }
 
 .chipFocused {
-  background-color: grey
+  background-color: grey;
 }
 
 .noOptionsMessage {
@@ -46,4 +49,9 @@
 
 .divider {
   height: 2px;
+}
+
+.chipLabel {
+  white-space: normal !important;
+  margin: 5px 0;
 }

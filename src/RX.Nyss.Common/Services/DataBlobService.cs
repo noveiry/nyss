@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using Azure.Core.Extensions;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Azure;

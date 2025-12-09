@@ -1,147 +1,206 @@
-import styles from './DataCollectorsPerformanceFilters.module.scss';
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer } from "react";
 import {
   Card,
   CardContent,
-  Button,
   TextField,
   MenuItem,
   Grid,
   Radio,
   RadioGroup,
   FormControlLabel,
-  InputLabel
+  InputLabel,
+  useTheme,
+  useMediaQuery,
+  makeStyles,
 } from "@material-ui/core";
-import { useSelector } from "react-redux";
-import { strings, stringKeys } from '../../../strings';
-import useDebounce from '../../../utils/debounce';
-import * as roles from '../../../authentication/roles';
-import {trainingStatus, trainingStatusAll, trainingStatusTrained} from "../logic/dataCollectorsConstants";
-import LocationFilter from '../../common/filters/LocationFilter';
-import { renderFilterLabel } from '../../common/filters/logic/locationFilterService';
+import { strings, stringKeys } from "../../../strings";
+import useDebounce from "../../../utils/debounce";
+import * as roles from "../../../authentication/roles";
+import { trainingStatus } from "../logic/dataCollectorsConstants";
+import LocationFilter from "../../common/filters/LocationFilter";
+import useLocalFilters from "../../common/filters/useLocalFilters";
+import useLocationFilter from "../../common/filters/useLocationFilter";
+import { DrawerFilter } from "../../common/filters/DrawerFilter";
 
-export const DataCollectorsPerformanceFilters = ({ onChange, filters, rtl }) => {
-  const locations = useSelector(state => state.dataCollectors.filtersData.locations);
-  const supervisors = useSelector(state => state.dataCollectors.filtersData.supervisors);
-  const callingUserRoles = useSelector(state => state.appData.user.roles);
+const useStyles = makeStyles((theme) => ({
+  selectFilterItem: {
+    width: "150px",
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+      maxWidth: "220px",
+    },
+  },
+  filterRadioGroup: {
+    paddingTop: "5px",
+  },
+  radio: {
+    height: "23px",
+  },
+}));
 
-  const [locationsFilterLabel, setLocationsFilterLabel] = useState(strings(stringKeys.filters.area.all));
+export const DataCollectorsPerformanceFilters = ({
+  onChange,
+  filters,
+  rtl,
+  locations,
+  supervisors,
+  userRoles,
+}) => {
+  //Reducer for local filters state
+  const [localFilters, updateLocalFilters] = useLocalFilters(filters);
 
-  const [name, setName] = useReducer((state, action) => {
-    if (state.value !== action) {
-      return { changed: true, value: action };
-    } else {
-      return state;
-    }
-  }, { value: '', changed: false });
+  //Fetches new data based on changes in filters
+  const handleFiltersChange = (filters) =>
+    onChange(updateLocalFilters(filters));
 
-  const debouncedName = useDebounce(name, 500);
-
-  const handleAreaChange = (newValue) =>
-    onChange({ type: 'updateLocations', locations: newValue, pageNumber: 1 });
-
-  const handleNameChange = event =>
-    setName(event.target.value);
-
-  const handleSupervisorChange = event =>
-    onChange({ type: 'updateSupervisor', supervisorId: event.target.value === 0 ? null : event.target.value });
-
-  const handleTrainingStatusChange = event =>
-    onChange({ type: 'updateTrainingStatus', trainingStatus: event.target.value });
-
-  useEffect(() => {
-    debouncedName.changed && onChange({ type: 'updateName', name: debouncedName.value });
-  }, [debouncedName, onChange]);
-
-  useEffect(() =>
-    setLocationsFilterLabel(!filters || !locations ? strings(stringKeys.filters.area.all) : renderFilterLabel(filters.locations, locations.regions, false))
-  , [filters, locations]);
-
-  const filterIsSet = filters && (
-    filters.locations !== null ||
-    (filters.name !== null && filters.name !== '') ||
-    filters.trainingStatus !== trainingStatusTrained ||
-    Object.values(filters).slice(4).some(f =>
-      Object.values(f).some(week =>
-        Object.values(week).slice(1).some(v => !v)))
+  //Syncs locations from redux store with filter state and sets label for location filter to 'All' or "Region (+n)"
+  //Neccecary if locations are added, edited or removed, to make all filters checked
+  const [locationsFilterLabel] = useLocationFilter(
+    locations,
+    localFilters,
+    updateLocalFilters,
   );
 
-  const resetFilters = () => {
-    setName('');
-    onChange({ type: 'reset' });
-  }
+  const theme = useTheme();
+  const classes = useStyles();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("xs"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const handleAreaChange = (newValue) =>
+    handleFiltersChange({ locations: newValue, pageNumber: 1 });
+
+  const handleSupervisorChange = (event) =>
+    handleFiltersChange({
+      supervisorId: event.target.value === 0 ? null : event.target.value,
+    });
+
+  const handleTrainingStatusChange = (event) =>
+    handleFiltersChange({ trainingStatus: event.target.value });
 
   if (!filters) {
     return null;
   }
 
+  const Filter = () => {
+    const [name, setName] = useReducer(
+      (state, action) => {
+        if (state.value !== action) {
+          return { changed: true, value: action };
+        } else {
+          return state;
+        }
+      },
+      { value: localFilters.name, changed: false },
+    );
+
+    const debouncedName = useDebounce(name, 500);
+
+    const handleNameChange = (event) => setName(event.target.value);
+
+    useEffect(() => {
+      debouncedName.changed &&
+        handleFiltersChange({ name: debouncedName.value });
+    }, [debouncedName.value]);
+
+    return (
+      <Grid container spacing={2} direction={"row"} alignItems={"flex-start"}>
+        <Grid item xs={isSmallScreen ? 6 : null}>
+          <TextField
+            label={strings(stringKeys.common.name)}
+            onChange={handleNameChange}
+            value={name.value}
+            className={classes.selectFilterItem}
+            InputLabelProps={{ shrink: true }}
+          />
+        </Grid>
+        <Grid item xs={isSmallScreen ? 6 : null}>
+          <LocationFilter
+            allLocations={locations}
+            filteredLocations={filters.locations}
+            filterLabel={locationsFilterLabel}
+            onChange={handleAreaChange}
+            rtl={rtl}
+          />
+        </Grid>
+
+        {!userRoles.some((r) => r === roles.Supervisor) && (
+          <Grid item xs={isSmallScreen ? 6 : null}>
+            <TextField
+              select
+              label={strings(stringKeys.dataCollectors.filters.supervisors)}
+              onChange={handleSupervisorChange}
+              value={filters.supervisorId || 0}
+              className={classes.selectFilterItem}
+              InputLabelProps={{ shrink: true }}
+              SelectProps={{
+                MenuProps: {
+                  PaperProps: {
+                    style: {
+                      maxWidth: "90%",
+                    },
+                  },
+                },
+              }}
+            >
+              <MenuItem value={0}>
+                {strings(stringKeys.dataCollectors.filters.supervisorsAll)}
+              </MenuItem>
+
+              {supervisors.map((supervisor) => (
+                <MenuItem
+                  key={`filter_supervisor_${supervisor.id}`}
+                  value={supervisor.id}
+                >
+                  {supervisor.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        )}
+
+        <Grid item xs={isSmallScreen ? 6 : null}>
+          <InputLabel>
+            {strings(stringKeys.dataCollectors.filters.trainingStatus)}
+          </InputLabel>
+          <RadioGroup
+            value={localFilters.trainingStatus || "All"}
+            onChange={handleTrainingStatusChange}
+            className={classes.filterRadioGroup}
+          >
+            {trainingStatus.map((status) => (
+              <FormControlLabel
+                key={`trainingStatus_filter_${status}`}
+                control={<Radio />}
+                className={classes.radio}
+                label={strings(
+                  stringKeys.dataCollectors.constants.trainingStatus[status],
+                )}
+                value={status}
+              />
+            ))}
+          </RadioGroup>
+        </Grid>
+      </Grid>
+    );
+  };
+
+  if (isMediumScreen) {
+    return (
+      <Grid container justifyContent="center" style={{ marginBottom: 20 }}>
+        <DrawerFilter
+          title={strings(stringKeys.dataCollectors.title)}
+          children={<Filter />}
+          showResults={handleFiltersChange}
+        />
+      </Grid>
+    );
+  }
+
   return (
     <Card>
       <CardContent>
-        <Grid container spacing={2}>
-          <Grid item>
-            <TextField
-              label={strings(stringKeys.common.name)}
-              onChange={handleNameChange}
-              value={name.value}
-              className={styles.filterItem}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item>
-            <LocationFilter
-              allLocations={locations}
-              filteredLocations={filters.locations}
-              filterLabel={locationsFilterLabel}
-              onChange={handleAreaChange}
-              rtl={rtl}
-            />
-          </Grid>
-
-          {(!callingUserRoles.some(r => r === roles.Supervisor) &&
-            <Grid item>
-              <TextField
-                select
-                label={strings(stringKeys.dataCollectors.filters.supervisors)}
-                onChange={handleSupervisorChange}
-                value={filters.supervisorId || 0}
-                className={styles.filterItem}
-                InputLabelProps={{ shrink: true }}
-              >
-                <MenuItem value={0}>{strings(stringKeys.dataCollectors.filters.supervisorsAll)}</MenuItem>
-
-                {supervisors.map(supervisor => (
-                  <MenuItem key={`filter_supervisor_${supervisor.id}`} value={supervisor.id}>
-                    {supervisor.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          )}
-
-          <Grid item>
-            <InputLabel>{strings(stringKeys.dataCollectors.filters.trainingStatus)}</InputLabel>
-            <RadioGroup
-              value={filters.trainingStatus}
-              onChange={handleTrainingStatusChange}
-              className={styles.filterRadioGroup}>
-              {trainingStatus
-                .filter(status => status !== trainingStatusAll)
-                .map(status => (
-                  <FormControlLabel key={`trainingStatus_filter_${status}`} control={<Radio />} label={strings(stringKeys.dataCollectors.constants.trainingStatus[status])} value={status} />
-                ))}
-            </RadioGroup>
-          </Grid>
-
-          {filterIsSet && (
-            <Grid item className={styles.resetButton}>
-              <Button onClick={resetFilters}>
-                {strings(stringKeys.dataCollectors.filters.resetAll)}
-              </Button>
-            </Grid>
-          )}
-        </Grid>
+        <Filter />
       </CardContent>
     </Card>
   );
-}
+};

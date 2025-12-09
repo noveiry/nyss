@@ -99,7 +99,7 @@ namespace RX.Nyss.Web.Features.Reports.Queries
                 strings["reports.list.femalesBelowFive"],
                 strings["reports.list.femalesAtLeastFive"],
                 strings["reports.list.dataCollectorDisplayName"]
-                
+
             };
         }
     }

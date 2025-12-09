@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +15,6 @@ using RX.Nyss.Common.Configuration;
 using RX.Nyss.Web.Configuration;
 
 namespace RX.Nyss.Web;
-
 public class Startup
 {
     public IConfiguration Configuration { get; }
@@ -61,8 +59,6 @@ public class Startup
             }
         });
 
-        //We should remove this 
-
         app.UseHttpsRedirection();
         app.UseSpaStaticFiles(new StaticFileOptions
         {
@@ -94,7 +90,7 @@ public class Startup
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Nyss API V1"));
         }
-
+        //
         app.UseRouting();
 
         app.UseAuthentication();
@@ -129,3 +125,4 @@ public class Startup
         });
     }
 }
+//Add this just to deploy demo with default settings!

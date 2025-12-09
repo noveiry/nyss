@@ -29,7 +29,7 @@ namespace RX.Nyss.Data.Models
 
         public virtual User ResetBy { get; set; }
 
-        public string ModifiedBy { get; set; }
+        public string? ModifiedBy { get; set; }
 
         public ReportStatus Status { get; set; }
 
@@ -39,9 +39,9 @@ namespace RX.Nyss.Data.Models
 
         public int EpiYear { get; set; }
 
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
-        public Point Location { get; set; }
+        public Point? Location { get; set; }
 
         public int ReportedCaseCount { get; set; }
 

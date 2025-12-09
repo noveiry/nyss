@@ -291,3 +291,4 @@ __blobstorage__/
 
 # Ignore local azurite json config files
 __azurite_*
+AzuriteConfig

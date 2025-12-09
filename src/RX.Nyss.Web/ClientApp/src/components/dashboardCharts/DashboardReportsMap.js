@@ -1,21 +1,22 @@
-import React from 'react';
-import { Card, CardContent, CardHeader } from '@material-ui/core';
-import { strings, stringKeys } from "../../strings";
+import React from "react";
 import { ReportsMap } from "../maps/ReportsMap";
+import useHoverChartTracking from "../../utils/useHoverChartTracking";
 
-export const DashboardReportsMap = ({ data, details, detailsFetching, getReportHealthRisks }) => {
-
+export const DashboardReportsMap = ({
+  data,
+  details,
+  detailsFetching,
+  getReportHealthRisks,
+}) => {
+  const trackHoveredChart = useHoverChartTracking();
   return (
-    <Card data-printable={true}>
-      <CardHeader title={strings(stringKeys.dashboard.map.title)} />
-      <CardContent>
-        <ReportsMap
-          data={data}
-          details={details}
-          detailsFetching={detailsFetching}
-          onMarkerClick={getReportHealthRisks}
-        />
-      </CardContent>
-    </Card>
+    <div style={{ height: "100%" }} data-printable={true} onMouseEnter={() => trackHoveredChart("hoveredReportsMap")} onTouchStart={() => trackHoveredChart("hoveredReportsMap")}>
+      <ReportsMap
+        data={data}
+        details={details}
+        detailsFetching={detailsFetching}
+        onMarkerClick={getReportHealthRisks}
+      />
+    </div>
   );
-}
+};

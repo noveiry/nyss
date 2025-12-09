@@ -17,7 +17,7 @@ export const CancelButton = ({ onClick, children, variant }) => {
 
 CancelButton.propTypes = {
   onClick: PropTypes.func,
-  label: PropTypes.string
+  label: PropTypes.string,
 };
 
 export default CancelButton;

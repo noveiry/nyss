@@ -1,5 +1,5 @@
-import React, { Fragment } from 'react';
-import { Collapse } from '@material-ui/core';
+import React, { Fragment } from "react";
+import { Collapse } from "@material-ui/core";
 
 export const ConditionalCollapse = ({ children, collapsible, expanded }) => (
   <Fragment>
@@ -9,8 +9,6 @@ export const ConditionalCollapse = ({ children, collapsible, expanded }) => (
       </Collapse>
     )}
 
-    {!collapsible && (
-      children
-    )}
+    {!collapsible && children}
   </Fragment>
 );

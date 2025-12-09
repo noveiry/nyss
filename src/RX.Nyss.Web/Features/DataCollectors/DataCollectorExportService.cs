@@ -80,6 +80,7 @@ namespace RX.Nyss.Web.Features.DataCollectors
                 }))
                 .OrderBy(dc => dc.Name)
                 .ThenBy(dc => dc.DisplayName)
+                .AsSplitQuery()
                 .ToListAsync();
         }
     }

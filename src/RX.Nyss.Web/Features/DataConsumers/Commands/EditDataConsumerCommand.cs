@@ -6,6 +6,7 @@ using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Common.Utils.Logging;
 using RX.Nyss.Data;
 using RX.Nyss.Data.Models;
+using RX.Nyss.Web.Features.Users;
 using RX.Nyss.Web.Services;
 
 namespace RX.Nyss.Web.Features.DataConsumers.Commands
@@ -47,18 +48,22 @@ namespace RX.Nyss.Web.Features.DataConsumers.Commands
 
             private readonly IVerificationEmailService _verificationEmailService;
 
+            private readonly IUserService _userService;
+
             public Handler(
                 IVerificationEmailService verificationEmailService,
                 IIdentityUserRegistrationService identityUserRegistrationService,
                 INyssContext dataContext,
                 INationalSocietyUserService nationalSocietyUserService,
-                ILoggerAdapter loggerAdapter)
+                ILoggerAdapter loggerAdapter,
+                IUserService userService)
             {
                 _verificationEmailService = verificationEmailService;
                 _identityUserRegistrationService = identityUserRegistrationService;
                 _dataContext = dataContext;
                 _nationalSocietyUserService = nationalSocietyUserService;
                 _loggerAdapter = loggerAdapter;
+                _userService = userService;
             }
 
             public async Task<Result> Handle(EditDataConsumerCommand request, CancellationToken cancellationToken)
@@ -66,23 +71,20 @@ namespace RX.Nyss.Web.Features.DataConsumers.Commands
                 try
                 {
                     var user = await _nationalSocietyUserService.GetNationalSocietyUser<DataConsumerUser>(request.Id);
-                    var oldEmail = user.EmailAddress;
 
                     if (user == null)
                     {
                         throw new ResultException(ResultKey.User.Registration.UserNotFound);
                     }
-                    else
-                    {
-                        user.Name = request.Body.Name;
-                        user.EmailAddress = request.Body.Email;
-                        user.PhoneNumber = request.Body.PhoneNumber;
-                        user.Organization = request.Body.Organization;
-                        user.AdditionalPhoneNumber = request.Body.AdditionalPhoneNumber;
 
-                        await _dataContext.SaveChangesAsync(cancellationToken);
+                    var oldEmail = user.EmailAddress;
 
-                    }
+                    await _userService.UpdateUserEmail(user, request.Body.Email);
+
+                    user.Name = request.Body.Name;
+                    user.PhoneNumber = request.Body.PhoneNumber;
+                    user.Organization = request.Body.Organization;
+                    user.AdditionalPhoneNumber = request.Body.AdditionalPhoneNumber;
 
                     if (oldEmail != request.Body.Email)
                     {
@@ -91,6 +93,8 @@ namespace RX.Nyss.Web.Features.DataConsumers.Commands
                         securityStamp = await _identityUserRegistrationService.GenerateEmailVerification(identityUser.Email);
                         await _verificationEmailService.SendVerificationForDataConsumersEmail(user, user.Organization, securityStamp);
                     }
+
+                    await _dataContext.SaveChangesAsync(cancellationToken);
 
                     return Result.Success();
                 }

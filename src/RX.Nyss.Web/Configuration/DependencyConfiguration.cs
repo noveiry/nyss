@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
@@ -23,17 +24,18 @@ using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Common.Utils.Logging;
 using RX.Nyss.Data;
 using RX.Nyss.Web.Data;
-using RX.Nyss.Web.Features.ProjectAlertRecipients.Access;
 using RX.Nyss.Web.Features.Alerts.Access;
 using RX.Nyss.Web.Features.Common;
 using RX.Nyss.Web.Features.Coordinators.Access;
 using RX.Nyss.Web.Features.DataCollectors.Access;
+using RX.Nyss.Web.Features.DataCollectors.Dto;
 using RX.Nyss.Web.Features.DataConsumers.Access;
 using RX.Nyss.Web.Features.HeadSupervisors.Access;
 using RX.Nyss.Web.Features.Managers.Access;
 using RX.Nyss.Web.Features.NationalSocieties.Access;
 using RX.Nyss.Web.Features.NationalSocietyStructure.Access;
 using RX.Nyss.Web.Features.Organizations.Access;
+using RX.Nyss.Web.Features.ProjectAlertRecipients.Access;
 using RX.Nyss.Web.Features.ProjectOrganizations.Access;
 using RX.Nyss.Web.Features.Projects.Access;
 using RX.Nyss.Web.Features.Reports.Access;
@@ -81,7 +83,10 @@ namespace RX.Nyss.Web.Configuration
 
         private static void RegisterMediatR(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddMediatR(typeof(Startup));
+            serviceCollection.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssemblyContaining<Startup>();
+            });
             serviceCollection.AddValidatorsFromAssembly(typeof(Startup).Assembly);
             serviceCollection.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         }
@@ -303,7 +308,6 @@ namespace RX.Nyss.Web.Configuration
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     options.JsonSerializerOptions.Converters.Add(new JsonStringDateTimeConverter());
                 })
-                //.AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly(), ValidatorsFilter))
                 .ConfigureApiBehaviorOptions(options =>
                 {
                     options.InvalidModelStateResponseFactory = actionContext =>
@@ -315,6 +319,10 @@ namespace RX.Nyss.Web.Configuration
                         return new BadRequestObjectResult(Result.Error(ResultKey.Validation.ValidationError, validationErrors));
                     };
                 });
+
+            serviceCollection.AddFluentValidationAutoValidation();
+            serviceCollection.AddFluentValidationClientsideAdapters();
+            serviceCollection.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), filter: ValidatorsFilter);
 
             serviceCollection.AddRazorPages();
             serviceCollection.AddHttpClient();
@@ -362,7 +370,7 @@ namespace RX.Nyss.Web.Configuration
                 .Select(Assembly.Load)
                 .ToArray();
 
-        //private static bool ValidatorsFilter(AssemblyScanner.AssemblyScanResult result) =>
-           // result.ValidatorType != typeof(DataCollectorLocationRequestDto.Validator);
+        private static bool ValidatorsFilter(AssemblyScanner.AssemblyScanResult result) =>
+         result.ValidatorType != typeof(DataCollectorLocationRequestDto.Validator);
     }
 }

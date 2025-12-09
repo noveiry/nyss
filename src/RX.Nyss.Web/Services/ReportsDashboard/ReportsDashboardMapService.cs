@@ -17,8 +17,8 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
 
     public class ReportsDashboardMapService : IReportsDashboardMapService
     {
-        private const double DefaultLatitude = 59.90822188626548; // Oslo
-        private const double DefaultLongitude = 10.744628906250002;
+        private const double _defaultLatitude = 59.90822188626548; // Oslo
+        private const double _defaultLongitude = 10.744628906250002;
         private readonly IReportService _reportService;
         private readonly IGeolocationService _geolocationService;
         private readonly INyssContext _nyssContext;
@@ -41,8 +41,8 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
             var reportsSummaryMap = await reports
                 .GroupBy(report => new
                 {
-                    report.Location.X,
-                    report.Location.Y
+                    report.Location!.X,
+                    report.Location!.Y
                 })
                 .Select(grouping => new ReportsSummaryMapResponseDto
                 {
@@ -53,6 +53,7 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                         Longitude = grouping.Key.X
                     }
                 })
+                .AsSplitQuery()
                 .ToListAsync();
 
             if (!reportsSummaryMap.Any())
@@ -60,19 +61,19 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                 var countryName = filters.ProjectId.HasValue
                     ? await _nyssContext.Projects
                         .Where(p => p.Id == filters.ProjectId)
-                        .Select(p => p.NationalSociety.Country.Name)
+                        .Select(p => p.NationalSociety != null && p.NationalSociety.Country != null ? p.NationalSociety.Country.Name : null)
                         .FirstOrDefaultAsync()
                     : await _nyssContext.NationalSocieties
                         .Where(ns => ns.Id == filters.NationalSocietyId)
-                        .Select(ns => ns.Country.Name)
+                        .Select(ns => ns.Country != null ? ns.Country.Name : null)
                         .FirstOrDefaultAsync();
 
-                var location = await _geolocationService.GetLocationFromCountry(countryName);
+                ReportsSummaryMapResponseDto.MapReportLocation mapLocation;
 
-                reportsSummaryMap.Add(new ReportsSummaryMapResponseDto
+                if (!string.IsNullOrEmpty(countryName))
                 {
-                    ReportsCount = 0,
-                    Location = location.IsSuccess
+                    var location = await _geolocationService.GetLocationFromCountry(countryName);
+                    mapLocation = location.IsSuccess
                         ? new ReportsSummaryMapResponseDto.MapReportLocation
                         {
                             Latitude = location.Value.Latitude,
@@ -80,9 +81,23 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                         }
                         : new ReportsSummaryMapResponseDto.MapReportLocation
                         {
-                            Latitude = DefaultLatitude,
-                            Longitude = DefaultLongitude
-                        }
+                            Latitude = _defaultLatitude,
+                            Longitude = _defaultLongitude
+                        };
+                }
+                else
+                {
+                    mapLocation = new ReportsSummaryMapResponseDto.MapReportLocation
+                    {
+                        Latitude = _defaultLatitude,
+                        Longitude = _defaultLongitude
+                    };
+                }
+
+                reportsSummaryMap.Add(new ReportsSummaryMapResponseDto
+                {
+                    ReportsCount = 0,
+                    Location = mapLocation
                 });
             }
 
@@ -94,12 +109,14 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
             var reports = _reportService.GetDashboardHealthRiskEventReportsQuery(filters);
 
             return await reports
-                .Where(r => r.Location.X == longitude && r.Location.Y == latitude)
+                .Where(r => r.Location != null && r.Location.X == longitude && r.Location.Y == latitude)
                 .Select(r => new
                 {
                     r.ProjectHealthRisk.HealthRiskId,
                     HealthRiskName = r.ProjectHealthRisk.HealthRisk.LanguageContents
-                        .Where(lc => lc.ContentLanguage.Id == r.ProjectHealthRisk.Project.NationalSociety.ContentLanguage.Id)
+                        .Where(lc => r.ProjectHealthRisk.Project.NationalSociety != null
+                            && r.ProjectHealthRisk.Project.NationalSociety.ContentLanguage != null
+                            && lc.ContentLanguage.Id == r.ProjectHealthRisk.Project.NationalSociety.ContentLanguage.Id)
                         .Select(lc => lc.Name).FirstOrDefault(),
                     Total = r.ReportedCaseCount
                 })
@@ -107,9 +124,10 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                 .GroupBy(r => r.HealthRiskId)
                 .Select(grouping => new ReportsSummaryHealthRiskResponseDto
                 {
-                    Name = _nyssContext.HealthRiskLanguageContents.Where(f => f.HealthRisk.Id == grouping.Key).Select(s => s.Name).FirstOrDefault(),
+                    Name = _nyssContext.HealthRiskLanguageContents.Where(f => f.HealthRisk.Id == grouping.Key).Select(s => s.Name).FirstOrDefault() ?? string.Empty,
                     Value = grouping.Sum(r => r.Total)
                 })
+                .AsSplitQuery()
                 .ToListAsync();
         }
     }

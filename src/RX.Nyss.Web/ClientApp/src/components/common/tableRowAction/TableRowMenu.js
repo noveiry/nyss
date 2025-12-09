@@ -3,15 +3,23 @@ import React, { Fragment, useState } from "react";
 import { Menu, CircularProgress, MenuItem } from "@material-ui/core";
 import { useSelector } from "react-redux";
 
-const TableRowMenuComponent = ({ id, icon, items, isFetching, alwaysShow, alwaysHighlighted, directionRtl }) => {
+const TableRowMenuComponent = ({
+  id,
+  icon,
+  items,
+  isFetching,
+  alwaysShow,
+  alwaysHighlighted,
+  directionRtl,
+}) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const user = useSelector(state => state.appData.user);
+  const user = useSelector((state) => state.appData.user);
 
   const handleDropdownClick = (e) => {
     e.stopPropagation();
 
     filteredItems.length !== 0 && setAnchorEl(e.currentTarget);
-  }
+  };
 
   const handleDropdownClose = (e) => {
     e && e.stopPropagation();
@@ -24,8 +32,10 @@ const TableRowMenuComponent = ({ id, icon, items, isFetching, alwaysShow, always
     handleDropdownClose();
   };
 
-  const filteredItems = items
-    .filter(item => !item.roles || user.roles.some(role => item.roles.indexOf(role) > -1));
+  const filteredItems = items.filter(
+    (item) =>
+      !item.roles || user.roles.some((role) => item.roles.indexOf(role) > -1),
+  );
 
   if (!filteredItems.length && !alwaysShow) {
     return null;
@@ -33,14 +43,17 @@ const TableRowMenuComponent = ({ id, icon, items, isFetching, alwaysShow, always
 
   return (
     <Fragment>
-      <div 
-        className={`${styles.tableRowAction} ${(alwaysHighlighted ? styles.alwaysHighlighted : "")} ${(isFetching ? styles.fetching : "")} ${directionRtl ? styles.rtl : ""}`} 
-        title={`more...`} 
-        onClick={handleDropdownClick}>
+      <div
+        className={`${styles.tableRowAction} ${
+          alwaysHighlighted ? styles.alwaysHighlighted : ""
+        } ${isFetching ? styles.fetching : ""} ${
+          directionRtl ? styles.rtl : ""
+        }`}
+        title={`more...`}
+        onClick={handleDropdownClick}
+      >
         {isFetching && <CircularProgress size={20} className={styles.loader} />}
-        <div className={styles.icon}>
-          {icon}
-        </div>
+        <div className={styles.icon}>{icon}</div>
       </div>
       <Menu
         key={`tableRowMenu_${id}`}

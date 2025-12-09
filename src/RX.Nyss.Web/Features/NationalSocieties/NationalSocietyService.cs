@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,6 +68,7 @@ namespace RX.Nyss.Web.Features.NationalSocieties
                     IsArchived = n.IsArchived
                 })
                 .OrderBy(n => n.Name)
+                .AsSplitQuery()
                 .ToListAsync();
 
             return Success(list);
@@ -88,6 +88,7 @@ namespace RX.Nyss.Web.Features.NationalSocieties
                 })
                 .Distinct()
                 .OrderBy(x => x.Name)
+                .AsSplitQuery()
                 .ToListAsync();
 
         public async Task<Result> Reopen(int nationalSocietyId)

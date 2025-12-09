@@ -11,24 +11,24 @@ export const nationalSocietyUsersSiteMap = [
     placeholder: placeholders.leftMenu,
     placeholderIndex: nationalSocietyLeftMenuOrder.userlist,
     access: accessMap.nationalSocietyUsers.list,
-    icon: "Users"
+    icon: "Users",
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/users",
     path: "/nationalsocieties/:nationalSocietyId/users/add",
     title: () => strings(stringKeys.nationalSocietyUser.form.creationTitle),
-    access: accessMap.nationalSocietyUsers.add
+    access: accessMap.nationalSocietyUsers.add,
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/users",
     path: "/nationalsocieties/:nationalSocietyId/users/addExisting",
     title: () => strings(stringKeys.nationalSocietyUser.form.addExistingTitle),
-    access: accessMap.nationalSocietyUsers.add
+    access: accessMap.nationalSocietyUsers.add,
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/users",
     path: "/nationalsocieties/:nationalSocietyId/users/:nationalSocietyUserId/edit",
     title: () => strings(stringKeys.nationalSocietyUser.form.editionTitle),
-    access: accessMap.nationalSocietyUsers.edit
-  }
+    access: accessMap.nationalSocietyUsers.edit,
+  },
 ];

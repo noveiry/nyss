@@ -14,19 +14,21 @@ public class EidsrIntegrationResponseDto
 
     public string TrackerProgramId { get; set; }
 
-    public string LocationDataElementId	{ get; set; }
+    public string LocationDataElementId { get; set; }
 
     public string DateOfOnsetDataElementId { get; set; }
 
     public string PhoneNumberDataElementId { get; set; }
 
-    public string SuspectedDiseaseDataElementId	{ get; set; }
+    public string SuspectedDiseaseDataElementId { get; set; }
 
     public string EventTypeDataElementId { get; set; }
 
     public string GenderDataElementId { get; set; }
 
     public string ReportLocationDataElementId { get; set; }
+
+    public string ReportGeoLocationDataElementId { get; set; }
 
     public string ReportHealthRiskDataElementId { get; set; }
 
@@ -36,9 +38,21 @@ public class EidsrIntegrationResponseDto
 
     public string ReportGenderDataElementId { get; set; }
 
-    public string ReportAgeAtLeastFiveDataElementId { get; set; }
+    public string ReportAgeGroupDataElementId { get; set; }
 
-    public string ReportAgeBelowFiveDataElementId { get; set; }
+    public string ReportCaseCountFemaleAgeAtLeastFiveDataElementId { get; set; }
+
+    public string ReportCaseCountMaleAgeAtLeastFiveDataElementId { get; set; }
+
+    public string ReportCaseCountFemaleAgeBelowFiveDataElementId { get; set; }
+
+    public string ReportCaseCountMaleAgeBelowFiveDataElementId { get; set; }
+
+    public string ReportDateDataElementId { get; set; }
+
+    public string ReportTimeDataElementId { get; set; }
+
+    public string ReportDataCollectorIdDataElementId { get; set; }
 
     public List<DistrictsWithOrganizationUnits> DistrictsWithOrganizationUnits { get; set; }
 }

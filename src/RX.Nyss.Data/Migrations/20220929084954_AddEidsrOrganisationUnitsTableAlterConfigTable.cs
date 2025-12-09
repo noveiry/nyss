@@ -8,15 +8,15 @@ namespace RX.Nyss.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-              migrationBuilder.AlterColumn<string>(
-                name: "Username",
-                schema: "nyss",
-                table: "EidsrConfiguration",
-                type: "varchar(256)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(256)",
-                oldNullable: true);
+            migrationBuilder.AlterColumn<string>(
+              name: "Username",
+              schema: "nyss",
+              table: "EidsrConfiguration",
+              type: "varchar(256)",
+              nullable: true,
+              oldClrType: typeof(string),
+              oldType: "nvarchar(256)",
+              oldNullable: true);
 
             migrationBuilder.AlterColumn<string>(
                 name: "TrackerProgramId",
@@ -116,15 +116,15 @@ namespace RX.Nyss.Data.Migrations
                 name: "EidsrOrganisationUnits",
                 schema: "nyss");
 
-              migrationBuilder.AlterColumn<string>(
-                name: "Username",
-                schema: "nyss",
-                table: "EidsrConfiguration",
-                type: "nvarchar(256)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "varchar(256)",
-                oldNullable: true);
+            migrationBuilder.AlterColumn<string>(
+              name: "Username",
+              schema: "nyss",
+              table: "EidsrConfiguration",
+              type: "nvarchar(256)",
+              nullable: true,
+              oldClrType: typeof(string),
+              oldType: "varchar(256)",
+              oldNullable: true);
 
             migrationBuilder.AlterColumn<string>(
                 name: "TrackerProgramId",

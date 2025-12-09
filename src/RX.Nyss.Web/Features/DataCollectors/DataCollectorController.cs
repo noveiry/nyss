@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Data.Concepts;
@@ -11,6 +13,7 @@ using RX.Nyss.Web.Features.DataCollectors.Dto;
 using RX.Nyss.Web.Features.DataCollectors.Queries;
 using RX.Nyss.Web.Utils;
 using RX.Nyss.Web.Utils.DataContract;
+using static RX.Nyss.Common.Utils.DataContract.Result;
 
 namespace RX.Nyss.Web.Features.DataCollectors
 {
@@ -51,9 +54,20 @@ namespace RX.Nyss.Web.Features.DataCollectors
 
         [HttpPost, Route("create")]
         [NeedsRole(Role.Administrator, Role.Manager, Role.TechnicalAdvisor, Role.Supervisor, Role.HeadSupervisor), NeedsPolicy(Policy.ProjectAccess)]
-        public async Task<Result> Create([FromBody] CreateDataCollectorCommand cmd) =>
-            await Sender.Send(cmd);
-
+        public async Task<Result> Create([FromBody] CreateDataCollectorCommand cmd)
+        {
+            try
+            {
+                return await Sender.Send(cmd);
+            }
+            catch (ValidationException e)
+            {
+                // Get the error message string key from the fluent validation exception or default error message
+                var errorMessage = e.Errors.FirstOrDefault()?.ErrorMessage.Split(":").Last()
+                    ?? ResultKey.Validation.ValidationError;
+                return Error(errorMessage);
+            }
+        }
         [HttpPost, Route("{dataCollectorId:int}/edit")]
         [NeedsRole(Role.Administrator, Role.Manager, Role.TechnicalAdvisor, Role.Supervisor, Role.HeadSupervisor), NeedsPolicy(Policy.DataCollectorAccess)]
         public async Task<Result> Edit([FromBody] EditDataCollectorCommand cmd) =>

@@ -14,6 +14,7 @@
         SmsEagle,
         Nyss,
         Telerivet,
-        SmsGateway
+        SmsGateway,
+        MTNSmsGateway
     }
 }

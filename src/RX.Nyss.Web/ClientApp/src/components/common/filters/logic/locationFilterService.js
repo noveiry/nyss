@@ -14,7 +14,7 @@ export const extractSelectedValues = (regions, includeUnknownLocation) => {
     .map((r) =>
       r.districts
         .filter((d) => d.selected || d.villages.some((v) => v.selected))
-        .map((d) => d.id)
+        .map((d) => d.id),
     )
     .flat();
 
@@ -26,8 +26,8 @@ export const extractSelectedValues = (regions, includeUnknownLocation) => {
         .map((d) =>
           d.villages
             .filter((v) => v.selected || v.zones.some((z) => z.selected))
-            .map((v) => v.id)
-        )
+            .map((v) => v.id),
+        ),
     )
     .flat(2);
 
@@ -39,8 +39,8 @@ export const extractSelectedValues = (regions, includeUnknownLocation) => {
         .map((d) =>
           d.villages
             .filter((v) => v.selected)
-            .map((v) => v.zones.filter((z) => z.selected).map((z) => z.id))
-        )
+            .map((v) => v.zones.filter((z) => z.selected).map((z) => z.id)),
+        ),
     )
     .flat(3);
 
@@ -165,7 +165,7 @@ export const cascadeSelectRegion = (region, selected) => {
 */
 export const cascadeSelectDistrict = (region, districtId, districtSelected) => {
   const districts = region.districts.map((d) =>
-    setDistrict(d, districtId, districtSelected)
+    setDistrict(d, districtId, districtSelected),
   );
   const hasSelectedDistricts = districts.some((d) => d.selected);
 
@@ -184,12 +184,12 @@ export const cascadeSelectVillage = (
   region,
   districtId,
   villageId,
-  villageSelected
+  villageSelected,
 ) => {
   const villages = region.districts
     .filter((d) => d.id === districtId)
     .map((d) =>
-      d.villages.map((v) => setVillage(v, villageId, villageSelected))
+      d.villages.map((v) => setVillage(v, villageId, villageSelected)),
     )
     .flat();
   const anySelectedVillages = villages.some((v) => v.selected);
@@ -216,14 +216,14 @@ export const cascadeSelectZone = (
   districtId,
   villageId,
   zoneId,
-  zoneSelected
+  zoneSelected,
 ) => {
   const zones = region.districts
     .filter((d) => d.id === districtId)
     .map((d) =>
       d.villages
         .filter((v) => v.id === villageId)
-        .map((v) => v.zones.map((z) => setZone(z, zoneId, zoneSelected)))
+        .map((v) => v.zones.map((z) => setZone(z, zoneId, zoneSelected))),
     )
     .flat(2);
 
@@ -235,7 +235,7 @@ export const cascadeSelectZone = (
         ...v,
         selected: v.id === villageId ? anySelectedZones : v.selected,
         zones: v.id === villageId ? zones : v.zones,
-      }))
+      })),
     )
     .flat();
   const anySelectedVillages = villages.some((v) => v.selected);
@@ -259,8 +259,20 @@ export const cascadeSelectZone = (
 export const renderFilterLabel = (
   filterValue,
   regions,
-  showUnknownLocation
+  showUnknownLocation,
 ) => {
+  const compactNameDisplay = (locationNames, withUnknownLocation) => {
+    if (withUnknownLocation){
+      return locationNames.length >= 1
+        ? `${locationNames[0]} (+${locationNames.length})`
+        : locationNames[0]; 
+    }
+    
+    return locationNames.length > 1
+    ? `${locationNames[0]} (+${locationNames.length - 1})`
+    : locationNames[0];
+  } 
+
   if (
     !filterValue ||
     (showUnknownLocation &&
@@ -271,28 +283,27 @@ export const renderFilterLabel = (
     return strings(stringKeys.filters.area.all);
   }
 
-  if (filterValue.regionIds.length > 0) {
-    const regionNames = filterValue.regionIds.map(
-      (id) => regions.find((r) => r.id === id).name
-    );
+  // Checks if all location filter options are deselected or null and if unknownlocation is unchecked if shown.
+  if (!filterValue.regionIds.length && !filterValue.districtIds.length && !filterValue.villageIds.length && !filterValue.zoneIds.length && (showUnknownLocation ? !filterValue.includeUnknownLocation : true)) {
+    return strings(stringKeys.filters.area.all);
+  }
 
-    return regionNames.length > 1
-      ? `${regionNames[0]} (+${regionNames.length - 1})`
-      : regionNames[0];
+  if (filterValue.regionIds.length > 0) {
+    let filterRegions = regions.filter(region => filterValue.regionIds.some(filterRegionId => region.id == filterRegionId));
+    let filteredRegionNames = filterRegions.map(reg => reg.name);
+    return compactNameDisplay(filteredRegionNames, filterValue.includeUnknownLocation);
   }
 
   if (filterValue.districtIds.length > 0) {
     const districtNames = filterValue.districtIds
       .map((id) =>
         regions.map((r) =>
-          r.districts.filter((d) => d.id === id).map((d) => d.name)
-        )
+          r.districts.filter((d) => d.id === id).map((d) => d.name),
+        ),
       )
       .flat(2);
 
-    return districtNames.length > 1
-      ? `${districtNames[0]} (+${districtNames.length - 1})`
-      : districtNames[0];
+      return compactNameDisplay(districtNames, filterValue.includeUnknownLocation)
   }
 
   if (filterValue.villageIds.length > 0) {
@@ -300,15 +311,13 @@ export const renderFilterLabel = (
       .map((id) =>
         regions.map((r) =>
           r.districts.map((d) =>
-            d.villages.filter((v) => v.id === id).map((v) => v.name)
-          )
-        )
+            d.villages.filter((v) => v.id === id).map((v) => v.name),
+          ),
+        ),
       )
       .flat(3);
 
-    return villageNames.length > 1
-      ? `${villageNames[0]} (+${villageNames.length - 1})`
-      : villageNames[0];
+    return compactNameDisplay(villageNames, filterValue.includeUnknownLocation)
   }
 
   if (filterValue.zoneIds.length > 0) {
@@ -317,16 +326,14 @@ export const renderFilterLabel = (
         regions.map((r) =>
           r.districts.map((d) =>
             d.villages.map((v) =>
-              v.zones.filter((z) => z.id === id).map((z) => z.name)
-            )
-          )
-        )
+              v.zones.filter((z) => z.id === id).map((z) => z.name),
+            ),
+          ),
+        ),
       )
       .flat(4);
 
-    return zoneNames.length > 1
-      ? `${zoneNames[0]} (+ ${zoneNames.length - 1})`
-      : zoneNames[0];
+    return compactNameDisplay(zoneNames, filterValue.includeUnknownLocation)
   }
 
   if (filterValue.includeUnknownLocation) {

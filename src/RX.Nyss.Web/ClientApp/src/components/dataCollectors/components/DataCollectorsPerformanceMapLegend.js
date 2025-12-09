@@ -9,10 +9,16 @@ import { strings, stringKeys } from "../../../strings";
 export const DataCollectorsPerformanceMapLegend = ({ rtl }) => {
   const renderItem = (status) => (
     <div className={styles.item}>
-      <div className={`${mapIconStyles.marker} ${mapStyles[`marker_${status}`]} ${styles.icon} ${rtl ? styles.rtl : ''}`}>
+      <div
+        className={`${mapIconStyles.marker} ${mapStyles[`marker_${status}`]} ${
+          styles.icon
+        } ${rtl ? styles.rtl : ""}`}
+      >
         <Icon>{getIconFromStatus(status)}</Icon>
       </div>
-      <div className={styles.description}>{strings(stringKeys.dataCollectors.mapOverview.legend[status])}</div>
+      <div className={styles.description}>
+        {strings(stringKeys.dataCollectors.mapOverview.legend[status])}
+      </div>
     </div>
   );
 
@@ -23,4 +29,4 @@ export const DataCollectorsPerformanceMapLegend = ({ rtl }) => {
       {renderItem(performanceStatus.notReporting)}
     </div>
   );
-}
+};

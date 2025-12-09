@@ -5,12 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Data;
 using RX.Nyss.Data.Concepts;
-using RX.Nyss.Web.Features.Common;
 using RX.Nyss.Web.Features.NationalSocietyStructure;
 using RX.Nyss.Web.Features.ProjectDashboard.Dto;
 using RX.Nyss.Web.Features.Projects;
 using RX.Nyss.Web.Features.Reports;
-using RX.Nyss.Web.Services.Authorization;
 using RX.Nyss.Web.Services.ReportsDashboard;
 using RX.Nyss.Web.Services.ReportsDashboard.Dto;
 using static RX.Nyss.Common.Utils.DataContract.Result;
@@ -46,6 +44,8 @@ namespace RX.Nyss.Web.Features.ProjectDashboard
 
         private readonly INationalSocietyStructureService _nationalSocietyStructureService;
 
+        private readonly IReportsDashboardService _reportsDashboardService;
+
         public ProjectDashboardService(
             IProjectService projectService,
             IReportsDashboardMapService reportsDashboardMapService,
@@ -55,7 +55,8 @@ namespace RX.Nyss.Web.Features.ProjectDashboard
             IReportsDashboardByDataCollectionPointService reportsDashboardByDataCollectionPointService,
             IProjectDashboardSummaryService projectDashboardSummaryService,
             INyssContext nyssContext,
-            INationalSocietyStructureService nationalSocietyStructureService)
+            INationalSocietyStructureService nationalSocietyStructureService,
+            IReportsDashboardService reportsDashboardService)
         {
             _projectService = projectService;
             _reportsDashboardMapService = reportsDashboardMapService;
@@ -66,6 +67,7 @@ namespace RX.Nyss.Web.Features.ProjectDashboard
             _projectDashboardSummaryService = projectDashboardSummaryService;
             _nyssContext = nyssContext;
             _nationalSocietyStructureService = nationalSocietyStructureService;
+            _reportsDashboardService = reportsDashboardService;
         }
 
         public async Task<Result<ProjectDashboardFiltersResponseDto>> GetFiltersData(int projectId)
@@ -103,7 +105,7 @@ namespace RX.Nyss.Web.Features.ProjectDashboard
                     {
                         Id = o.Organization.Id,
                         Name = o.Organization.Name
-                    }).ToListAsync();
+                    }).AsSplitQuery().ToListAsync();
 
         public async Task<Result<ProjectDashboardResponseDto>> GetData(int projectId, FiltersRequestDto filtersDto)
         {
@@ -120,6 +122,9 @@ namespace RX.Nyss.Web.Features.ProjectDashboard
             var filters = MapToReportFilters(projectId, filtersDto);
             var reportsByFeaturesAndDate = await _reportsDashboardByFeatureService.GetReportsGroupedByFeaturesAndDate(filters, filtersDto.GroupingType, epiWeekStartDay);
 
+            var keptReportsInEscalatedAlertsHistogramData =
+                await _reportsDashboardService.GetKeptReportsInEscalatedAlertsHistogramData(filters, filtersDto.GroupingType, epiWeekStartDay, nationalSocietyId: null, projectId: projectId);
+
             var dashboardDataDto = new ProjectDashboardResponseDto
             {
                 Summary = await _projectDashboardSummaryService.GetData(filters),
@@ -130,7 +135,8 @@ namespace RX.Nyss.Web.Features.ProjectDashboard
                 ReportsGroupedByFeatures = GetReportsGroupedByFeatures(reportsByFeaturesAndDate),
                 DataCollectionPointReportsGroupedByDate = filtersDto.DataCollectorType == FiltersRequestDto.DataCollectorTypeFilterDto.DataCollectionPoint
                     ? await _reportsDashboardByDataCollectionPointService.GetDataCollectionPointReports(filters, filtersDto.GroupingType, epiWeekStartDay)
-                    : Enumerable.Empty<DataCollectionPointsReportsByDateDto>()
+                    : Enumerable.Empty<DataCollectionPointsReportsByDateDto>(),
+                KeptReportsInEscalatedAlertsHistogramData = keptReportsInEscalatedAlertsHistogramData
             };
 
             return Success(dashboardDataDto);

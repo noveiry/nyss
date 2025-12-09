@@ -9,6 +9,8 @@ public static class SmsContentKey
         public const string HealthRiskNotFound = "sms.error.healthRiskNotFound";
 
         public const string Other = "sms.error.other";
+
+        public const string TimestampError = "sms.error.timestamp";
     }
 
     public static class Alerts

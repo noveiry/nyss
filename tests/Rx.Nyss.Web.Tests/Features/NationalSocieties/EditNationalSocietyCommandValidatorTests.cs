@@ -1,5 +1,4 @@
-﻿using FluentValidation.TestHelper;
-using NSubstitute;
+﻿using NSubstitute;
 using RX.Nyss.Web.Features.NationalSocieties.Commands;
 using RX.Nyss.Web.Features.NationalSocieties.Validation;
 using Xunit;

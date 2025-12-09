@@ -1,50 +1,71 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useCallback } from "react";
 import PropTypes from "prop-types";
 import { connect, useSelector } from "react-redux";
-import * as alertsActions from './logic/alertsActions';
-import { withLayout } from '../../utils/layout';
-import Layout from '../layout/Layout';
-import AlertsTable from './components/AlertsTable';
-import { useMount } from '../../utils/lifecycle';
-import { AlertsFilters } from './components/AlertsFilters';
-import TableActions from '../common/tableActions/TableActions';
-import { TableActionsButton } from '../common/buttons/tableActionsButton/TableActionsButton';
-import { stringKeys, strings } from '../../strings';
+import * as alertsActions from "./logic/alertsActions";
+import { withLayout } from "../../utils/layout";
+import Layout from "../layout/Layout";
+import AlertsTable from "./components/AlertsTable";
+import { useMount } from "../../utils/lifecycle";
+import { AlertsFilters } from "./components/AlertsFilters";
+import TableActions from "../common/tableActions/TableActions";
+import { TableActionsButton } from "../common/buttons/tableActionsButton/TableActionsButton";
+import { stringKeys, strings } from "../../strings";
+import { Loading } from "../common/loading/Loading";
+import TableHeader from "../common/tableHeader/TableHeader";
+import { trackEvent, trackPageView } from "../../utils/appInsightsHelper";
 
-const AlertsListPageComponent = (props) => {
+const AlertsListPageComponent = ({ openAlertsList, ...props }) => {
   useMount(() => {
-    props.openAlertsList(props.projectId);
+    openAlertsList(props.projectId);
+
+    // Track page view
+    trackPageView("AlertsListPage");
   });
 
-  const useRtlDirection = useSelector(state => state.appData.direction === 'rtl');
+  const useRtlDirection = useSelector(
+    (state) => state.appData.direction === "rtl",
+  );
 
-  const handleFilterChange = (filters) => {
-    props.getList(props.projectId, props.data.page, filters);
-  }
+  //useCallback important to avoid infinite loop from useEffect in AlertsFilters
+  const handleFilterChange = useCallback(
+    (filters) => {
+      props.getAlerts(props.projectId, 1, filters); // 1 is the default page number
+    },
+    [props.getAlerts, props.projectId],
+  );
+
+  const handleExportToExcel = () => {
+    trackEvent("exportAlertsExcel", { exportFileType: "Excel" });
+
+    props.export(props.projectId, props.filters);
+  };
 
   const handlePageChange = (page) => {
-    props.getList(props.projectId, page, props.filters);
-  }
+    props.getAlerts(props.projectId, page, props.filters);
+  };
 
-  if (!props.data) {
-    return null;
+  if (!props.filters) {
+    return <Loading />;
   }
 
   return (
     <Fragment>
-
-      <TableActions>
-        <TableActionsButton
-          onClick={() => props.export(props.projectId, props.filters)}
-          variant={"outlined"}
-        >
-          {strings(stringKeys.alerts.list.export)}
-        </TableActionsButton>
-      </TableActions>
+      <TableHeader>
+        <TableActions>
+          <TableActionsButton
+            onClick={handleExportToExcel}
+            variant={"outlined"}
+          >
+            {strings(stringKeys.alerts.list.export)}
+          </TableActionsButton>
+        </TableActions>
+      </TableHeader>
 
       <AlertsFilters
         filters={props.filters}
         filtersData={props.filtersData}
+        locations={props.locations}
+        healthRisks={props.healthRisks}
         onChange={handleFilterChange}
         rtl={useRtlDirection}
       />
@@ -63,12 +84,12 @@ const AlertsListPageComponent = (props) => {
       />
     </Fragment>
   );
-}
+};
 
 AlertsListPageComponent.propTypes = {
   getAlerts: PropTypes.func,
   isFetching: PropTypes.bool,
-  list: PropTypes.array
+  list: PropTypes.array,
 };
 
 const mapStateToProps = (state, ownProps) => ({
@@ -77,17 +98,18 @@ const mapStateToProps = (state, ownProps) => ({
   isListFetching: state.alerts.listFetching,
   isRemoving: state.alerts.listRemoving,
   filters: state.alerts.filters,
-  filtersData: state.alerts.filtersData
+  locations: state.alerts.filtersData.locations,
+  healthRisks: state.alerts.filtersData.healthRisks,
 });
 
 const mapDispatchToProps = {
   openAlertsList: alertsActions.openList.invoke,
   goToAssessment: alertsActions.goToAssessment,
-  getList: alertsActions.getList.invoke,
-  export: alertsActions.exportAlerts.invoke
+  getAlerts: alertsActions.getAlerts.invoke,
+  export: alertsActions.exportAlerts.invoke,
 };
 
 export const AlertsListPage = withLayout(
   Layout,
-  connect(mapStateToProps, mapDispatchToProps)(AlertsListPageComponent)
+  connect(mapStateToProps, mapDispatchToProps)(AlertsListPageComponent),
 );

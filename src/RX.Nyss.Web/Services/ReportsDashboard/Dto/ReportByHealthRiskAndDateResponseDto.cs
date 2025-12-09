@@ -11,9 +11,9 @@ namespace RX.Nyss.Web.Services.ReportsDashboard.Dto
 
         public class ReportHealthRiskDto
         {
-            public string HealthRiskName { get; set; }
+            public string? HealthRiskName { get; set; }
 
-            public IEnumerable<PeriodDto> Periods { get; set; }
+            public IEnumerable<PeriodDto>? Periods { get; set; }
         }
     }
 }

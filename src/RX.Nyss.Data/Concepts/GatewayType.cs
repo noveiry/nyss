@@ -1,10 +1,10 @@
-﻿namespace RX.Nyss.Data.Concepts
+﻿namespace RX.Nyss.Data.Concepts;
+
+public enum GatewayType
 {
-    public enum GatewayType
-    {
-        Unknown,
-        SmsEagle,
-        Telerivet,
-        SmsGateway
-    }
+    Unknown,
+    SmsEagle,
+    Telerivet,
+    SmsGateway,
+    MTNSmsGateway
 }

@@ -1,8 +1,7 @@
-namespace RX.Nyss.ReportApi.Features.Common
+namespace RX.Nyss.ReportApi.Features.Common;
+
+public class SendSmsRecipient
 {
-    public class SendSmsRecipient
-    {
-        public string PhoneNumber { get; set; }
-        public int? Modem { get; set; }
-    }
+    public string PhoneNumber { get; set; }
+    public int? Modem { get; set; }
 }

@@ -24,5 +24,7 @@ namespace RX.Nyss.Web.Features.Alerts.Dto
         public string LastReportDistrict { get; set; }
 
         public string LastReportRegion { get; set; }
+
+        public string LastReportZone { get; set; }
     }
 }

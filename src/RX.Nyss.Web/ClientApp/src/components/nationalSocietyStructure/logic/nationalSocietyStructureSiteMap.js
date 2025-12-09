@@ -10,6 +10,6 @@ export const nationalSocietyStructureSiteMap = [
     placeholder: placeholders.tabMenu,
     placeholderIndex: 3,
     access: accessMap.nationalSocietyStructure.edit,
-    middleStepOnly: true
-  }
+    middleStepOnly: true,
+  },
 ];

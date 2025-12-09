@@ -18,6 +18,13 @@ namespace RX.Nyss.Web.Features.SmsGateways.Dto
         public string ModemTwoName { get; set; }
         public string TelerivetApiKey { get; set; }
         public string TelerivetProjectId { get; set; }
+        public string GatewayApiKey { get; set; }
+        public string GatewayApiKeyName { get; set; }
+        public string GatewayExtraKey { get; set; }
+        public string GatewayExtraKeyName { get; set; }
+        public string GatewayUrl { get; set; }
+        public string GatewayAuthUrl { get; set; }
+        public string GatewaySenderId { get; set; }
 
         public class GatewaySettingRequestValidator : AbstractValidator<EditGatewaySettingRequestDto>
         {

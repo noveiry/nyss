@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Data.Concepts;
 using RX.Nyss.Web.Features.Common;
-using RX.Nyss.Web.Utils;
 using RX.Nyss.Web.Features.ProjectAlertRecipients.Dto;
+using RX.Nyss.Web.Utils;
 
 namespace RX.Nyss.Web.Features.ProjectAlertRecipients
 {

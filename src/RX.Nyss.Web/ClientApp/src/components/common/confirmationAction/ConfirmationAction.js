@@ -1,16 +1,21 @@
-import styles from "./ConfirmationAction.module.scss"
+import styles from "./ConfirmationAction.module.scss";
 
 import React, { Fragment, useState } from "react";
 import PropTypes from "prop-types";
 import { Menu, MenuItem, ListItemIcon } from "@material-ui/core";
 
-export const ConfirmationAction = ({ children, icon, confirmationText, onClick }) => {
+export const ConfirmationAction = ({
+  children,
+  icon,
+  confirmationText,
+  onClick,
+}) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleDropdownClick = (e) => {
     e.stopPropagation();
     setAnchorEl(e.currentTarget);
-  }
+  };
 
   const handleDropdownClose = (e) => {
     e && e.stopPropagation();
@@ -33,7 +38,10 @@ export const ConfirmationAction = ({ children, icon, confirmationText, onClick }
         onClose={handleDropdownClose}
         open={Boolean(anchorEl)}
       >
-        <MenuItem onClick={handleMenuClick} data-automationid="confirmationButton_confirm">
+        <MenuItem
+          onClick={handleMenuClick}
+          data-automationid="confirmationButton_confirm"
+        >
           {icon && <ListItemIcon>{icon}</ListItemIcon>}
           {confirmationText}
         </MenuItem>
@@ -47,7 +55,7 @@ ConfirmationAction.propTypes = {
   canEdit: PropTypes.bool,
   isIcon: PropTypes.bool,
   onClick: PropTypes.func,
-  children: PropTypes.any
+  children: PropTypes.any,
 };
 
 export default ConfirmationAction;

@@ -20,31 +20,31 @@ export const assessmentStatus = {
   rejected: "Rejected",
   toEscalate: "ToEscalate",
   toDismiss: "ToDismiss",
-  open: "Open"
-}
+  open: "Open",
+};
 
 export const escalatedOutcomes = {
   dismissed: "Dismissed",
   actionTaken: "ActionTaken",
-  other: "Other"
-}
+  other: "Other",
+};
 
 export const alertStatusFilters = {
   all: "All",
   open: "Open",
   escalated: "Escalated",
   dismissed: "Dismissed",
-  closed: "Closed"
-}
+  closed: "Closed",
+};
 
 export const alertStatus = {
   open: "Open",
   escalated: "Escalated",
   dismissed: "Dismissed",
-  closed: "Closed"
-}
+  closed: "Closed",
+};
 
-export const dateFilter = "DateFilter"
+export const dateFilter = "DateFilter";
 export const timeTriggeredColumn = "TimeTriggered";
 export const timeOfLastReportColumn = "TimeOfLastReport";
 export const statusColumn = "Status";

@@ -1,6 +1,5 @@
 using System;
 using NetTopologySuite.Geometries;
-using RX.Nyss.Data.Concepts;
 
 namespace RX.Nyss.Web.Features.Reports.Dto
 {

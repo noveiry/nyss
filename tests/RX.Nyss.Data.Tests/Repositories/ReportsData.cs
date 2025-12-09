@@ -95,10 +95,10 @@ public static class ReportsData
         {
             healthRisk.HealthRiskSuspectedDiseases.Add(
                 new HealthRiskSuspectedDisease
-            {
-                SuspectedDisease = new SuspectedDisease
                 {
-                    LanguageContents = new List<SuspectedDiseaseLanguageContent>
+                    SuspectedDisease = new SuspectedDisease
+                    {
+                        LanguageContents = new List<SuspectedDiseaseLanguageContent>
                     {
                         new SuspectedDiseaseLanguageContent
                         {
@@ -106,8 +106,8 @@ public static class ReportsData
                             Name = disease
                         }
                     }
-                },
-            });
+                    },
+                });
         }
 
         return healthRisk;

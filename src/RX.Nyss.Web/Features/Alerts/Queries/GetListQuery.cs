@@ -88,6 +88,7 @@ public class GetListQuery : IRequest<Result<PaginatedList<AlertListItemResponseD
                     LastReport = a.AlertReports.OrderByDescending(ar => ar.Report.Id)
                         .Select(ar => new
                         {
+                            ZoneName = ar.Report.RawReport.Zone != null ? ar.Report.RawReport.Zone.Name : "",
                             VillageName = ar.Report.RawReport.Village.Name,
                             DistrictName = ar.Report.RawReport.Village.District.Name,
                             RegionName = ar.Report.RawReport.Village.District.Region.Name,
@@ -101,6 +102,7 @@ public class GetListQuery : IRequest<Result<PaginatedList<AlertListItemResponseD
                 })
                 .Page(pageNumber, rowsPerPage)
                 .AsNoTracking()
+                .AsSplitQuery()
                 .ToListAsync();
 
             var dtos = alerts
@@ -112,6 +114,7 @@ public class GetListQuery : IRequest<Result<PaginatedList<AlertListItemResponseD
                     EscalatedOutcome = a.EscalatedOutcome,
                     Comments = a.Comments,
                     ReportCount = a.ReportCount,
+                    LastReportZone = a.LastReport.ZoneName,
                     LastReportVillage = a.LastReport.IsAnonymized
                         ? ""
                         : a.LastReport.VillageName,

@@ -43,7 +43,7 @@ public class ExportTests : AlertFeatureBase
 
         // Act
 
-        var handler = new ExportQuery.Handler(NyssContext,  AuthorizationService, ExcelExportService, StringsService);
+        var handler = new ExportQuery.Handler(NyssContext, AuthorizationService, ExcelExportService, StringsService);
         var res = await handler.Handle(new ExportQuery(1, new AlertListFilterRequestDto
         {
             Locations = null,

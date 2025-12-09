@@ -44,10 +44,10 @@ namespace RX.Nyss.Web.Features.Resources
         {
             var result = await _resourcesService.DeleteString(dto);
 
-//            if (result.IsSuccess)
-//            {
-//                    _inMemoryCache.Remove($"GetStrings.{translation.LanguageCode.ToLower()}");
-//            }
+            //            if (result.IsSuccess)
+            //            {
+            //                    _inMemoryCache.Remove($"GetStrings.{translation.LanguageCode.ToLower()}");
+            //            }
 
             return result;
         }
@@ -73,10 +73,10 @@ namespace RX.Nyss.Web.Features.Resources
         {
             var result = await _resourcesService.DeleteEmailString(dto);
 
-//            if (result.IsSuccess)
-//            {
-//                    _inMemoryCache.Remove($"GetStrings.{translation.LanguageCode.ToLower()}");
-//            }
+            //            if (result.IsSuccess)
+            //            {
+            //                    _inMemoryCache.Remove($"GetStrings.{translation.LanguageCode.ToLower()}");
+            //            }
 
             return result;
         }
@@ -102,10 +102,10 @@ namespace RX.Nyss.Web.Features.Resources
         {
             var result = await _resourcesService.DeleteSmsString(dto);
 
-//            if (result.IsSuccess)
-//            {
-//                    _inMemoryCache.Remove($"GetStrings.{translation.LanguageCode.ToLower()}");
-//            }
+            //            if (result.IsSuccess)
+            //            {
+            //                    _inMemoryCache.Remove($"GetStrings.{translation.LanguageCode.ToLower()}");
+            //            }
 
             return result;
         }

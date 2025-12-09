@@ -74,6 +74,7 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                     Count = grouping.Sum(r => r.ReportedCaseCount)
                 })
                 .Where(g => g.Count > 0)
+                .AsSplitQuery()
                 .ToListAsync();
 
             var reportsGroupedByHealthRisk = groupedReports
@@ -155,6 +156,7 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                         .Select(lc => lc.Name).FirstOrDefault()
                 })
                 .Where(g => g.Count > 0)
+                .AsSplitQuery()
                 .ToListAsync();
 
             var reportsGroupedByHealthRisk = groupedReports
@@ -195,7 +197,7 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                     Periods = x.Data.GroupBy(v => v.Period).OrderBy(g => g.Key.EpiYear).ThenBy(g => g.Key.EpiWeek)
                         .Select(g => new PeriodDto
                         {
-                            Period = g.Key.EpiWeek.ToString(),
+                            Period = $"{g.Key.EpiYear.ToString()}/{g.Key.EpiWeek.ToString()}",
                             Count = g.Sum(w => w.Count)
                         })
                         .ToList()
@@ -203,7 +205,7 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
                 .ToList();
 
             var allPeriods = _dateTimeProvider.GetEpiDateRange(startDate, endDate, epiWeekStartDay)
-                .Select(day => day.EpiWeek.ToString());
+                .Select(day => $"{day.EpiYear.ToString()}/{day.EpiWeek.ToString()}");
 
             return new ReportByHealthRiskAndDateResponseDto
             {

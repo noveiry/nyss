@@ -79,7 +79,7 @@ namespace RX.Nyss.Web.Features.Reports.Queries
                     worksheet.Cells[columnIndex, 10].Value = data.Village;
                     worksheet.Cells[columnIndex, 11].Value = data.Zone;
                     worksheet.Cells[columnIndex, 12].Value = data.DataCollectorDisplayName;
-                    
+
                 }
 
                 worksheet.Column(2).Width = 12; //Date
@@ -131,7 +131,7 @@ namespace RX.Nyss.Web.Features.Reports.Queries
                     worksheet.Cells[columnIndex, 13].Value = data.CountMalesAtLeastFive;
                     worksheet.Cells[columnIndex, 14].Value = data.CountFemalesBelowFive;
                     worksheet.Cells[columnIndex, 15].Value = data.CountFemalesAtLeastFive;
-                   
+
 
                     if (reportListDataCollectorType == ReportListDataCollectorType.CollectionPoint)
                     {
@@ -139,12 +139,12 @@ namespace RX.Nyss.Web.Features.Reports.Queries
                         worksheet.Cells[columnIndex, 17].Value = data.DeathCount;
                         worksheet.Cells[columnIndex, 18].Value = data.FromOtherVillagesCount;
                         worksheet.Cells[columnIndex, 19].Value = data.DataCollectorDisplayName;
-                        
+
                     }
                     else
                     {
                         worksheet.Cells[columnIndex, 16].Value = data.DataCollectorDisplayName;
-                        
+
                     }
                 }
 
@@ -155,7 +155,7 @@ namespace RX.Nyss.Web.Features.Reports.Queries
                 if (reportListDataCollectorType == ReportListDataCollectorType.CollectionPoint)
                 {
                     worksheet.Column(19).Width = 20; //DcpName
-                    
+
                 }
                 else
                 {

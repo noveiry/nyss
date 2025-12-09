@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using RX.Nyss.Web.Features.Organizations;
 using RX.Nyss.Web.Services;
 
 namespace RX.Nyss.Web.Features.Managers.Dto

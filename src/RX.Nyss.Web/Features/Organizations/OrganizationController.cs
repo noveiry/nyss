@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Data.Concepts;
 using RX.Nyss.Web.Features.Common;
-using RX.Nyss.Web.Features.NationalSocieties.Dto;
 using RX.Nyss.Web.Features.Organizations.Dto;
 using RX.Nyss.Web.Utils;
 

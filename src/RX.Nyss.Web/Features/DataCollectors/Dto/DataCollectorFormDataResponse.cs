@@ -14,7 +14,7 @@ namespace RX.Nyss.Web.Features.DataCollectors.Dto
 
         public LocationDto DefaultLocation { get; set; }
 
-        public string CountryCode {get; set;}
+        public string CountryCode { get; set; }
 
         public int? DefaultSupervisorId { get; set; }
     }

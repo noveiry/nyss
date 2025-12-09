@@ -6,57 +6,56 @@ using RX.Nyss.Data.Concepts;
 using RX.Nyss.Web.Features.NationalSocieties.Access;
 using RX.Nyss.Web.Services.Authorization;
 
-namespace RX.Nyss.Web.Features.SmsGateways.Access
+namespace RX.Nyss.Web.Features.SmsGateways.Access;
+
+public interface ISmsGatewayAccessService
 {
-    public interface ISmsGatewayAccessService
+    Task<bool> HasCurrentUserAccessToSmsGateway(int smsGatewayId);
+}
+
+public class SmsGatewayAccessService : ISmsGatewayAccessService
+{
+    private readonly INyssContext _nyssContext;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly INationalSocietyAccessService _nationalSocietyAccessService;
+
+    public SmsGatewayAccessService(
+        INyssContext nyssContext,
+        IAuthorizationService authorizationService,
+        INationalSocietyAccessService nationalSocietyAccessService)
     {
-        Task<bool> HasCurrentUserAccessToSmsGateway(int smsGatewayId);
+        _nyssContext = nyssContext;
+        _authorizationService = authorizationService;
+        _nationalSocietyAccessService = nationalSocietyAccessService;
     }
 
-    public class SmsGatewayAccessService : ISmsGatewayAccessService
+    public async Task<bool> HasCurrentUserAccessToSmsGateway(int smsGatewayId)
     {
-        private readonly INyssContext _nyssContext;
-        private readonly IAuthorizationService _authorizationService;
-        private readonly INationalSocietyAccessService _nationalSocietyAccessService;
+        var currentUser = await _authorizationService.GetCurrentUser();
 
-        public SmsGatewayAccessService(
-            INyssContext nyssContext,
-            IAuthorizationService authorizationService,
-            INationalSocietyAccessService nationalSocietyAccessService)
-        {
-            _nyssContext = nyssContext;
-            _authorizationService = authorizationService;
-            _nationalSocietyAccessService = nationalSocietyAccessService;
-        }
-
-        public async Task<bool> HasCurrentUserAccessToSmsGateway(int smsGatewayId)
-        {
-            var currentUser = await _authorizationService.GetCurrentUser();
-
-            var nationalSocietyData = await _nyssContext.GatewaySettings
-                .Where(g => g.Id == smsGatewayId)
-                .Select(ns => new
-                {
-                    CurrentUserOrganizationId = ns.NationalSociety.NationalSocietyUsers
-                        .Where(uns => uns.User == currentUser)
-                        .Select(uns => uns.OrganizationId)
-                        .SingleOrDefault(),
-                    HasCoordinator = ns.NationalSociety.NationalSocietyUsers
-                        .Any(uns => uns.User.Role == Role.Coordinator)
-                })
-                .SingleAsync();
-
-            if (nationalSocietyData.HasCoordinator && !_authorizationService.IsCurrentUserInAnyRole(Role.Administrator, Role.Coordinator))
+        var nationalSocietyData = await _nyssContext.GatewaySettings
+            .Where(g => g.Id == smsGatewayId)
+            .Select(ns => new
             {
-                return false;
-            }
+                CurrentUserOrganizationId = ns.NationalSociety.NationalSocietyUsers
+                    .Where(uns => uns.User == currentUser)
+                    .Select(uns => uns.OrganizationId)
+                    .SingleOrDefault(),
+                HasCoordinator = ns.NationalSociety.NationalSocietyUsers
+                    .Any(uns => uns.User.Role == Role.Coordinator)
+            })
+            .SingleAsync();
 
-            var nationalSocietyId = await _nyssContext.GatewaySettings
-                .Where(g => g.Id == smsGatewayId)
-                .Select(s => s.NationalSociety.Id)
-                .SingleAsync();
-
-            return await _nationalSocietyAccessService.HasCurrentUserAccessToNationalSociety(nationalSocietyId);
+        if (nationalSocietyData.HasCoordinator && !_authorizationService.IsCurrentUserInAnyRole(Role.Administrator, Role.Coordinator))
+        {
+            return false;
         }
+
+        var nationalSocietyId = await _nyssContext.GatewaySettings
+            .Where(g => g.Id == smsGatewayId)
+            .Select(s => s.NationalSociety.Id)
+            .SingleAsync();
+
+        return await _nationalSocietyAccessService.HasCurrentUserAccessToNationalSociety(nationalSocietyId);
     }
 }

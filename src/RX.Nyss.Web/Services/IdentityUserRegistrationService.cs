@@ -54,7 +54,7 @@ namespace RX.Nyss.Web.Services
             return identityUser;
         }
 
-        public async Task<IdentityUser> EditIdentityUser(string oldEmail , string newEmail)
+        public async Task<IdentityUser> EditIdentityUser(string oldEmail, string newEmail)
         {
             var identityUser = await _userManager.FindByEmailAsync(oldEmail);
 
@@ -139,7 +139,7 @@ namespace RX.Nyss.Web.Services
             var (emailSubject, emailBody) = await _emailTextGeneratorService.GenerateResetPasswordEmail(resetUrl, nyssUser.Name, nyssUser.ApplicationLanguage.LanguageCode);
 
             await _emailPublisherService.SendEmail((email, nyssUser.Name), emailSubject, emailBody);
-            
+
             return Success(ResultKey.User.ResetPassword.Success);
         }
 
@@ -176,7 +176,7 @@ namespace RX.Nyss.Web.Services
             }
 
             var passwordChangeResult = await _userManager.ResetPasswordAsync(user, verificationToken, newPassword);
-            
+
             var isPasswordTooWeak = passwordChangeResult.Errors.Any(x => x.IsPasswordTooWeak());
             if (isPasswordTooWeak)
             {

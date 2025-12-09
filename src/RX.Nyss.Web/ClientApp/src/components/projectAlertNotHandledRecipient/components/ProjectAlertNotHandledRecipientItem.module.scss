@@ -16,20 +16,20 @@
 
 .recipientNameSelect {
   font-weight: bold !important;
-  margin-right: 3ch;
+  margin-right: 30px;
   flex: 1 0 auto;
   min-width: 200px;
   max-width: 200px;
 
   &.rtl {
     margin-right: unset;
-    margin-left: 3ch;
+    margin-left: 30px;
   }
 }
 
 .organizationField {
   margin-right: auto !important;
-  width: 310px;
+  width: 200px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

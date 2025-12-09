@@ -192,14 +192,14 @@ namespace RX.Nyss.Web.Features.Agreements
                     (x.DefaultOrganization.HeadManager == userEntity || x.DefaultOrganization.PendingHeadManager == userEntity)));
 
             var activeAgreements = _nyssContext.NationalSocietyConsents.Where(nsc => !nsc.ConsentedUntil.HasValue && nsc.UserEmailAddress == userEntity.EmailAddress);
-            var pendingNationalSocieties = await applicableNationalSocieties.Where(ns => activeAgreements.All(aa => aa.NationalSocietyId != ns.Id)).ToListAsync();
+            var pendingNationalSocieties = await applicableNationalSocieties.Where(ns => activeAgreements.All(aa => aa.NationalSocietyId != ns.Id)).AsSplitQuery().ToListAsync();
 
             var staleNationalSocieties = new List<NationalSociety>();
             if (activeAgreements.Any())
             {
                 var agreementLastUpdatedTimeStamp = await _generalBlobProvider.GetPlatformAgreementLastModifiedDate(userEntity.ApplicationLanguage.LanguageCode);
                 var staleAgreements = activeAgreements.Where(nsc => nsc.ConsentedFrom < agreementLastUpdatedTimeStamp);
-                staleNationalSocieties.AddRange(await applicableNationalSocieties.Where(ns => staleAgreements.Any(sa => sa.NationalSocietyId == ns.Id)).ToListAsync());
+                staleNationalSocieties.AddRange(await applicableNationalSocieties.Where(ns => staleAgreements.Any(sa => sa.NationalSocietyId == ns.Id)).AsSplitQuery().ToListAsync());
             }
 
             return (pendingNationalSocieties, staleNationalSocieties);

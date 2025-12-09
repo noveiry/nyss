@@ -1,11 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {IconButton, Typography } from '@material-ui/core';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { IconButton, Typography } from "@material-ui/core";
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
 
 export const PasswordDisplayField = ({ label, value }) => {
-
   const [showPassword, setShowPassword] = React.useState(false);
 
   const togglePassword = () => {
@@ -18,15 +17,13 @@ export const PasswordDisplayField = ({ label, value }) => {
 
   return (
     <>
-      <Typography variant="h6">
-        { label }
-      </Typography>
+      <Typography variant="h6">{label}</Typography>
       <Typography variant="body1" gutterBottom>
-        { showPassword ? value : getAsterisk(value) }
+        {showPassword ? value : getAsterisk(value)}
         <IconButton
           aria-label="toggle password visibility"
           onClick={togglePassword}
-          onMouseDown={event => event.preventDefault()}
+          onMouseDown={(event) => event.preventDefault()}
         >
           {showPassword ? <Visibility /> : <VisibilityOff />}
         </IconButton>
@@ -37,7 +34,7 @@ export const PasswordDisplayField = ({ label, value }) => {
 
 PasswordDisplayField.propTypes = {
   onClick: PropTypes.func,
-  label: PropTypes.string
+  label: PropTypes.string,
 };
 
 export default PasswordDisplayField;

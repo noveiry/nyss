@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RX.Nyss.Data;
 using RX.Nyss.Data.Concepts;
-using RX.Nyss.Data.Models;
 using RX.Nyss.Web.Services.Authorization;
 
 namespace RX.Nyss.Web.Features.NationalSocieties.Access

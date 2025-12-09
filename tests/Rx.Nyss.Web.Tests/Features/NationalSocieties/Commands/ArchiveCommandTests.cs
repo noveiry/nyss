@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
-using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Data;
 using RX.Nyss.Web.Features.Managers;
 using RX.Nyss.Web.Features.NationalSocieties.Commands;

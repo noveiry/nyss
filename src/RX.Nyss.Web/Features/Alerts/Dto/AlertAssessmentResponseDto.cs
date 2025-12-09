@@ -12,6 +12,12 @@ namespace RX.Nyss.Web.Features.Alerts.Dto
 
         public string CaseDefinition { get; set; }
 
+        public int HealthRiskCountThreshold { get; set; }
+
+        public int? HealthRiskDaysThreshold { get; set; }
+
+        public int? HealthRiskKilometersThreshold { get; set; }
+
         public string Comments { get; set; }
 
         public bool RecipientsNotified { get; set; }
@@ -35,6 +41,8 @@ namespace RX.Nyss.Web.Features.Alerts.Dto
             public string PhoneNumber { get; set; }
 
             public string Village { get; set; }
+
+            public string Zone { get; set; }
 
             public string Sex { get; set; }
 

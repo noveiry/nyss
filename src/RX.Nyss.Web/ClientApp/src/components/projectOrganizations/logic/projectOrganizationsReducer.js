@@ -3,13 +3,19 @@ import { initialState } from "../../../initialState";
 import { setProperty } from "../../../utils/immutable";
 import { LOCATION_CHANGE } from "connected-react-router";
 
-export function projectOrganizationsReducer(state = initialState.projectOrganizations, action) {
+export function projectOrganizationsReducer(
+  state = initialState.projectOrganizations,
+  action,
+) {
   switch (action.type) {
     case LOCATION_CHANGE: // cleanup
-      return { ...state, formData: null, formError: null }
+      return { ...state, formData: null, formError: null };
 
     case actions.OPEN_PROJECT_ORGANIZATIONS_LIST.INVOKE:
-      return { ...state, listStale: state.listStale || action.projectId !== state.listProjectId };
+      return {
+        ...state,
+        listStale: state.listStale || action.projectId !== state.listProjectId,
+      };
 
     case actions.OPEN_PROJECT_ORGANIZATIONS_LIST.SUCCESS:
       return { ...state, listProjectId: action.projectId };
@@ -18,7 +24,12 @@ export function projectOrganizationsReducer(state = initialState.projectOrganiza
       return { ...state, listFetching: true, listData: [] };
 
     case actions.GET_PROJECT_ORGANIZATIONS.SUCCESS:
-      return { ...state, listFetching: false, listData: action.list, listStale: false };
+      return {
+        ...state,
+        listFetching: false,
+        listData: action.list,
+        listStale: false,
+      };
 
     case actions.GET_PROJECT_ORGANIZATIONS.FAILURE:
       return { ...state, listFetching: false, listData: [] };
@@ -36,15 +47,25 @@ export function projectOrganizationsReducer(state = initialState.projectOrganiza
       return { ...state, formSaving: false, formError: action.error };
 
     case actions.REMOVE_PROJECT_ORGANIZATION.REQUEST:
-      return { ...state, listRemoving: setProperty(state.listRemoving, action.id, true) };
+      return {
+        ...state,
+        listRemoving: setProperty(state.listRemoving, action.id, true),
+      };
 
     case actions.REMOVE_PROJECT_ORGANIZATION.SUCCESS:
-      return { ...state, listRemoving: setProperty(state.listRemoving, action.id, undefined), listStale: true };
+      return {
+        ...state,
+        listRemoving: setProperty(state.listRemoving, action.id, undefined),
+        listStale: true,
+      };
 
     case actions.REMOVE_PROJECT_ORGANIZATION.FAILURE:
-      return { ...state, listRemoving: setProperty(state.listRemoving, action.id, undefined) };
+      return {
+        ...state,
+        listRemoving: setProperty(state.listRemoving, action.id, undefined),
+      };
 
     default:
       return state;
   }
-};
+}

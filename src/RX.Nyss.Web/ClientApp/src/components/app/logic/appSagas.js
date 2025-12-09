@@ -1,4 +1,11 @@
-import { call, put, takeEvery, takeLatest, select, delay } from "redux-saga/effects";
+import {
+  call,
+  put,
+  takeEvery,
+  takeLatest,
+  select,
+  delay,
+} from "redux-saga/effects";
 import * as consts from "./appConstans";
 import * as authConsts from "../../../authentication/authConstants";
 import * as actions from "./appActions";
@@ -17,13 +24,13 @@ export const appSagas = () => [
   takeEvery(consts.ENTITY_UPDATED, entityUpdated),
   takeEvery(consts.SWITCH_STRINGS, switchStrings),
   takeEvery(consts.SEND_FEEDBACK.INVOKE, sendFeedback),
-  takeLatest("*", checkLogin)
+  takeLatest("*", checkLogin),
 ];
 
 function* initApplication() {
   yield put(actions.initApplication.request());
   try {
-    const user = yield select(state => state.appData.user);
+    const user = yield select((state) => state.appData.user);
     yield call(getAppData);
     yield call(getStrings, user ? user.languageCode : "en");
     yield call(initTracking);
@@ -35,7 +42,7 @@ function* initApplication() {
   } catch (error) {
     yield put(actions.initApplication.failure(error.message));
   }
-};
+}
 
 function storeUser(user) {
   if (user) {
@@ -46,10 +53,11 @@ function storeUser(user) {
 }
 
 function* checkLogin() {
-  const authCookieExpiration = yield select(state => state.appData.authCookieExpiration);
+  const authCookieExpiration = yield select(
+    (state) => state.appData.authCookieExpiration,
+  );
 
-  if (!authCookieExpiration)
-  {
+  if (!authCookieExpiration) {
     return;
   }
 
@@ -66,10 +74,10 @@ function* switchStrings() {
 }
 
 function* openModule({ path, params }) {
-  const route = yield select(state => state.appData.route);
-  path = path || (yield select(state => route && route.path));
+  const route = yield select((state) => state.appData.route);
+  path = path || (yield select((state) => route && route.path));
 
-  const user = yield select(state => state.appData.user);
+  const user = yield select((state) => state.appData.user);
 
   const routeParams = (route && route.params) || {};
   const menuParams = { ...routeParams, ...params };
@@ -77,43 +85,74 @@ function* openModule({ path, params }) {
   const generalMenu = getMenu(menuParams, placeholders.generalMenu, path, user);
   const sideMenu = getMenu(menuParams, placeholders.leftMenu, path, user);
   const tabMenu = getMenu(menuParams, placeholders.tabMenu, path, user);
-  const projectTabMenu = getMenu(menuParams, placeholders.projectTabMenu, path, user);
-  const title = getHierarchy(path, menuParams, user).filter(b => !b.hidden).slice(-1)[0].title;
+  const projectTabMenu = getMenu(
+    menuParams,
+    placeholders.projectTabMenu,
+    path,
+    user,
+  ).map((item) => ({
+    ...item,
+    subMenu: getMenu(
+      menuParams,
+      placeholders.projectSubMenu,
+      path,
+      user,
+      item.path,
+    ),
+  }));
+  const title =
+    params.title || getHierarchy(path, menuParams, user).slice(-1)[0].title;
 
-  yield put(actions.openModule.success(path, menuParams, generalMenu, sideMenu, tabMenu, projectTabMenu, title))
+  yield put(
+    actions.openModule.success(
+      path,
+      menuParams,
+      generalMenu,
+      sideMenu,
+      tabMenu,
+      projectTabMenu,
+      title,
+    ),
+  );
 }
 
 function* getAppData() {
   yield put(actions.getAppData.request());
   try {
     const appData = yield call(http.get, "/api/appData/getAppData", true);
-    yield put(actions.getAppData.success(
-      appData.value.contentLanguages,
-      appData.value.countries,
-      appData.value.isDevelopment,
-      appData.value.isDemo,
-      appData.value.authCookieExpiration,
-      appData.value.applicationInsightsConnectionString,
-      ));
+    yield put(
+      actions.getAppData.success(
+        appData.value.contentLanguages,
+        appData.value.countries,
+        appData.value.isDevelopment,
+        appData.value.isDemo,
+        appData.value.authCookieExpiration,
+        appData.value.applicationInsightsConnectionString,
+      ),
+    );
   } catch (error) {
     yield put(actions.getAppData.failure(error.message));
   }
-};
+}
 
 function* getStrings(languageCode) {
   yield put(actions.getStrings.invoke());
   try {
-    const response = yield call(http.get, `/api/appData/getStrings/${languageCode}`, true);
+    const response = yield call(
+      http.get,
+      `/api/appData/getStrings/${languageCode}`,
+      true,
+    );
     updateStrings(response.value);
     yield put(actions.getStrings.success());
   } catch (error) {
     yield put(actions.getStrings.failure(error.message));
   }
-};
+}
 
 function entityUpdated({ entities }) {
   cache.cleanCacheForDependencies(entities);
-};
+}
 
 function* sendFeedback({ message }) {
   yield put(actions.sendFeedback.request());
@@ -123,4 +162,4 @@ function* sendFeedback({ message }) {
   } catch (error) {
     yield put(actions.sendFeedback.failure(error.message));
   }
-};
+}

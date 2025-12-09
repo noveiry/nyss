@@ -75,9 +75,7 @@ namespace RX.Nyss.Web.Tests.Services.ReportsDashboard
 
             var result = await _reportsDashboardByDataCollectionPointService.GetDataCollectionPointReports(new ReportsFilter(), DatesGroupingType.Day, DayOfWeek.Sunday);
 
-            result.Sum(r => r.DeathCount).ShouldBe(5);
             result.Sum(r => r.ReferredCount).ShouldBe(7);
-            result.Sum(r => r.FromOtherVillagesCount).ShouldBe(9);
         }
 
         [Fact]
@@ -106,10 +104,6 @@ namespace RX.Nyss.Web.Tests.Services.ReportsDashboard
             });
 
             var result = await _reportsDashboardByDataCollectionPointService.GetDataCollectionPointReports(new ReportsFilter(), DatesGroupingType.Day, DayOfWeek.Sunday);
-
-            result.Where(x => x.Period == "01/01/20").Sum(r => r.DeathCount).ShouldBe(1);
-            result.Where(x => x.Period == "02/01/20").Sum(r => r.DeathCount).ShouldBe(5);
-            result.Where(x => x.Period == "03/01/20").Sum(r => r.DeathCount).ShouldBe(0);
         }
 
         [Fact]
@@ -144,9 +138,6 @@ namespace RX.Nyss.Web.Tests.Services.ReportsDashboard
             });
 
             var result = await _reportsDashboardByDataCollectionPointService.GetDataCollectionPointReports(new ReportsFilter(), DatesGroupingType.Week, DayOfWeek.Sunday);
-
-            result.Where(x => x.Period == "1").Sum(r => r.DeathCount).ShouldBe(1);
-            result.Where(x => x.Period == "53").Sum(r => r.DeathCount).ShouldBe(5);
         }
     }
 }

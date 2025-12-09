@@ -1,21 +1,27 @@
 import styles from "./ReportsEditPage.module.scss";
 
-import React, { useEffect, useState, useRef, Fragment } from 'react';
-import { validators, createForm } from '../../utils/forms';
-import Form from '../forms/form/Form';
-import FormActions from '../forms/formActions/FormActions';
-import SubmitButton from '../common/buttons/submitButton/SubmitButton';
-import TextInputField from '../forms/TextInputField';
-import { strings, stringKeys } from '../../strings';
-import { useTheme, Grid, MenuItem, LinearProgress } from "@material-ui/core"
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import { Dialog, DialogContent, DialogTitle, Typography, useMediaQuery } from "@material-ui/core";
+import React, { useEffect, useState, useRef, Fragment } from "react";
+import { validators, createForm } from "../../utils/forms";
+import Form from "../forms/form/Form";
+import FormActions from "../forms/formActions/FormActions";
+import SubmitButton from "../common/buttons/submitButton/SubmitButton";
+import TextInputField from "../forms/TextInputField";
+import { strings, stringKeys } from "../../strings";
+import { useTheme, Grid, MenuItem, LinearProgress } from "@material-ui/core";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Typography,
+  useMediaQuery,
+} from "@material-ui/core";
 import { useSelector } from "react-redux";
 import { DatePicker } from "../forms/DatePicker";
 import AutocompleteTextInputField from "../forms/AutocompleteTextInputField";
 import SelectField from "../forms/SelectField";
-import {getUtcOffset} from "../../utils/date";
+import { getUtcOffset } from "../../utils/date";
 import * as http from "../../utils/http";
 import CancelButton from "../common/buttons/cancelButton/CancelButton";
 import TimePicker from "../forms/TimePicker";
@@ -23,13 +29,15 @@ import TimePicker from "../forms/TimePicker";
 export const SendReportDialog = ({ close, showMessage }) => {
   const [form, setForm] = useState(null);
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))
+  const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
   dayjs.extend(utc);
-  const isFetching = useSelector(state => state.reports.formFetching);
-  const dataCollectors = useSelector(state => state.reports.sendReport.dataCollectors);
-  const formData = useSelector(state => state.reports.sendReport.formData);
+  const isFetching = useSelector((state) => state.reports.formFetching);
+  const dataCollectors = useSelector(
+    (state) => state.reports.sendReport.dataCollectors,
+  );
+  const formData = useSelector((state) => state.reports.sendReport.formData);
   const [date, setDate] = useState(dayjs());
-  const [time, setTime] = useState(dayjs().format('HH:mm'));
+  const [time, setTime] = useState(dayjs().format("HH:mm"));
   const [timeError, setTimeError] = useState(null);
   const [isSending, setIsSending] = useState(false);
   const [gatewayModemsDisabled, setGatewayModemsDisabled] = useState(false);
@@ -38,7 +46,10 @@ export const SendReportDialog = ({ close, showMessage }) => {
   const dcFieldSubscription = useRef(null);
 
   const canSelectModem = !!formData && formData.modems.length > 0;
-  const dataCollectorsOptions = dataCollectors.map(dc => ({ title: `${dc.name} / ${dc.phoneNumber}`, id: dc.id }));
+  const dataCollectorsOptions = dataCollectors.map((dc) => ({
+    title: `${dc.name} / ${dc.phoneNumber}`,
+    id: dc.id,
+  }));
 
   useEffect(() => {
     if (!formData) {
@@ -47,8 +58,10 @@ export const SendReportDialog = ({ close, showMessage }) => {
 
     const fields = {
       dataCollector: null,
-      gatewayModemId: !!formData.currentUserModemId ? formData.currentUserModemId.toString() : '',
-      message: '',
+      gatewayModemId: !!formData.currentUserModemId
+        ? formData.currentUserModemId.toString()
+        : "",
+      message: "",
     };
 
     const validation = {
@@ -60,31 +73,37 @@ export const SendReportDialog = ({ close, showMessage }) => {
     setForm(createForm(fields, validation));
   }, [canSelectModem, formData]);
 
-
   useEffect(() => {
     if (!form) return;
 
-    dcFieldSubscription.current = form.fields.dataCollector.subscribe(onDataCollectorChange);
+    dcFieldSubscription.current = form.fields.dataCollector.subscribe(
+      onDataCollectorChange,
+    );
 
     return () => {
       dcFieldSubscription.current?.unsubscribe();
-    }
+    };
   }, [form]);
 
   function getReportStatus(timestamp, dataCollectorId) {
     return new Promise((resolve, reject) => {
       intervalHandler.current = setInterval(() => {
-        http.get(`/api/report/status?timestamp=${timestamp}&dataCollectorId=${dataCollectorId}`, false, abortController.current.signal)
-        .then(status => {
-          if (!status) return;
+        http
+          .get(
+            `/api/report/status?timestamp=${timestamp}&dataCollectorId=${dataCollectorId}`,
+            false,
+            abortController.current.signal,
+          )
+          .then((status) => {
+            if (!status) return;
 
-          clearInterval(intervalHandler.current);
-          resolve(status);
-        })
-        .catch(err => {
-          clearInterval(intervalHandler.current);
-          reject(err);
-        });
+            clearInterval(intervalHandler.current);
+            resolve(status);
+          })
+          .catch((err) => {
+            clearInterval(intervalHandler.current);
+            reject(err);
+          });
       }, 3000);
     });
   }
@@ -94,41 +113,59 @@ export const SendReportDialog = ({ close, showMessage }) => {
 
     if (!form.isValid() || !!timeError) {
       return;
-    };
+    }
 
     const values = form.getValues();
-    const dataCollector = dataCollectorsOptions.filter(dc => dc.title === values.dataCollector)[0];
-    const currentSeconds = dayjs().format('ss');
-    const timestamp = dayjs(`${date.format('YYYY-MM-DD')} ${time}:${currentSeconds}`).utc().format('YYYYMMDDHHmmss');
+    const dataCollector = dataCollectorsOptions.filter(
+      (dc) => dc.title === values.dataCollector,
+    )[0];
+    const currentSeconds = dayjs().format("ss");
+    const timestamp = dayjs(
+      `${date.format("YYYY-MM-DD")} ${time}:${currentSeconds}`,
+    )
+      .utc()
+      .format("YYYYMMDDHHmmss");
 
     const data = {
       dataCollectorId: dataCollector.id,
       text: values.message,
       timestamp: timestamp,
       modemId: !!values.gatewayModemId ? parseInt(values.gatewayModemId) : null,
-      utcOffset: getUtcOffset()
+      utcOffset: getUtcOffset(),
     };
 
     try {
       setIsSending(true);
-      await http.post("/api/report/sendReport", data, false, abortController.current.signal);
-      const status = await getReportStatus(data.timestamp, data.dataCollectorId);
+      await http.post(
+        "/api/report/sendReport",
+        data,
+        false,
+        abortController.current.signal,
+      );
+      const status = await getReportStatus(
+        data.timestamp,
+        data.dataCollectorId,
+      );
 
-      showMessage(status.feedbackMessage ? status.feedbackMessage : stringKeys.reports.sendReport.success);
+      showMessage(
+        status.feedbackMessage
+          ? status.feedbackMessage
+          : stringKeys.reports.sendReport.success,
+      );
 
       setIsSending(false);
       close();
     } catch (error) {
       setIsSending(false);
 
-      if (error.name === 'AbortError') {
+      if (error.name === "AbortError") {
         close();
         return;
-      };
+      }
 
       showMessage?.(error.message);
     }
-  };
+  }
 
   function onClose() {
     if (isSending) {
@@ -146,8 +183,8 @@ export const SendReportDialog = ({ close, showMessage }) => {
   }
 
   function onDataCollectorChange({ newValue }) {
-    const dcOption = dataCollectorsOptions.find(dc => dc.title === newValue);
-    const dc = dataCollectors.find(dc => dc.id === dcOption?.id);
+    const dcOption = dataCollectorsOptions.find((dc) => dc.title === newValue);
+    const dc = dataCollectors.find((dc) => dc.id === dcOption?.id);
 
     if (dc?.phoneNumber && canSelectModem) {
       setGatewayModemsDisabled(false);
@@ -159,102 +196,115 @@ export const SendReportDialog = ({ close, showMessage }) => {
     }
   }
 
-  const onDateChange = date => {
+  const onDateChange = (date) => {
     const newDate = dayjs(date);
     setDate(newDate);
     setTimeError(validateTime(time, newDate));
-  }
+  };
 
   const validateTime = (value, newDate = null) =>
-    dayjs(`${(!!newDate ? newDate : date).format('YYYY-MM-DD')} ${value}`) > dayjs()
+    dayjs(`${(!!newDate ? newDate : date).format("YYYY-MM-DD")} ${value}`) >
+    dayjs()
       ? strings(stringKeys.validation.timeNotInFuture)
       : null;
 
-  const onTimeChange = time => {
+  const onTimeChange = (time) => {
     setTimeError(validateTime(time));
     setTime(time);
-  }
+  };
 
-  return !!form && (
-    <Fragment>
-      <Dialog open={true} onClose={close} onClick={e => e.stopPropagation()} fullScreen={fullScreen}>
-        {isFetching && <LinearProgress />}
-        <DialogTitle id="form-dialog-title">
-          <Typography variant="h5">
-            {strings(stringKeys.reports.sendReport.sendReport)}
-          </Typography>
-        </DialogTitle>
-        <DialogContent>
-          <Form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <AutocompleteTextInputField
-                  label={strings(stringKeys.reports.sendReport.dataCollector)}
-                  field={form.fields.dataCollector}
-                  options={dataCollectorsOptions}
-                  allowAddingValue={false}
-                  autoSelect
-                  name="dataCollectors"
-                />
-              </Grid>
-
-              {canSelectModem && (
+  return (
+    !!form && (
+      <Fragment>
+        <Dialog
+          open={true}
+          onClose={close}
+          onClick={(e) => e.stopPropagation()}
+          fullScreen={fullScreen}
+        >
+          {isFetching && <LinearProgress />}
+          <DialogTitle id="form-dialog-title">
+            <Typography variant="h5">
+              {strings(stringKeys.reports.sendReport.sendReport)}
+            </Typography>
+          </DialogTitle>
+          <DialogContent>
+            <Form onSubmit={handleSubmit}>
+              <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <SelectField
-                    label={strings(stringKeys.reports.sendReport.modem)}
-                    field={form.fields.gatewayModemId}
-                    name="gatewayModems"
-                    disabled={gatewayModemsDisabled}
-                  >
-                    {formData.modems.map(modem => (
-                      <MenuItem key={`gatewayModem_${modem.id}`} value={modem.id.toString()}>
-                        {modem.name}
-                      </MenuItem>
-                    ))}
-                  </SelectField>
+                  <AutocompleteTextInputField
+                    label={strings(stringKeys.reports.sendReport.dataCollector)}
+                    field={form.fields.dataCollector}
+                    options={dataCollectorsOptions}
+                    allowAddingValue={false}
+                    autoSelect
+                    name="dataCollectors"
+                  />
                 </Grid>
-              )}
 
-              <Grid item xs={6}>
-                <DatePicker
-                  label={strings(stringKeys.reports.sendReport.dateOfReport)}
-                  fullWidth
-                  onChange={onDateChange}
-                  value={date}
-                />
+                {canSelectModem && (
+                  <Grid item xs={12}>
+                    <SelectField
+                      label={strings(stringKeys.reports.sendReport.modem)}
+                      field={form.fields.gatewayModemId}
+                      name="gatewayModems"
+                      disabled={gatewayModemsDisabled}
+                    >
+                      {formData.modems.map((modem) => (
+                        <MenuItem
+                          key={`gatewayModem_${modem.id}`}
+                          value={modem.id.toString()}
+                        >
+                          {modem.name}
+                        </MenuItem>
+                      ))}
+                    </SelectField>
+                  </Grid>
+                )}
+
+                <Grid item xs={6}>
+                  <DatePicker
+                    label={strings(stringKeys.reports.sendReport.dateOfReport)}
+                    fullWidth
+                    onChange={onDateChange}
+                    value={date}
+                  />
+                </Grid>
+
+                <Grid item xs={6}>
+                  <TimePicker
+                    label={strings(stringKeys.reports.sendReport.timeOfReport)}
+                    type="time"
+                    name="time"
+                    value={time}
+                    error={timeError}
+                    onChange={onTimeChange}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextInputField
+                    className={styles.fullWidth}
+                    label={strings(stringKeys.reports.sendReport.message)}
+                    name="message"
+                    field={form.fields.message}
+                    inputMode={"tel"}
+                  />
+                </Grid>
               </Grid>
 
-              <Grid item xs={6}>
-                <TimePicker
-                  label={strings(stringKeys.reports.sendReport.timeOfReport)}
-                  type="time"
-                  name="time"
-                  value={time}
-                  error={timeError}
-                  onChange={onTimeChange}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <TextInputField
-                  className={styles.fullWidth}
-                  label={strings(stringKeys.reports.sendReport.message)}
-                  name="message"
-                  field={form.fields.message}
-                  inputMode={"tel"}
-                />
-              </Grid>
-            </Grid>
-
-            <FormActions>
-              <CancelButton onClick={onClose}>
-                {strings(stringKeys.form.cancel)}
-              </CancelButton>
-              <SubmitButton isFetching={isSending}>{strings(stringKeys.reports.sendReport.sendReport)}</SubmitButton>
-            </FormActions>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </Fragment>
+              <FormActions>
+                <CancelButton onClick={onClose}>
+                  {strings(stringKeys.form.cancel)}
+                </CancelButton>
+                <SubmitButton isFetching={isSending}>
+                  {strings(stringKeys.reports.sendReport.sendReport)}
+                </SubmitButton>
+              </FormActions>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </Fragment>
+    )
   );
-}
+};

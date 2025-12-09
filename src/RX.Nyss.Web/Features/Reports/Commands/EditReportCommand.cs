@@ -218,8 +218,6 @@ public class EditReportCommand : IRequest<Result>
             }
 
             report.DataCollectionPointCase.ReferredCount = requestDto.ReferredCount;
-            report.DataCollectionPointCase.DeathCount = requestDto.DeathCount;
-            report.DataCollectionPointCase.FromOtherVillagesCount = requestDto.FromOtherVillagesCount;
         }
     }
 }

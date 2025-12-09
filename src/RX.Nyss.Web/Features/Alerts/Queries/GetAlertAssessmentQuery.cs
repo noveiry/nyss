@@ -64,6 +64,8 @@ namespace RX.Nyss.Web.Features.Alerts.Queries
                             .Select(lc => lc.Name)
                             .Single(),
                         HealthRiskCountThreshold = a.ProjectHealthRisk.AlertRule.CountThreshold,
+                        HealthRiskDaysThreshold = a.ProjectHealthRisk.AlertRule.DaysThreshold,
+                        HealthRiskKilometersThreshold = a.ProjectHealthRisk.AlertRule.KilometersThreshold,
                         CaseDefinition = a.ProjectHealthRisk.CaseDefinition,
                         Reports = a.AlertReports.Select(ar => new
                         {
@@ -85,6 +87,7 @@ namespace RX.Nyss.Web.Features.Alerts.Queries
                                 : ar.Report.DataCollector.HeadSupervisor.PhoneNumber,
                             ReceivedAt = ar.Report.ReceivedAt,
                             PhoneNumber = ar.Report.PhoneNumber,
+                            Zone = ar.Report.RawReport.Zone.Name,
                             Village = ar.Report.RawReport.Village.Name,
                             District = ar.Report.RawReport.Village.District.Name,
                             Region = ar.Report.RawReport.Village.District.Region.Name,
@@ -148,6 +151,9 @@ namespace RX.Nyss.Web.Features.Alerts.Queries
                     CreatedAt = alert.CreatedAt.AddHours(request.UtcOffset),
                     EscalatedAt = alert.EscalatedAt?.AddHours(request.UtcOffset),
                     CaseDefinition = alert.CaseDefinition,
+                    HealthRiskCountThreshold = alert.HealthRiskCountThreshold,
+                    HealthRiskDaysThreshold = alert.HealthRiskDaysThreshold,
+                    HealthRiskKilometersThreshold = alert.HealthRiskKilometersThreshold,
                     AssessmentStatus = alert.Status.GetAssessmentStatus(acceptedReports, pendingReports, alert.HealthRiskCountThreshold),
                     EscalatedOutcome = alert.EscalatedOutcome,
                     RecipientsNotified = alert.RecipientsNotifiedAt.HasValue,
@@ -165,6 +171,7 @@ namespace RX.Nyss.Web.Features.Alerts.Queries
                                 ? "***"
                                 : ar.PhoneNumber,
                             Status = ar.Status.ToString(),
+                            Zone = ar.Zone,
                             Village = ar.Village,
                             District = ar.District,
                             Region = ar.Region,

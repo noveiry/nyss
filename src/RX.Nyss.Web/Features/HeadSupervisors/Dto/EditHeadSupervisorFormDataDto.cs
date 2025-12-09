@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using RX.Nyss.Web.Features.ProjectAlertRecipients.Dto;
 
 namespace RX.Nyss.Web.Features.HeadSupervisors.Dto
 {

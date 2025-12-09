@@ -9,10 +9,11 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/pickers": "^3.3.10",
-    "@microsoft/applicationinsights-web": "^2.7.1",
+    "@microsoft/applicationinsights-react-js": "^17.0.2",
+    "@microsoft/applicationinsights-web": "^2.8.16",
     "babel-eslint": "^10.1.0",
     "connected-react-router": "^6.9.2",
-    "date-fns": "^2.28.0",
+    "date-fns": "^2.30.0",
     "dayjs": "^1.10.4",
     "dom-to-image": "^2.6.0",
     "highcharts": "^9.3.2",
@@ -26,6 +27,7 @@
     "query-string": "^7.0.1",
     "react": "^17.0.2",
     "react-app-polyfill": "^2.0.0",
+    "react-device-detect": "^2.2.3",
     "react-dom": "^17.0.2",
     "react-leaflet": "^3.2.2",
     "react-leaflet-markercluster": "^3.0.0-rc1",
@@ -52,7 +54,9 @@
     "eslint-plugin-flowtype": "^5.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-react": "^7.22.0"
+    "eslint-plugin-react": "^7.22.0",
+    "lint-staged": "^15.1.0",
+    "prettier": "3.1.0"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -63,6 +67,9 @@
     "test": "cross-env CI=true react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "lint": "eslint ./src/"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,scss}": "prettier --write"
   },
   "browserslist": {
     "production": [

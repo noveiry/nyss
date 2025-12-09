@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import Layout from '../layout/Layout';
-import { withLayout } from '../../utils/layout';
-import { Typography } from '@material-ui/core';
+import React, { useEffect } from "react";
+import Layout from "../layout/Layout";
+import { withLayout } from "../../utils/layout";
+import { Typography } from "@material-ui/core";
 import { push } from "connected-react-router";
 import { connect } from "react-redux";
 
@@ -10,7 +10,7 @@ const HomeComponent = ({ user, push }) => {
     if (!user.homePage) {
       return;
     }
-    push(getHomePageUrl(user))
+    push(getHomePageUrl(user));
   }, [user, push]);
 
   return (
@@ -18,7 +18,7 @@ const HomeComponent = ({ user, push }) => {
       <Typography variant="h2">Dashboard</Typography>
     </div>
   );
-}
+};
 
 const getHomePageUrl = (user) => {
   switch (user.homePage.page) {
@@ -31,19 +31,19 @@ const getHomePageUrl = (user) => {
     case "ProjectList":
       return `/nationalSocieties/${user.homePage.nationalSocietyId}/projects`;
     default:
-      return '/';
+      return "/";
   }
 };
 
-const mapStateToProps = state => ({
-  user: state.appData.user
+const mapStateToProps = (state) => ({
+  user: state.appData.user,
 });
 
 const mapDispatchToProps = {
-  push: push
+  push: push,
 };
 
 export const Home = withLayout(
   Layout,
-  connect(mapStateToProps, mapDispatchToProps)(HomeComponent)
+  connect(mapStateToProps, mapDispatchToProps)(HomeComponent),
 );

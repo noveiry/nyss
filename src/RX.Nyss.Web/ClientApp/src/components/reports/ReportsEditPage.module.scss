@@ -1,11 +1,15 @@
 .fullWidth {
-    width: 100%;
+  width: 100%;
 }
 
 .formSectionTitle {
   margin: 20px 0 5px 0;
   font-weight: bold;
   font-size: 18px;
+}
+
+.correctNegativeMargin {
+  margin: 0px !important;
 }
 
 .tableActionsContainer {

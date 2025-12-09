@@ -18,8 +18,4 @@ export const reportErrorFilterTypes = [
   ReportErrorFilterType.other,
 ];
 
-export const correctedStateTypes = [
-  "All",
-  "Corrected",
-  "NotCorrected",
-];
+export const correctedStateTypes = ["All", "Corrected", "NotCorrected"];

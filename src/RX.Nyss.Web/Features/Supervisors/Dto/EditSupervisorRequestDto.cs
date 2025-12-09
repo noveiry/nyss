@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using FluentValidation;
+﻿using FluentValidation;
 using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Data.Concepts;
-using RX.Nyss.Web.Features.Organizations;
 using RX.Nyss.Web.Features.Projects.Access;
 using RX.Nyss.Web.Services;
 using RX.Nyss.Web.Utils.Extensions;

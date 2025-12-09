@@ -3,7 +3,6 @@ import { accessMap } from "../../../authentication/accessMap";
 import { strings, stringKeys } from "../../../strings";
 import { nationalSocietyLeftMenuOrder } from "../../nationalSocieties/logic/nationalSocietiesSiteMap";
 
-
 export const nationalSocietyReportsSiteMap = [
   {
     parentPath: "/nationalsocieties/:nationalSocietyId",
@@ -12,7 +11,7 @@ export const nationalSocietyReportsSiteMap = [
     placeholder: placeholders.leftMenu,
     access: accessMap.nationalSocietyReports.list,
     placeholderIndex: nationalSocietyLeftMenuOrder.nationalSocietyReports,
-    icon: "Report"
+    icon: "Report",
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/reports",
@@ -21,7 +20,7 @@ export const nationalSocietyReportsSiteMap = [
     placeholder: placeholders.tabMenu,
     access: accessMap.nationalSocietyReports.list,
     placeholderIndex: 1,
-    middleStepOnly: true
+    middleStepOnly: true,
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/reports",
@@ -30,6 +29,6 @@ export const nationalSocietyReportsSiteMap = [
     placeholder: placeholders.tabMenu,
     access: accessMap.nationalSocietyReports.list,
     placeholderIndex: 1,
-    middleStepOnly: true
-  }
+    middleStepOnly: true,
+  },
 ];

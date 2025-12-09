@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using RX.Nyss.Data.Concepts;
-using RX.Nyss.Data.Models;
 
 namespace RX.Nyss.Web.Features.DataCollectors.Dto
 {

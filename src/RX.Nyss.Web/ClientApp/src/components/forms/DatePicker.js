@@ -1,12 +1,15 @@
-import styles from "./DatePicker.module.scss"
-import React, { useEffect, useState } from 'react';
+import styles from "./DatePicker.module.scss";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider,
+} from "@material-ui/pickers";
 import format from "date-fns/format";
 import frLocale from "date-fns/locale/fr";
 import arLocale from "date-fns/locale/ar";
-import esLocale from 'date-fns/locale/es';
-import enLocale from 'date-fns/locale/en-GB';
+import esLocale from "date-fns/locale/es";
+import enLocale from "date-fns/locale/en-GB";
 import DateFnsUtils from "@date-io/date-fns";
 import { useSelector } from "react-redux";
 
@@ -16,22 +19,30 @@ class LocalizedUtils extends DateFnsUtils {
   }
 }
 
-export const DatePicker = ({ label, value, onChange, className, fullWidth }) => {
-  const userLanguageCode = useSelector(state => state.appData.user.languageCode);
+export const DatePicker = ({
+  label,
+  value,
+  onChange,
+  className,
+  fullWidth,
+}) => {
+  const userLanguageCode = useSelector(
+    (state) => state.appData.user.languageCode,
+  );
   const [locale, setLocale] = useState(enLocale);
 
   useEffect(() => {
     switch (userLanguageCode) {
-      case 'en':
+      case "en":
         setLocale(enLocale);
         break;
-      case 'es':
+      case "es":
         setLocale(esLocale);
         break;
-      case 'fr':
+      case "fr":
         setLocale(frLocale);
         break;
-      case 'ar':
+      case "ar":
         setLocale(arLocale);
         break;
       default:
@@ -42,7 +53,7 @@ export const DatePicker = ({ label, value, onChange, className, fullWidth }) => 
   return (
     <MuiPickersUtilsProvider utils={LocalizedUtils} locale={locale}>
       <KeyboardDatePicker
-        className={`${className} ${fullWidth ? '' : styles.datePicker}`}
+        className={`${className} ${fullWidth ? "" : styles.datePicker}`}
         autoOk
         disableFuture
         disableToolbar
@@ -55,7 +66,7 @@ export const DatePicker = ({ label, value, onChange, className, fullWidth }) => 
         InputLabelProps={{ shrink: true }}
       />
     </MuiPickersUtilsProvider>
-  )
+  );
 };
 
 DatePicker.propTypes = {
@@ -63,5 +74,5 @@ DatePicker.propTypes = {
   value: PropTypes.any,
   onChange: PropTypes.func,
   className: PropTypes.string,
-  fullWidth: PropTypes.bool
-}
+  fullWidth: PropTypes.bool,
+};

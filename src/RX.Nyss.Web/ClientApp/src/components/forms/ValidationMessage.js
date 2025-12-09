@@ -1,6 +1,6 @@
-import { SnackbarContent } from '@material-ui/core';
-import { resetPageContentScroll } from '../layout/Layout';
-import { extractString } from '../../strings';
+import { SnackbarContent } from "@material-ui/core";
+import { resetPageContentScroll } from "../layout/Layout";
+import { extractString } from "../../strings";
 
 export const ValidationMessage = ({ message }) => {
   return (
@@ -9,5 +9,5 @@ export const ValidationMessage = ({ message }) => {
       ref={resetPageContentScroll}
       style={{ marginBottom: 25 }}
     />
-  )
+  );
 };

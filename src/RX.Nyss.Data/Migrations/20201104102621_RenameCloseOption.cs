@@ -12,16 +12,16 @@ namespace RX.Nyss.Data.Migrations
                 table: "Alerts",
                 maxLength: 20,
                 nullable: true);
-                
+
             migrationBuilder.Sql(@"
             UPDATE Alert SET Alert.EscalatedOutcome = Alert.CloseOption
             FROM nyss.Alerts AS Alert
             ");
-            
+
             migrationBuilder.DropColumn(
                 name: "CloseOption",
                 schema: "nyss",
-                table: "Alerts");            
+                table: "Alerts");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -33,17 +33,17 @@ namespace RX.Nyss.Data.Migrations
                 type: "nvarchar(20)",
                 maxLength: 20,
                 nullable: true);
-                
+
             migrationBuilder.Sql(@"
             UPDATE Alert SET Alert.CloseOption = Alert.EscalatedOutcome
             FROM nyss.Alerts AS Alert
             ");
-            
+
             migrationBuilder.DropColumn(
                 name: "EscalatedOutcome",
                 schema: "nyss",
                 table: "Alerts");
-            
+
         }
     }
 }

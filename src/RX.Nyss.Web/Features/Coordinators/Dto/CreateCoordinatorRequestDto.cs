@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FluentValidation.Validators;
 using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Web.Features.Organizations;
 using RX.Nyss.Web.Services;

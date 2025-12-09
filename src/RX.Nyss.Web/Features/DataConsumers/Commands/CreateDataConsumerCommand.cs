@@ -92,54 +92,54 @@ namespace RX.Nyss.Web.Features.DataConsumers.Commands
                 }
             }
 
-        private async Task<(DataConsumerUser user, ICollection<Organization> Organizations)> CreateDataConsumerUser(
-            IdentityUser identityUser,
-            int nationalSocietyId,
-            CreateDataConsumerCommand.RequestBody body)
-        {
-            var nationalSociety = await _dataContext.NationalSocieties
-                .Include(ns => ns.ContentLanguage)
-                .Include(ns => ns.Organizations)
-                .SingleOrDefaultAsync(ns => ns.Id == nationalSocietyId);
-
-            if (nationalSociety == null)
+            private async Task<(DataConsumerUser user, ICollection<Organization> Organizations)> CreateDataConsumerUser(
+                IdentityUser identityUser,
+                int nationalSocietyId,
+                CreateDataConsumerCommand.RequestBody body)
             {
-                throw new ResultException(ResultKey.User.Registration.NationalSocietyDoesNotExist);
+                var nationalSociety = await _dataContext.NationalSocieties
+                    .Include(ns => ns.ContentLanguage)
+                    .Include(ns => ns.Organizations)
+                    .SingleOrDefaultAsync(ns => ns.Id == nationalSocietyId);
+
+                if (nationalSociety == null)
+                {
+                    throw new ResultException(ResultKey.User.Registration.NationalSocietyDoesNotExist);
+                }
+
+                if (nationalSociety.IsArchived)
+                {
+                    throw new ResultException(ResultKey.User.Registration.CannotCreateUsersInArchivedNationalSociety);
+                }
+
+                var defaultUserApplicationLanguage = await _dataContext.ApplicationLanguages
+                    .SingleOrDefaultAsync(al => al.LanguageCode == nationalSociety.ContentLanguage.LanguageCode);
+
+                var user = new DataConsumerUser
+                {
+                    IdentityUserId = identityUser.Id,
+                    EmailAddress = identityUser.Email,
+                    Name = body.Name,
+                    PhoneNumber = body.PhoneNumber,
+                    AdditionalPhoneNumber = body.AdditionalPhoneNumber,
+                    Organization = body.Organization,
+                    ApplicationLanguage = defaultUserApplicationLanguage
+                };
+
+                var userNationalSociety = CreateUserNationalSocietyReference(nationalSociety, user);
+
+                await _dataContext.AddAsync(userNationalSociety);
+                await _dataContext.SaveChangesAsync();
+
+                return (user, nationalSociety.Organizations);
             }
 
-            if (nationalSociety.IsArchived)
-            {
-                throw new ResultException(ResultKey.User.Registration.CannotCreateUsersInArchivedNationalSociety);
-            }
-
-            var defaultUserApplicationLanguage = await _dataContext.ApplicationLanguages
-                .SingleOrDefaultAsync(al => al.LanguageCode == nationalSociety.ContentLanguage.LanguageCode);
-
-            var user = new DataConsumerUser
-            {
-                IdentityUserId = identityUser.Id,
-                EmailAddress = identityUser.Email,
-                Name = body.Name,
-                PhoneNumber = body.PhoneNumber,
-                AdditionalPhoneNumber = body.AdditionalPhoneNumber,
-                Organization = body.Organization,
-                ApplicationLanguage = defaultUserApplicationLanguage
-            };
-
-            var userNationalSociety = CreateUserNationalSocietyReference(nationalSociety, user);
-
-            await _dataContext.AddAsync(userNationalSociety);
-            await _dataContext.SaveChangesAsync();
-
-            return (user, nationalSociety.Organizations);
-        }
-
-        private UserNationalSociety CreateUserNationalSocietyReference(NationalSociety nationalSociety, User user) =>
-            new UserNationalSociety
-            {
-                NationalSociety = nationalSociety,
-                User = user
-            };
+            private UserNationalSociety CreateUserNationalSocietyReference(NationalSociety nationalSociety, User user) =>
+                new UserNationalSociety
+                {
+                    NationalSociety = nationalSociety,
+                    User = user
+                };
         }
 
         public class Validator : AbstractValidator<RequestBody>

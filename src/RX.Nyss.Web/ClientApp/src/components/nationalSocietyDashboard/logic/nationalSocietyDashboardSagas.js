@@ -14,19 +14,19 @@ dayjs.extend(utc);
 export const nationalSocietyDashboardSagas = () => [
   takeEvery(
     consts.OPEN_NATIONAL_SOCIETY_DASHBOARD.INVOKE,
-    openNationalSocietyDashboard
+    openNationalSocietyDashboard,
   ),
   takeEvery(
     consts.GET_NATIONAL_SOCIETY_DASHBOARD_DATA.INVOKE,
-    getNationalSocietyDashboardData
+    getNationalSocietyDashboardData,
   ),
   takeEvery(
     consts.GET_NATIONAL_SOCIETY_DASHBOARD_REPORT_HEALTH_RISKS.INVOKE,
-    getNationalSocietyDashboardReportHealthRisks
+    getNationalSocietyDashboardReportHealthRisks,
   ),
   takeEvery(
     consts.GENERATE_NATIONAL_SOCIETY_PDF.INVOKE,
-    generateNationalSocietyPdf
+    generateNationalSocietyPdf,
   ),
 ];
 
@@ -36,16 +36,15 @@ function* openNationalSocietyDashboard({ nationalSocietyId }) {
     yield call(openNationalSocietyDashboardModule, nationalSocietyId);
     const filtersData = yield call(
       http.get,
-      `/api/nationalSocietyDashboard/filters?nationalSocietyId=${nationalSocietyId}`
+      `/api/nationalSocietyDashboard/filters?nationalSocietyId=${nationalSocietyId}`,
     );
     const localDate = dayjs();
     const utcOffset = Math.floor(localDate.utcOffset() / 60);
-    let endDate = localDate.add(-utcOffset, 'hour');
-    endDate = endDate.set('hour', 0);
-    endDate = endDate.set('minute', 0);
-    endDate = endDate.set('second', 0);
-    const filters =
-    {
+    let endDate = localDate.add(-utcOffset, "hour");
+    endDate = endDate.set("hour", 0);
+    endDate = endDate.set("minute", 0);
+    endDate = endDate.set("second", 0);
+    const filters = {
       healthRisks: [],
       organizationId: null,
       locations: null,
@@ -64,7 +63,7 @@ function* openNationalSocietyDashboard({ nationalSocietyId }) {
     yield call(getNationalSocietyDashboardData, { nationalSocietyId, filters });
 
     yield put(
-      actions.openDashboard.success(nationalSocietyId, filtersData.value)
+      actions.openDashboard.success(nationalSocietyId, filtersData.value),
     );
   } catch (error) {
     yield put(actions.openDashboard.failure(error.message));
@@ -75,16 +74,23 @@ function* openNationalSocietyDashboard({ nationalSocietyId }) {
 function* getNationalSocietyDashboardData({ nationalSocietyId, filters }) {
   yield put(actions.getDashboardData.request());
   try {
-    const response = yield call(http.post, `/api/nationalSocietyDashboard/data?nationalSocietyId=${nationalSocietyId}`, filters);
-    yield put(actions.getDashboardData.success(
+    const response = yield call(
+      http.post,
+      `/api/nationalSocietyDashboard/data?nationalSocietyId=${nationalSocietyId}`,
       filters,
-      response.value.summary,
-      response.value.reportsGroupedByLocation,
-      response.value.reportsGroupedByVillageAndDate,
-      response.value.reportsGroupedByHealthRiskAndDate,
-      response.value.reportsGroupedByFeaturesAndDate,
-      response.value.reportsGroupedByFeatures,
-    ));
+    );
+    yield put(
+      actions.getDashboardData.success(
+        filters,
+        response.value.summary,
+        response.value.reportsGroupedByLocation,
+        response.value.reportsGroupedByVillageAndDate,
+        response.value.reportsGroupedByHealthRiskAndDate,
+        response.value.reportsGroupedByFeaturesAndDate,
+        response.value.reportsGroupedByFeatures,
+        response.value.keptReportsInEscalatedAlertsHistogramData,
+      ),
+    );
   } catch (error) {
     yield put(actions.getDashboardData.failure(error.message));
   }
@@ -98,12 +104,12 @@ function* getNationalSocietyDashboardReportHealthRisks({
   yield put(actions.getReportHealthRisks.request());
   try {
     const filters = yield select(
-      (state) => state.nationalSocietyDashboard.filters
+      (state) => state.nationalSocietyDashboard.filters,
     );
     const response = yield call(
       http.post,
       `/api/nationalSocietyDashboard/reportHealthRisks?nationalSocietyId=${nationalSocietyId}&latitude=${latitude}&longitude=${longitude}`,
-      filters
+      filters,
     );
     yield put(actions.getReportHealthRisks.success(response.value));
   } catch (error) {
@@ -115,7 +121,7 @@ function* generateNationalSocietyPdf({ containerElement }) {
   const reportFileName = "Report";
 
   const nationalSocietyId = yield select(
-    (state) => state.appData.route.params.nationalSocietyId
+    (state) => state.appData.route.params.nationalSocietyId,
   );
   const message = "Generate National Society dashboard pdf";
   const properties = {
@@ -126,7 +132,7 @@ function* generateNationalSocietyPdf({ containerElement }) {
   yield put(actions.generateNationalSocietyPdf.request());
   try {
     const siteMapParams = yield select(
-      (state) => state.appData.siteMap.parameters
+      (state) => state.appData.siteMap.parameters,
     );
 
     const printTitleParams = {
@@ -136,7 +142,7 @@ function* generateNationalSocietyPdf({ containerElement }) {
     const title = stringsFormat(
       stringKeys.dashboard.printTitleNationalSociety,
       printTitleParams,
-      true
+      true,
     );
 
     yield call(generatePdfDocument, title, containerElement, reportFileName);
@@ -158,7 +164,7 @@ function* openNationalSocietyDashboardModule(nationalSocietyId) {
       nationalSocietyName: nationalSociety.value.name,
       nationalSocietyCountry: nationalSociety.value.countryName,
       nationalSocietyIsArchived: nationalSociety.value.isArchived,
-    })
+    }),
   );
 
   return nationalSociety.value;

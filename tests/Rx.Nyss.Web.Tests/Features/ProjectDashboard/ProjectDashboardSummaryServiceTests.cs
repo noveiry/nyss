@@ -190,7 +190,7 @@ namespace RX.Nyss.Web.Tests.Features.ProjectDashboard
                 }
             };
 
-            _reportService.GetRawReportsWithDataCollectorQuery(filters).Returns(rawReports.AsQueryable());
+            _reportService.GetRawReportsWithDataCollectorAndActivityReportsQuery(filters).Returns(rawReports.AsQueryable());
 
             var summaryData = await _projectDashboardDataService.GetData(filters);
 
@@ -219,7 +219,7 @@ namespace RX.Nyss.Web.Tests.Features.ProjectDashboard
                 }
             };
 
-            _reportService.GetRawReportsWithDataCollectorQuery(filters).Returns(rawReports.AsQueryable());
+            _reportService.GetRawReportsWithDataCollectorAndActivityReportsQuery(filters).Returns(rawReports.AsQueryable());
             var summaryData = await _projectDashboardDataService.GetData(filters);
 
             summaryData.NumberOfVillages.ShouldBe(1);

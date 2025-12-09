@@ -85,6 +85,7 @@ namespace RX.Nyss.Web.Features.Alerts
                     (ar.SupervisorAlertRecipients.Count == 0 || ar.SupervisorAlertRecipients.Any(sar => alert.InvolvedSupervisorIds.Contains(sar.SupervisorId))) &&
                     (ar.HeadSupervisorUserAlertRecipients.Count == 0 || ar.HeadSupervisorUserAlertRecipients.Any(sar => alert.InvolvedHeadSupervisorIds.Contains(sar.HeadSupervisorId))) &&
                     (ar.ProjectHealthRiskAlertRecipients.Count == 0 || ar.ProjectHealthRiskAlertRecipients.Any(phr => phr.ProjectHealthRiskId == alert.ProjectHealthRiskId)))
+                    .AsSplitQuery()
                 .ToListAsync();
 
             return recipients;

@@ -220,6 +220,7 @@ namespace RX.Nyss.Web.Features.AlertEvents
         {
             var eventTypes = await _nyssContext.AlertEventTypes
                 .Include((a => a.AlertEventSubtypes))
+                .AsSplitQuery()
                 .ToListAsync();
 
             var types = eventTypes.Select(e => new AlertEventsTypeDto

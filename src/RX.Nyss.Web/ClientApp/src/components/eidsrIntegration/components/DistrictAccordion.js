@@ -1,21 +1,21 @@
-﻿import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import MuiAccordion from '@material-ui/core/Accordion';
-import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
-import MuiAccordionDetails from '@material-ui/core/AccordionDetails';
+﻿import React from "react";
+import { withStyles } from "@material-ui/core/styles";
+import MuiAccordion from "@material-ui/core/Accordion";
+import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
+import MuiAccordionDetails from "@material-ui/core/AccordionDetails";
 
 export const DistrictAccordion = withStyles({
   root: {
-    border: '1px solid rgba(0, 0, 0, .125)',
-    boxShadow: 'none',
-    '&:not(:last-child)': {
+    border: "1px solid rgba(0, 0, 0, .125)",
+    boxShadow: "none",
+    "&:not(:last-child)": {
       borderBottom: 0,
     },
-    '&:before': {
-      display: 'none',
+    "&:before": {
+      display: "none",
     },
-    '&$expanded': {
-      margin: 'auto',
+    "&$expanded": {
+      margin: "auto",
     },
   },
   expanded: {},
@@ -23,17 +23,17 @@ export const DistrictAccordion = withStyles({
 
 export const DistrictAccordionSummary = withStyles({
   root: {
-    backgroundColor: 'rgba(0, 0, 0, .005)',
-    borderBottom: '1px solid rgba(0, 0, 0, .125)',
+    backgroundColor: "rgba(0, 0, 0, .005)",
+    borderBottom: "1px solid rgba(0, 0, 0, .125)",
     marginBottom: -1,
     minHeight: 56,
-    '&$expanded': {
+    "&$expanded": {
       minHeight: 56,
     },
   },
   content: {
-    '&$expanded': {
-      margin: '12px 0',
+    "&$expanded": {
+      margin: "12px 0",
     },
   },
   expanded: {},

@@ -3,18 +3,28 @@ import { initialState } from "../../../initialState";
 
 export function agreementsReducer(state = initialState.agreements, action) {
   switch (action.type) {
-
     case actions.OPEN_AGREEMENT_PAGE.REQUEST:
       return {
-        ...state, pendingSocieties: [], staleSocieties: [], agreementDocuments: []
+        ...state,
+        pendingSocieties: [],
+        staleSocieties: [],
+        agreementDocuments: [],
       };
 
     case actions.OPEN_AGREEMENT_PAGE.SUCCESS:
-      return { ...state, pendingSocieties: action.pendingAgreementDocuments.pendingSocieties, staleSocieties: action.pendingAgreementDocuments.staleSocieties, agreementDocuments: action.pendingAgreementDocuments.agreementDocuments };
+      return {
+        ...state,
+        pendingSocieties: action.pendingAgreementDocuments.pendingSocieties,
+        staleSocieties: action.pendingAgreementDocuments.staleSocieties,
+        agreementDocuments: action.pendingAgreementDocuments.agreementDocuments,
+      };
 
     case actions.OPEN_AGREEMENT_PAGE.FAILURE:
       return {
-        ...state, pendingSocieties: [], staleSocieties: [], agreementDocuments: []
+        ...state,
+        pendingSocieties: [],
+        staleSocieties: [],
+        agreementDocuments: [],
       };
 
     case actions.ACCEPT_AGREEMENT.REQUEST:
@@ -29,4 +39,4 @@ export function agreementsReducer(state = initialState.agreements, action) {
     default:
       return state;
   }
-};
+}

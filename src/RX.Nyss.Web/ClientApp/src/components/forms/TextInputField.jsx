@@ -1,9 +1,28 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { createFieldComponent } from "./FieldBase";
-import { TextField } from '@material-ui/core';
+import { TextField } from "@material-ui/core";
 
-const TextInput = ({ error, name, label, value, controlProps, multiline, rows, autoWidth, autoFocus, disabled, type, inputMode, endAdornment, className, fieldRef, placeholder, classNameInput, classNameLabel }) => {
+const TextInput = ({
+  error,
+  name,
+  label,
+  value,
+  controlProps,
+  multiline,
+  rows,
+  autoWidth,
+  autoFocus,
+  disabled,
+  type,
+  inputMode,
+  endAdornment,
+  className,
+  fieldRef,
+  placeholder,
+  classNameInput,
+  classNameLabel,
+}) => {
   return (
     <TextField
       ref={fieldRef}
@@ -18,12 +37,17 @@ const TextInput = ({ error, name, label, value, controlProps, multiline, rows, a
       disabled={disabled}
       fullWidth={autoWidth ? false : true}
       placeholder={placeholder}
-      InputLabelProps={{ shrink: true, className: classNameLabel}}
+      InputLabelProps={{ shrink: true, className: classNameLabel }}
       InputProps={{
         ...controlProps,
         endAdornment: !!endAdornment && endAdornment,
       }}
-      inputProps={{ autoFocus: autoFocus, inputMode: inputMode, step: type === "number" ? "any" : null, className: classNameInput}}
+      inputProps={{
+        autoFocus: autoFocus,
+        inputMode: inputMode,
+        step: type === "number" ? "any" : null,
+        className: classNameInput,
+      }}
       type={type}
     />
   );
@@ -31,7 +55,7 @@ const TextInput = ({ error, name, label, value, controlProps, multiline, rows, a
 
 TextInput.propTypes = {
   controlProps: PropTypes.object,
-  name: PropTypes.string
+  name: PropTypes.string,
 };
 
 export const TextInputField = createFieldComponent(TextInput);

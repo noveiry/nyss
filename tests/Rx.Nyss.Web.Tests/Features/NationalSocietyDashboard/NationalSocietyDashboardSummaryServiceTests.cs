@@ -204,7 +204,7 @@ namespace RX.Nyss.Web.Tests.Features.NationalSocietyDashboard
                 }
             };
 
-            _reportService.GetRawReportsWithDataCollectorQuery(filters).Returns(rawReports.AsQueryable());
+            _reportService.GetRawReportsWithDataCollectorAndActivityReportsQuery(filters).Returns(rawReports.AsQueryable());
 
             var summaryData = await _nationalSocietyDashboardSummaryService.GetData(filters);
 
@@ -248,7 +248,7 @@ namespace RX.Nyss.Web.Tests.Features.NationalSocietyDashboard
                 }
             };
 
-            _reportService.GetRawReportsWithDataCollectorQuery(filters).Returns(reports.AsQueryable());
+            _reportService.GetRawReportsWithDataCollectorAndActivityReportsQuery(filters).Returns(reports.AsQueryable());
 
             var summaryData = await _nationalSocietyDashboardSummaryService.GetData(filters);
 

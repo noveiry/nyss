@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Azure.Devices;
 using RX.Nyss.Data.Concepts;
 using RX.Nyss.Data.Models;
 using RX.Nyss.Web.Features.Alerts.Dto;
@@ -13,7 +12,7 @@ namespace RX.Nyss.Web.Features.Common.Extensions
     {
         public static IQueryable<Alert> FilterByDate(this IQueryable<Alert> alerts, DateTimeOffset startDate, DateTimeOffset endDate) =>
             alerts
-                .Where(a => a.CreatedAt >= startDate && a.CreatedAt < endDate.AddDays(1) );
+                .Where(a => a.CreatedAt >= startDate && a.CreatedAt < endDate.AddDays(1));
 
         public static IQueryable<Alert> FilterByProject(this IQueryable<Alert> alerts, int? projectId) =>
             alerts.Where(alert => !projectId.HasValue || alert.ProjectHealthRisk.Project.Id == projectId.Value);
@@ -38,11 +37,11 @@ namespace RX.Nyss.Web.Features.Common.Extensions
                 : alerts;
 
         public static IQueryable<Alert> FilterByArea(this IQueryable<Alert> alerts, AreaDto area) =>
-            area != null
+            area != null && area.RegionIds.Any()
                 ? alerts.Where(a => a.AlertReports.Any(ar => area.RegionIds.Contains(ar.Report.RawReport.Village.District.Region.Id)
-                    || area.DistrictIds.Contains(ar.Report.RawReport.Village.District.Id)
-                    || area.VillageIds.Contains(ar.Report.RawReport.Village.Id)
-                    || area.ZoneIds.Contains(ar.Report.RawReport.Zone.Id)
+                    && area.DistrictIds.Contains(ar.Report.RawReport.Village.District.Id)
+                    && area.VillageIds.Contains(ar.Report.RawReport.Village.Id)
+                    && (ar.Report.RawReport.Zone == null || area.ZoneIds.Contains(ar.Report.RawReport.Zone.Id))
                     || (area.IncludeUnknownLocation && ar.Report.RawReport.Village == null)))
                 : alerts;
 

@@ -73,6 +73,7 @@ namespace RX.Nyss.Web.Features.DataCollectors.Access
 
             var dataCollectorData = await query
                 .Distinct()
+                .AsSplitQuery()
                 .ToListAsync();
 
             var projectId = dataCollectorData.Select(d => d.ProjectId).Distinct().Single();

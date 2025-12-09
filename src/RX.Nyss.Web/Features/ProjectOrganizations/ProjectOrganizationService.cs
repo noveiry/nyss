@@ -43,6 +43,7 @@ namespace RX.Nyss.Web.Features.ProjectOrganizations
                     Name = gs.Organization.Name,
                     IsDefaultOrganization = gs.Organization.NationalSociety.DefaultOrganization == gs.Organization
                 })
+                .AsSplitQuery()
                 .ToListAsync();
 
             var result = Success(projectOrganizations);

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using RX.Nyss.Data.Concepts;
-using RX.Nyss.Web.Features.Common;
 using RX.Nyss.Web.Features.Common.Dto;
 
 namespace RX.Nyss.Web.Features.Reports
 {
     public class ReportsFilter
     {
-        public List<int> HealthRisks { get; set; }
-
+        public List<int> HealthRisks { get; set; } = new List<int>();
         public int? NationalSocietyId { get; set; }
 
         public int? ProjectId { get; set; }
@@ -18,7 +16,7 @@ namespace RX.Nyss.Web.Features.Reports
 
         public DateTimeOffset EndDate { get; set; }
 
-        public AreaDto Area { get; set; }
+        public AreaDto Area { get; set; } = new AreaDto();
 
         public int? OrganizationId { get; set; }
 

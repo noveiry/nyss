@@ -8,9 +8,9 @@ namespace RX.Nyss.Data.Models
 
         public int SuspectedDiseaseCode { get; set; }
 
-        public virtual ICollection<SuspectedDiseaseLanguageContent> LanguageContents { get; set; }
+        public virtual ICollection<SuspectedDiseaseLanguageContent>? LanguageContents { get; set; }
 
-        public virtual ICollection<HealthRiskSuspectedDisease> HealthRiskSuspectedDiseases { get; set; }
+        public virtual ICollection<HealthRiskSuspectedDisease>? HealthRiskSuspectedDiseases { get; set; }
 
     }
 }

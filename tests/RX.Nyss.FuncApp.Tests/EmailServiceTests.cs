@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Blob;
 using NSubstitute;
 using RX.Nyss.FuncApp.Configuration;
 using RX.Nyss.FuncApp.Contracts;

@@ -17,7 +17,7 @@
             public string[] Roles { get; set; }
 
             public string LanguageCode { get; set; }
-            
+
             public HomePageDto HomePage { get; set; }
         }
 

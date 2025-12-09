@@ -1,11 +1,10 @@
-﻿using System.Net.Http;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+﻿using System.Net;
+using System.Text;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using RX.Nyss.PublicApiFuncApp.Configuration;
+using System.Reflection;
 
 namespace RX.Nyss.PublicApiFuncApp;
 
@@ -20,27 +19,38 @@ public class HealthCheck
         _config = config;
     }
 
-    [FunctionName("Ping")]
-    public IActionResult Ping(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ping")] HttpRequestMessage httpRequest)
+    [Function("Ping")]
+    public HttpResponseData Ping(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ping")] HttpRequestData httpRequest)
     {
         _logger.Log(LogLevel.Debug, "Received ping request");
-        return new OkObjectResult("I am alive!");
+        var json = System.Text.Json.JsonSerializer.Serialize(new { Message = "I am alive!" });
+        var response = httpRequest.CreateResponse(HttpStatusCode.OK);
+        response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+        var bytes = Encoding.UTF8.GetBytes(json);
+        response.Body = new MemoryStream(bytes);
+        return response;
     }
 
-    [FunctionName("Version")]
-    public IActionResult Version(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "version")] HttpRequestMessage httpRequest)
+    [Function("Version")]
+    public HttpResponseData Version(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "version")] HttpRequestData httpRequest)
     {
         var assemblyName = Assembly.GetExecutingAssembly().GetName();
         var version = assemblyName.Version;
 
-        return new OkObjectResult(new
+        var result = new
         {
             assemblyName.Name,
-            Version = $"{version.Major}.{version.Minor}.{version.Build}",
+            Version = version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "unknown",
             ReleaseName = _config.ReleaseName,
-            Framework = RuntimeInformation.FrameworkDescription
-        });
+            Framework = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription
+        };
+        var json = System.Text.Json.JsonSerializer.Serialize(result);
+        var response = httpRequest.CreateResponse(HttpStatusCode.OK);
+        response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+        var bytes = Encoding.UTF8.GetBytes(json);
+        response.Body = new MemoryStream(bytes);
+        return response;
     }
 }

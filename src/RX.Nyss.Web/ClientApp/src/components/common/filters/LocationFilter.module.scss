@@ -6,14 +6,13 @@
   padding: 5px;
 }
 
-
 .locationFilterItem {
   width: 100%;
   display: flex;
   justify-content: flex-start;
   align-items: center;
 
-  &[type=district] {
+  &[type="district"] {
     padding-left: 15px;
 
     &.rtl {
@@ -22,7 +21,7 @@
     }
   }
 
-  &[type=village] {
+  &[type="village"] {
     padding-left: 30px;
 
     &.rtl {
@@ -31,7 +30,7 @@
     }
   }
 
-  &[type=zone] {
+  &[type="zone"] {
     padding-left: 45px;
 
     &.rtl {
@@ -72,7 +71,7 @@
   justify-content: center;
   align-items: center;
 
-  &[nodata=true] {
+  &[nodata="true"] {
     padding-left: 21px;
 
     &.rtl {

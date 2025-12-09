@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +30,7 @@ namespace RX.Nyss.Web.Services.Authorization
             _httpContextAccessor = httpContextAccessor;
             _nyssContext = nyssContext;
         }
-        
+
         public async Task<User> GetCurrentUser()
         {
             var userName = GetCurrentUserName();

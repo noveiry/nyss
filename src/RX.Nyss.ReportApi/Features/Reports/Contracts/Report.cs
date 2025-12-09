@@ -1,13 +1,12 @@
 ﻿using RX.Nyss.Common.Utils.DataContract;
 
-namespace RX.Nyss.ReportApi.Features.Reports.Contracts
+namespace RX.Nyss.ReportApi.Features.Reports.Contracts;
+
+public class Report
 {
-    public class Report
-    {
-        public string Content { get; set; }
+    public string Content { get; set; }
 
-        public ReportSource ReportSource { get; set; }
+    public ReportSource ReportSource { get; set; }
 
-        public override string ToString() => $"{nameof(Content)}: {Content}, {nameof(ReportSource)}: {ReportSource}";
-    }
+    public override string ToString() => $"{nameof(Content)}: {Content}, {nameof(ReportSource)}: {ReportSource}";
 }

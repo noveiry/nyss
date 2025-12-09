@@ -1,5 +1,5 @@
 .filterItem {
-  min-width: 200px !important;
+  width: 150px !important;
 }
 
 .filters {
@@ -7,8 +7,11 @@
 }
 
 .filterRadioGroup {
-  flex-direction: row !important;
-  margin-top: 10px;
+  padding-top: 5px;
+}
+
+.radio {
+  height: 23px;
 }
 
 .filterLabel {

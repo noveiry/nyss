@@ -7,6 +7,8 @@
     "SERVICEBUS_CONNECTIONSTRING": "",
     "GENERALBLOBSTORAGE_CONNECTIONSTRING": "UseDevelopmentStorage=true",
     "SERVICEBUS_REPORTQUEUE": "nrx-cbs-nyss-bus-report-queue-dev",
+    "SERVICEBUS_TELERIVETREPORTQUEUE": "nrx-cbs-nyss-bus-telerivet-report-queue-dev",
+    "SERVICEBUS_MTNREPORTQUEUE": "nrx-cbs-nyss-bus-mtn-report-queue-dev",
     "SERVICEBUS_SENDEMAILQUEUE": "nrx-cbs-nyss-bus-send-email-queue-dev",
     "SERVICEBUS_SENDSMSQUEUE": "nrx-cbs-nyss-bus-send-sms-queue-dev",
     "AuthorizedApiKeysBlobPath": "sms-gateway/authorized-api-keys.txt",

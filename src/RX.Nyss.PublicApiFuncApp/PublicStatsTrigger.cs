@@ -1,40 +1,69 @@
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using System.Net;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using Azure.Storage.Blobs;
 
-namespace RX.Nyss.PublicApiFuncApp
+namespace RX.Nyss.PublicApiFuncApp;
+
+public class PublicStatsTrigger
 {
-    public class PublicStatsTrigger
+    private readonly ILogger<PublicStatsTrigger> _logger;
+    private readonly BlobServiceClient _blobServiceClient;
+
+    public PublicStatsTrigger(ILogger<PublicStatsTrigger> logger, BlobServiceClient blobServiceClient)
     {
-        private readonly ILogger<PublicStatsTrigger> _logger;
+        _logger = logger;
+        _blobServiceClient = blobServiceClient;
+    }
 
-        public PublicStatsTrigger(ILogger<PublicStatsTrigger> logger)
+
+    [Function("Stats")]
+    public async Task<HttpResponseData> Stats(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "stats")] HttpRequestData httpRequest)
+    {
+         // Read azureWebJobsStorage from blob
+        string azureWebJobsStorage;
+        try
         {
-            _logger = logger;
-        }
-
-        [FunctionName("Stats")]
-        public async Task<IActionResult> Stats(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "stats")] HttpRequestMessage httpRequestMessage,
-            [Blob("%PublicStatsBlobObjectPath%", FileAccess.ReadWrite, Connection = "DATABLOBSTORAGE_CONNECTIONSTRING")] BlobClient statsBlob)
-        {
-            _logger.LogInformation("Getting public stats from data blob");
-            BlobDownloadResult blobContent = await statsBlob.DownloadContentAsync();
-            var stats = blobContent.Content.ToString();
-
-            if (string.IsNullOrEmpty(stats))
+            var azureWebJobsStorageBlobPath = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+            if (string.IsNullOrWhiteSpace(azureWebJobsStorageBlobPath))
             {
-                return new NotFoundResult();
+                _logger.LogCritical("AzureWebJobsStorage environment variable is not set.");
+                return httpRequest.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return new OkObjectResult(JsonConvert.DeserializeObject(stats));
+            var blobClient = GetBlobClient(_blobServiceClient, azureWebJobsStorageBlobPath);
+            
+            var blobDownloadResult = await blobClient.DownloadContentAsync();
+            azureWebJobsStorage = blobDownloadResult.Value.Content.ToString();
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to read authorized API keys from blob storage.");
+            return httpRequest.CreateResponse(HttpStatusCode.InternalServerError);
+        }
+
+
+        if (string.IsNullOrEmpty(azureWebJobsStorage))
+        {
+            _logger.LogCritical("AzureWebJobsStorage connection string is empty.");
+            return httpRequest.CreateResponse(HttpStatusCode.InternalServerError);
+        }
+        
+
+        var response = httpRequest.CreateResponse(HttpStatusCode.OK);
+        response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+        await response.WriteStringAsync(azureWebJobsStorage);
+        return response;
+    }
+      private BlobClient GetBlobClient(BlobServiceClient serviceClient, string blobPath)
+    {
+        var parts = blobPath.Split('/', 2);
+        var containerName = parts[0];
+        var blobName = parts.Length > 1 ? parts[1] : string.Empty;
+        
+        return serviceClient.GetBlobContainerClient(containerName).GetBlobClient(blobName);
     }
 }
+

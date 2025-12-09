@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using RX.Nyss.Common.Services.StringsResources;
 using RX.Nyss.Common.Utils;
 using RX.Nyss.Data;
-using RX.Nyss.Data.Models;
 using RX.Nyss.Web.Features.Common;
 using RX.Nyss.Web.Features.Common.Dto;
 using RX.Nyss.Web.Features.Common.Extensions;
-using RX.Nyss.Web.Features.DataCollectors.DataContracts;
 using RX.Nyss.Web.Features.DataCollectors.Dto;
 using RX.Nyss.Web.Services;
 

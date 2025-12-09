@@ -7,7 +7,7 @@ namespace RX.Nyss.Common.Utils.Logging;
 
 public static class GlobalLoggerConfiguration
 {
-    public static void ConfigureLogger(ILoggingOptions loggingOptions, string appInsightsInstrumentationKey)
+    public static void ConfigureLogger(ILoggingOptions loggingOptions)
     {
         var loggerConfiguration = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -19,11 +19,6 @@ public static class GlobalLoggerConfiguration
                     Path.Combine(loggingOptions.LogsLocation, loggingOptions.LogFile),
                     rollingInterval: RollingInterval.Day,
                     outputTemplate: loggingOptions.LogMessageTemplate));
-
-        /*if (!string.IsNullOrEmpty(appInsightsInstrumentationKey))
-        {
-            loggerConfiguration.WriteTo.ApplicationInsights(appInsightsInstrumentationKey, TelemetryConverter.Traces);
-        }*/
 
         Log.Logger = loggerConfiguration.CreateLogger();
     }

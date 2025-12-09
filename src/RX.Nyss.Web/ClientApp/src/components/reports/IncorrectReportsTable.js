@@ -1,13 +1,16 @@
-import styles from './ReportsTable.module.scss';
-import reportsTableStyles from './ReportsTable.module.scss';
-import { Fragment, useState } from 'react';
-import PropTypes from 'prop-types';
-import { Loading } from '../common/loading/Loading';
-import { strings, stringKeys } from '../../strings';
-import dayjs from 'dayjs';
-import TablePager from '../common/tablePagination/TablePager';
-import { TableContainer } from '../common/table/TableContainer';
-import { DateColumnName, ReportErrorType, reportDetailedFormatErrors } from './logic/reportsConstants';
+import styles from "./ReportsTable.module.scss";
+import reportsTableStyles from "./ReportsTable.module.scss";
+import { Fragment, useState } from "react";
+import PropTypes from "prop-types";
+import { Loading } from "../common/loading/Loading";
+import { strings, stringKeys } from "../../strings";
+import dayjs from "dayjs";
+import TablePager from "../common/tablePagination/TablePager";
+import {
+  DateColumnName,
+  ReportErrorType,
+  reportDetailedFormatErrors,
+} from "./logic/reportsConstants";
 import {
   Typography,
   Table,
@@ -16,9 +19,10 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-} from '@material-ui/core';
+  TableContainer
+} from "@material-ui/core";
 import CorrectedButton from "./CorrectedButton";
-import { renderDataCollectorDisplayName } from './logic/reportsService';
+import { renderDataCollectorDisplayName } from "./logic/reportsService";
 
 export const IncorrectReportsTable = ({
   isListFetching,
@@ -31,42 +35,43 @@ export const IncorrectReportsTable = ({
   sorting,
   onSort,
   onCorrectToggle,
-  rtl
+  rtl,
 }) => {
-
   const [value, setValue] = useState(sorting);
 
   const updateValue = (change) => {
     const newValue = {
       ...value,
-      ...change
-    }
+      ...change,
+    };
 
     setValue(newValue);
     return newValue;
   };
 
   const dashIfEmpty = (text, ...args) => {
-    return [text || '-', ...args].filter(x => !!x).join(', ');
+    return [text || "-", ...args].filter((x) => !!x).join(", ");
   };
 
-  const createSortHandler = column => event => {
+  const createSortHandler = (column) => (event) => {
     handleSortChange(event, column);
   };
 
   const handleSortChange = (event, column) => {
     const isAscending = sorting.orderBy === column && sorting.sortAscending;
     onSort(updateValue({ orderBy: column, sortAscending: !isAscending }));
-  }
+  };
 
   const handlePageChange = (event, page) => {
     onChangePage(page);
-  }
+  };
 
   const errorTypeString = (errorType) => {
-    const errorTypeTranslation = strings(stringKeys.reports.errorTypes[errorType]);
+    const errorTypeTranslation = strings(
+      stringKeys.reports.errorTypes[errorType],
+    );
 
-    if (reportDetailedFormatErrors.some(e => e === errorType)) {
+    if (reportDetailedFormatErrors.some((e) => e === errorType)) {
       return (
         <span>
           {strings(stringKeys.reports.errorTypes[ReportErrorType.formatError])}
@@ -77,59 +82,84 @@ export const IncorrectReportsTable = ({
     } else {
       return errorTypeTranslation;
     }
-  }
+  };
 
   return (
     <Fragment>
-      <TableContainer sticky>
+      <TableContainer>
         {isListFetching && <Loading absolute />}
-        <Table>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell style={{ width: '6%', minWidth: '80px' }}>
+              <TableCell style={{ width: "6%", minWidth: "80px" }}>
                 <TableSortLabel
                   active={sorting.orderBy === DateColumnName}
-                  direction={sorting.sortAscending ? 'asc' : 'desc'}
+                  direction={sorting.sortAscending ? "asc" : "desc"}
                   onClick={createSortHandler(DateColumnName)}
                 >
                   {strings(stringKeys.reports.list.date)}
                 </TableSortLabel>
               </TableCell>
-              <TableCell style={{ width: '30%' }}>{strings(stringKeys.reports.list.errorType)}</TableCell>
-              <TableCell style={{ width: '12%' }}>{strings(stringKeys.reports.list.message)}</TableCell>
-              <TableCell style={{ width: '12%' }}>{strings(stringKeys.reports.list.dataCollectorDisplayName)}</TableCell>
-              <TableCell style={{ width: '23%' }}>{strings(stringKeys.common.location)}</TableCell>
-              <TableCell style={{ width: '13%' }}>{strings(stringKeys.reports.list.corrected)}</TableCell>
+              <TableCell style={{ width: "30%" }}>
+                {strings(stringKeys.reports.list.errorType)}
+              </TableCell>
+              <TableCell style={{ width: "12%" }}>
+                {strings(stringKeys.reports.list.message)}
+              </TableCell>
+              <TableCell style={{ width: "12%" }}>
+                {strings(stringKeys.reports.list.dataCollectorDisplayName)}
+              </TableCell>
+              <TableCell style={{ width: "23%" }}>
+                {strings(stringKeys.common.location)}
+              </TableCell>
+              <TableCell style={{ width: "13%" }}>
+                {strings(stringKeys.reports.list.corrected)}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {list.map(row => (
+            {list.map((row) => (
               <TableRow key={row.id} hover>
-                <TableCell>{dayjs(row.dateTime).format('YYYY-MM-DD HH:mm')}</TableCell>
+                <TableCell>
+                  {dayjs(row.dateTime).format("YYYY-MM-DD HH:mm")}
+                </TableCell>
                 <TableCell>{errorTypeString(row.reportErrorType)}</TableCell>
                 <TableCell>
-                  <Typography className={styles.message} title={row.message}>{dashIfEmpty(row.message)}</Typography>
+                  <Typography className={styles.message} title={row.message}>
+                    {dashIfEmpty(row.message)}
+                  </Typography>
                 </TableCell>
                 <TableCell className={reportsTableStyles.phoneNumber}>
                   {renderDataCollectorDisplayName(row)}
                 </TableCell>
-                <TableCell>{dashIfEmpty(row.region, row.district, row.village, row.zone)}</TableCell>
                 <TableCell>
-                  <CorrectedButton isCorrected={row.isCorrected} onClick={() => onCorrectToggle(row)} />
+                  {dashIfEmpty(row.region, row.district, row.village, row.zone)}
+                </TableCell>
+                <TableCell>
+                  <CorrectedButton
+                    isCorrected={row.isCorrected}
+                    onClick={() => onCorrectToggle(row)}
+                  />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <TablePager totalRows={totalRows} rowsPerPage={rowsPerPage} page={page} onChangePage={handlePageChange} rtl={rtl} />
+        <TablePager
+          totalRows={totalRows}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onChangePage={handlePageChange}
+          rtl={rtl}
+        />
       </TableContainer>
     </Fragment>
-  )
-}
+  );
+};
 
 IncorrectReportsTable.propTypes = {
   isFetching: PropTypes.bool,
-  list: PropTypes.array
+  list: PropTypes.array,
 };
 
 export default IncorrectReportsTable;

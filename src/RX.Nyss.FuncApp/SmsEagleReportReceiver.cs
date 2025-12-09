@@ -1,15 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Net;
 using System.Web;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Azure.Storage.Blobs;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using RX.Nyss.FuncApp.Configuration;
 using RX.Nyss.Common.Utils.DataContract;
+using RX.Nyss.FuncApp.Configuration;
 using RX.Nyss.FuncApp.Contracts;
 using RX.Nyss.FuncApp.Services;
 
@@ -17,45 +13,61 @@ namespace RX.Nyss.FuncApp;
 
 public class SmsEagleReportReceiver
 {
-    private const string ApiKeyQueryParameterName = "apikey";
+    private const string _apiKeyQueryParameterName = "apikey";
     private readonly ILogger<SmsEagleReportReceiver> _logger;
     private readonly IConfig _config;
     private readonly IReportPublisherService _reportPublisherService;
+    private readonly BlobServiceClient _blobServiceClient;
 
-    public SmsEagleReportReceiver(ILogger<SmsEagleReportReceiver> logger, IConfig config, IReportPublisherService reportPublisherService)
+    public SmsEagleReportReceiver(
+        ILogger<SmsEagleReportReceiver> logger,
+        IConfig config, 
+        IReportPublisherService reportPublisherService,
+        BlobServiceClient blobServiceClient)
     {
         _logger = logger;
         _config = config;
         _reportPublisherService = reportPublisherService;
+        _blobServiceClient = blobServiceClient;
     }
 
-    [FunctionName("EnqueueSmsEagleReport")]
-    public async Task<IActionResult> EnqueueSmsEagleReport(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "enqueueSmsEagleReport")] HttpRequestMessage httpRequest,
-        [Blob("%AuthorizedApiKeysBlobPath%", FileAccess.Read)] string authorizedApiKeys)
+    [Function("EnqueueSmsEagleReport")]
+    public async Task<HttpResponseData> EnqueueSmsEagleReport(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "enqueueSmsEagleReport")] HttpRequestData httpRequest)
     {
-        var maxContentLength = _config.MaxContentLength;
-        var contentLength = httpRequest.Content.Headers.ContentLength;
-        if (contentLength == null || contentLength > maxContentLength)
+        if (httpRequest.Body.Length == 0)
         {
-            _logger.Log(LogLevel.Warning, $"Received an SMS Eagle request with length more than {maxContentLength} bytes. (length: {contentLength.ToString() ?? "N/A"})");
-            return new BadRequestResult();
+            _logger.LogWarning("Received SMS Eagle report with header content length null.");
+            return httpRequest.CreateResponse(HttpStatusCode.BadRequest);
         }
-
-        var httpRequestContent = await httpRequest.Content.ReadAsStringAsync();
-        _logger.Log(LogLevel.Debug, $"Received SMS Eagle report: {httpRequestContent}.{Environment.NewLine}HTTP request: {httpRequest}");
+        
+        var httpRequestContent = await new StreamReader(httpRequest.Body).ReadToEndAsync();
+        _logger.LogDebug($"Received SMS Eagle report: {httpRequestContent}.{Environment.NewLine}HTTP request: {httpRequest}");
 
         if (string.IsNullOrWhiteSpace(httpRequestContent))
         {
-            _logger.Log(LogLevel.Warning, "Received an empty SMS Eagle report.");
-            return new BadRequestResult();
+            _logger.LogWarning("Received an empty Nyss report.");
+            return httpRequest.CreateResponse(HttpStatusCode.BadRequest);
         }
 
         var decodedHttpRequestContent = HttpUtility.UrlDecode(httpRequestContent);
 
+        try
+        {
+            // Read authorized API keys from blob
+        var authorizedApiKeysBlobPath = Environment.GetEnvironmentVariable("AuthorizedApiKeysBlobPath");
+            if (string.IsNullOrWhiteSpace(authorizedApiKeysBlobPath))
+            {
+                _logger.LogError("Environment variable 'AuthorizedApiKeysBlobPath' is not set or empty.");
+                throw new InvalidOperationException("Missing AuthorizedApiKeysBlobPath environment variable.");
+            }
+         var blobClient = GetBlobClient(_blobServiceClient, authorizedApiKeysBlobPath);
+         var blobDownloadResult = await blobClient.DownloadContentAsync();
+         var authorizedApiKeys = blobDownloadResult.Value.Content.ToString();
+
         if (!VerifyApiKey(authorizedApiKeys, decodedHttpRequestContent))
         {
-            return new UnauthorizedResult();
+            return httpRequest.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         var report = new Report
@@ -65,8 +77,23 @@ public class SmsEagleReportReceiver
         };
 
         await _reportPublisherService.AddReportToQueue(report);
+        return httpRequest.CreateResponse(HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing SendSms trigger");
+            throw;
+        } 
+    }
 
-        return new OkResult();
+
+    private BlobClient GetBlobClient(BlobServiceClient serviceClient, string blobPath)
+    {
+        var parts = blobPath.Split('/', 2);
+        var containerName = parts[0];
+        var blobName = parts.Length > 1 ? parts[1] : string.Empty;
+        
+        return serviceClient.GetBlobContainerClient(containerName).GetBlobClient(blobName);
     }
 
     private bool VerifyApiKey(string authorizedApiKeys, string decodedHttpRequestContent)
@@ -78,7 +105,7 @@ public class SmsEagleReportReceiver
         }
 
         var authorizedApiKeyList = authorizedApiKeys.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-        var apiKey = HttpUtility.ParseQueryString(decodedHttpRequestContent)[ApiKeyQueryParameterName];
+        var apiKey = HttpUtility.ParseQueryString(decodedHttpRequestContent)[_apiKeyQueryParameterName];
 
         if (string.IsNullOrWhiteSpace(apiKey))
         {

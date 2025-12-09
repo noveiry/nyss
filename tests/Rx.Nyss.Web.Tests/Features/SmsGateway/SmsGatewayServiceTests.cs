@@ -5,6 +5,7 @@ using MockQueryable.NSubstitute;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NSubstitute.ReturnsExtensions;
+using RX.Nyss.Common.Services;
 using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Common.Utils.Logging;
 using RX.Nyss.Data;
@@ -25,6 +26,8 @@ namespace RX.Nyss.Web.Tests.Features.SmsGateway
         private readonly INyssContext _nyssContextMock;
         private readonly ISmsGatewayBlobProvider _smsGatewayBlobProviderMock;
         private readonly IIotHubService _iotHubService;
+        private readonly ICryptographyService _cryptographyService;
+        private readonly INyssWebConfig _nyssWebConfig;
 
         public SmsGatewayServiceTests()
         {
@@ -33,7 +36,14 @@ namespace RX.Nyss.Web.Tests.Features.SmsGateway
             var config = Substitute.For<INyssWebConfig>();
             _smsGatewayBlobProviderMock = Substitute.For<ISmsGatewayBlobProvider>();
             _iotHubService = Substitute.For<IIotHubService>();
-            _smsGatewayService = new SmsGatewayService(_nyssContextMock, loggerAdapterMock, _smsGatewayBlobProviderMock, _iotHubService);
+            _cryptographyService = Substitute.For<ICryptographyService>();
+            _nyssWebConfig = Substitute.For<INyssWebConfig>();
+            _smsGatewayService = new SmsGatewayService(_nyssContextMock,
+                loggerAdapterMock,
+                _smsGatewayBlobProviderMock,
+                _iotHubService,
+                _cryptographyService,
+                _nyssWebConfig);
         }
 
         [Fact]

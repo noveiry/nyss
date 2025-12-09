@@ -1,5 +1,5 @@
 .requiredMapLocation {
-  &[data-with-error=true] {
+  &[data-with-error="true"] {
     border-color: #f44336;
   }
 }
@@ -38,7 +38,7 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  
+
   h6::after {
     counter-increment: locations;
     content: "\00a0" counter(locations);

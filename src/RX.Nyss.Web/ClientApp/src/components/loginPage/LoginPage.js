@@ -1,35 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { withLayout } from '../../utils/layout';
+import { withLayout } from "../../utils/layout";
 import { connect } from "react-redux";
-import { AnonymousLayout } from '../layout/AnonymousLayout';
-import { Paper, Typography, Link, Grid } from '@material-ui/core';
-import styles from './LoginPage.module.scss';
-import { strings, stringKeys } from '../../strings';
-import { createForm, validators } from '../../utils/forms';
-import TextInputField from '../forms/TextInputField';
-import PasswordInputField from '../forms/PasswordInputField';
-import * as authActions from '../../authentication/authActions';
-import { getRedirectUrl, redirectToRoot } from '../../authentication/auth';
-import { ValidationMessage } from '../forms/ValidationMessage';
-import FormActions from '../forms/formActions/FormActions';
-import SubmitButton from '../common/buttons/submitButton/SubmitButton';
-import { useMount } from '../../utils/lifecycle';
+import { AnonymousLayout } from "../layout/AnonymousLayout";
+import { Paper, Typography, Link, Grid } from "@material-ui/core";
+import styles from "./LoginPage.module.scss";
+import { strings, stringKeys } from "../../strings";
+import { createForm, validators } from "../../utils/forms";
+import TextInputField from "../forms/TextInputField";
+import PasswordInputField from "../forms/PasswordInputField";
+import * as authActions from "../../authentication/authActions";
+import { getRedirectUrl, redirectToRoot } from "../../authentication/auth";
+import { ValidationMessage } from "../forms/ValidationMessage";
+import FormActions from "../forms/formActions/FormActions";
+import SubmitButton from "../common/buttons/submitButton/SubmitButton";
+import { useMount } from "../../utils/lifecycle";
+import { trackPageView } from "../../utils/appInsightsHelper";
 
 const LoginPageComponent = (props) => {
   const [form] = useState(() => {
     const fields = {
       userName: "",
-      password: ""
+      password: "",
     };
 
     const validation = {
       userName: [validators.required, validators.email],
-      password: [validators.required]
+      password: [validators.required],
     };
 
     return createForm(fields, validation);
-  })
+  });
 
   const [logoClick, setLogoClick] = useState(0);
 
@@ -37,6 +38,9 @@ const LoginPageComponent = (props) => {
     if (props.user) {
       redirectToRoot();
     }
+
+    // Track page view
+    trackPageView("LoginPage");
   });
 
   const handleSubmit = (e) => {
@@ -44,7 +48,7 @@ const LoginPageComponent = (props) => {
 
     if (!form.isValid()) {
       return;
-    };
+    }
 
     const values = form.getValues();
 
@@ -67,15 +71,11 @@ const LoginPageComponent = (props) => {
                 id="svg28"
                 width="382.46814"
                 height="140.69597"
-                onClick={() => setLogoClick(logoClick + 1)}>
-                <title
-                  id="title14">Nyss logo</title>
-                <g
-                  id="Layer_2"
-                  data-name="Layer 2">
-                  <g
-                    id="Layer_1-2"
-                    data-name="Layer 1">
+                onClick={() => setLogoClick(logoClick + 1)}
+              >
+                <title id="title14">Nyss logo</title>
+                <g id="Layer_2" data-name="Layer 2">
+                  <g id="Layer_1-2" data-name="Layer 1">
                     <path
                       className={styles.redFill}
                       d="M 102.19,125.11 H 71.28 V 50.38 c 0,-6.92 0,-19.8 -15.65,-19.8 -15.42,0 -23.24,10.85 -23.24,32.26 v 62.27 H 0.48 V 38.43 c 0,-9 0,-17.45 -0.21,-25.5 L 0,2.45 h 30.31 l 0.47,3.66 Q 41.47,0 56.38,0 c 12.87,0 23.92,4 31.94,11.49 9.2,8.62 13.87,21.12 13.87,37.16 z"
@@ -106,13 +106,18 @@ const LoginPageComponent = (props) => {
                   key={logoClick}
                   className={styles.animationCurve}
                   d="m 0.38207769,137.47286 c 0,0 107.55487231,0.57311 121.30967231,0.57311 13.75479,0 27.49288,-4.70899 33.18715,-11.85597 7.98172,-10.01797 12.66262,-23.94733 19.53957,-23.86829 16.62038,0.19104 -1.05413,36.13803 97.71636,36.58395 30.57545,0.13803 110.32493,-0.47761 110.32493,-0.47761"
-                  id="fullcurve" />
+                  id="fullcurve"
+                />
               </svg>
             </div>
             <div className={styles.loginPaperContent}>
-              <Typography variant="h2" className={styles.loginHeader}>{strings(stringKeys.login.title)}</Typography>
+              <Typography variant="h2" className={styles.loginHeader}>
+                {strings(stringKeys.login.title)}
+              </Typography>
 
-              {props.loginResponse && <ValidationMessage message={props.loginResponse} />}
+              {props.loginResponse && (
+                <ValidationMessage message={props.loginResponse} />
+              )}
 
               <form onSubmit={handleSubmit}>
                 <Grid container spacing={2}>
@@ -155,39 +160,57 @@ const LoginPageComponent = (props) => {
       <Grid item xs={12}>
         <Grid container className={styles.loginFooter}>
           <Grid item xs={12}>
-            <Typography align="center" variant="h6" className={styles.supportLogoHeader}>Nyss was developed with the support of:</Typography>
+            <Typography
+              align="center"
+              variant="h6"
+              className={styles.supportLogoHeader}
+            >
+              Nyss was developed with the support of:
+            </Typography>
           </Grid>
           <Grid item>
-            <img className={styles.supportLogo} src="/images/logo-ifrc.svg" alt="IFRC logo" />
+            <img
+              className={styles.supportLogo}
+              src="/images/logo-ifrc.svg"
+              alt="IFRC logo"
+            />
           </Grid>
           <Grid item>
-            <img className={styles.supportLogo} src="/images/logo-nrc.svg" alt="Norwegian Red Cross logo" />
+            <img
+              className={styles.supportLogo}
+              src="/images/logo-nrc.svg"
+              alt="Norwegian Red Cross logo"
+            />
           </Grid>
           <Grid item>
-            <img className={styles.supportLogo} src="/images/logo-crb.svg" alt="Croix-Rouge Belgium logo" />
+            <img
+              className={styles.supportLogo}
+              src="/images/logo-crb.svg"
+              alt="Croix-Rouge Belgium logo"
+            />
           </Grid>
         </Grid>
       </Grid>
-    </Grid >
+    </Grid>
   );
 };
 
 LoginPageComponent.propTypes = {
   login: PropTypes.func,
-  loginResponse: PropTypes.string
+  loginResponse: PropTypes.string,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   user: state.appData.user,
   loginResponse: state.auth.loginResponse,
-  isFetching: state.auth.isFetching
+  isFetching: state.auth.isFetching,
 });
 
 const mapDispatchToProps = {
-  login: authActions.login.invoke
+  login: authActions.login.invoke,
 };
 
 export const LoginPage = withLayout(
   AnonymousLayout,
-  connect(mapStateToProps, mapDispatchToProps)(LoginPageComponent)
+  connect(mapStateToProps, mapDispatchToProps)(LoginPageComponent),
 );

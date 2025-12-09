@@ -19,6 +19,8 @@ namespace RX.Nyss.Web.Features.Projects.Dto
         {
             public int Id { get; set; }
             public string Name { get; set; }
+
+            public int? OrganizationId { get; set; }
         }
     }
 }

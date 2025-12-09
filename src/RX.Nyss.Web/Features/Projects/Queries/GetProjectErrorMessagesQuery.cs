@@ -58,6 +58,7 @@ namespace RX.Nyss.Web.Features.Projects.Queries
 
                 var projectMessages = await _context.ProjectErrorMessages
                     .Where(x => x.ProjectId == request.ProjectId)
+                    .AsSplitQuery()
                     .ToListAsync(cancellationToken);
 
                 return MessageKeys.Select(key => new ProjectErrorMessageDto

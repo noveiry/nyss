@@ -1,59 +1,71 @@
 import styles from "./AlertsAssessment.module.scss";
-import React, { useEffect, useMemo, Fragment } from 'react';
+import React, { useEffect, useMemo, Fragment } from "react";
 import { connect, useSelector } from "react-redux";
-import { withLayout } from '../../utils/layout';
-import * as alertsActions from './logic/alertsActions';
-import Layout from '../layout/Layout';
-import { Loading } from '../common/loading/Loading';
-import { useMount } from '../../utils/lifecycle';
-import { Grid, Divider } from '@material-ui/core';
-import { stringKeys, strings } from '../../strings';
+import { withLayout } from "../../utils/layout";
+import * as alertsActions from "./logic/alertsActions";
+import Layout from "../layout/Layout";
+import { Loading } from "../common/loading/Loading";
+import { useMount } from "../../utils/lifecycle";
+import { Grid, Typography } from "@material-ui/core";
+import { stringKeys, strings } from "../../strings";
 import DisplayField from "../forms/DisplayField";
 import { AlertsAssessmentReport } from "./components/AlertsAssessmentReport";
 import { assessmentStatus } from "./logic/alertsConstants";
 import { AlertsAssessmentActions } from "./components/AlertsAssessmentActions";
 import AlertNotificationRecipients from "./components/AlertNotificationRecipients";
+import { makeStyles } from "@material-ui/core/styles";
+import { sortByReportStatus } from "../../utils/sortReportByStatus";
+import { AlertStatusChip } from "../common/chip/AlertStatusChip";
+import { trackPageView } from "../../utils/appInsightsHelper";
+import { TabMenu } from "../layout/TabMenu";
 
-const getAssessmentStatusInformation = (status) => {
-  switch (status) {
-    case assessmentStatus.open:
-    case assessmentStatus.toEscalate:
-    case assessmentStatus.toDismiss:
-      return stringKeys.alerts.assess.introduction;
+const useStyles = makeStyles((theme) => ({
+  infoBox: {
+    padding: 10,
+    backgroundColor: theme.palette.backgroundDark.main,
+    border: "1px solid #E3E3E3",
+    borderRadius: 5,
+    margin: "20px 0 20px 0",
+    width: "fit-content",
+    maxWidth: 350,
+  },
+}));
 
-    case assessmentStatus.closed:
-      return stringKeys.alerts.assess.statusDescription.closed;
-    case assessmentStatus.escalated:
-      return stringKeys.alerts.assess.statusDescription.escalated;
-    case assessmentStatus.dismissed:
-      return stringKeys.alerts.assess.statusDescription.dismissed;
-    case assessmentStatus.rejected:
-      return stringKeys.alerts.assess.statusDescription.rejected;
-    default:
-      throw new Error("Wrong status")
-  }
-}
+const isLargerThanOne = (number) => number > 1;
 
-const AlertsAssessmentPageComponent = ({ alertId, projectId, data, ...props }) => {
+const AlertsAssessmentPageComponent = ({
+  alertId,
+  projectId,
+  data,
+  ...props
+}) => {
   useMount(() => {
     props.openAssessment(projectId, alertId);
+
+    // Track page view
+    trackPageView("AlertsAssessmentPage");
   });
 
-  const useRtlDirection = useSelector(state => state.appData.direction === 'rtl');
+  const classes = useStyles();
+
+  const useRtlDirection = useSelector(
+    (state) => state.appData.direction === "rtl",
+  );
 
   const handleReset = (alertId, reportId) => {
     props.resetReport(alertId, reportId);
-  }
+  };
 
   useEffect(() => {
     if (!props.data) {
       return;
     }
-
   }, [props.data, props.match]);
 
-  const hasAccessToActions = useMemo(() => !!data && data.reports.filter(r => !r.isAnonymized).length > 0,
-    [data]);
+  const hasAccessToActions = useMemo(
+    () => !!data && data.reports.filter((r) => !r.isAnonymized).length > 0,
+    [data],
+  );
 
   if (props.isFetching || !data) {
     return <Loading />;
@@ -61,12 +73,21 @@ const AlertsAssessmentPageComponent = ({ alertId, projectId, data, ...props }) =
 
   return (
     <Fragment>
+      <Grid container alignItems="center">
+        <Typography variant="h3" style={{ marginRight: 10 }}>
+          {props.title}
+        </Typography>
+        <Typography
+          variant="body1"
+          style={{ alignSelf: "center", marginRight: 15 }}
+        >{`#${alertId}`}</Typography>
+        <AlertStatusChip status={data.assessmentStatus} />
+      </Grid>
+      <Typography variant="body1">
+        {props.subTitle}
+      </Typography>
+      <TabMenu/>
       <div className={styles.form}>
-        <DisplayField
-          label={strings(getAssessmentStatusInformation(data.assessmentStatus))}
-          value={strings(stringKeys.alerts.constants.escalatedOutcomes[data.escalatedOutcome])}
-        />
-
         {data.assessmentStatus === assessmentStatus.closed && data.comments && (
           <DisplayField
             label={strings(stringKeys.alerts.assess.closeReason)}
@@ -74,27 +95,68 @@ const AlertsAssessmentPageComponent = ({ alertId, projectId, data, ...props }) =
           />
         )}
 
-        <Divider />
+        <Grid container className={classes.infoBox}>
+          <Typography variant="body1">{data.caseDefinition}</Typography>
+        </Grid>
+        <Grid container className={classes.infoBox}>
+          <Typography
+            style={{ display: "flex", flexDirection: "row" }}
+            variant="body1"
+          >
+            <>
+              <Typography variant="body1" style={{ marginRight: 5 }}>
+                {strings(stringKeys.alerts.assess.thresholdInfo.threshold)}:
+              </Typography>
+              <strong style={{ marginRight: 5 }}>
+                {data.healthRiskCountThreshold}{" "}
+                {isLargerThanOne(data.healthRiskCountThreshold)
+                  ? strings(stringKeys.alerts.assess.thresholdInfo.reports)
+                  : strings(stringKeys.alerts.assess.thresholdInfo.report)}
+              </strong>
+            </>
+            {data.healthRiskDaysThreshold && (
+              <>
+                <Typography variant="body1" style={{ marginRight: 5 }}>
+                  {strings(stringKeys.alerts.assess.thresholdInfo.in)}
+                </Typography>
+                <strong style={{ marginRight: 5 }}>
+                  {data.healthRiskDaysThreshold}{" "}
+                  {isLargerThanOne(data.healthRiskDaysThreshold)
+                    ? strings(stringKeys.alerts.assess.thresholdInfo.days)
+                    : strings(stringKeys.alerts.assess.thresholdInfo.day)}
+                </strong>
+              </>
+            )}
+            {data.healthRiskKilometersThreshold && (
+              <>
+                <Typography variant="body1" style={{ marginRight: 5 }}>
+                  {strings(stringKeys.alerts.assess.thresholdInfo.within)}
+                </Typography>
+                <strong style={{ marginRight: 5 }}>
+                  {data.healthRiskKilometersThreshold}{" "}
+                  {strings(stringKeys.alerts.assess.thresholdInfo.kilometers)}
+                </strong>
+              </>
+            )}
+          </Typography>
+        </Grid>
 
-        <DisplayField
-          label={strings(stringKeys.alerts.assess.caseDefinition)}
-          value={data.caseDefinition}
-        />
+        {data.recipientsNotified && data.escalatedTo.length > 0 && (
+          <>
+            <DisplayField
+              label={`${strings(stringKeys.alerts.assess.escalatedTo.title)}:`}
+              value=""
+            />
+            <AlertNotificationRecipients recipients={data.escalatedTo} />
+          </>
+        )}
 
-        <Divider />
-
-        {data.recipientsNotified && data.escalatedTo.length > 0 && <>
-          <DisplayField
-            label={`${strings(stringKeys.alerts.assess.escalatedTo.title)}:`}
-            value=""
-          />
-          <AlertNotificationRecipients recipients={data.escalatedTo} />
-        </>}
-
-        <div className={styles.reportsTitle}>{strings(stringKeys.alerts.assess.reports)}</div>
+        <Typography variant="h4" style={{ marginTop: 20 }}>
+          {strings(stringKeys.alerts.assess.reports)}
+        </Typography>
 
         <Grid container spacing={2}>
-          {data.reports.map(report => (
+          {data.reports.sort(sortByReportStatus).map((report) => (
             <Grid item xs={12} key={`report_${report.id}`}>
               <AlertsAssessmentReport
                 report={report}
@@ -115,41 +177,30 @@ const AlertsAssessmentPageComponent = ({ alertId, projectId, data, ...props }) =
           alertId={alertId}
           projectId={projectId}
           alertAssessmentStatus={data.assessmentStatus}
-
           isNationalSocietyEidsrEnabled={data.isNationalSocietyEidsrEnabled}
-
           hasAccess={hasAccessToActions}
-
           goToList={props.goToList}
-
           closeAlert={props.closeAlert}
           isClosing={props.isClosing}
-
           escalateAlert={props.escalateAlert}
           isEscalating={props.isEscalating}
-
           dismissAlert={props.dismissAlert}
           isDismissing={props.isDismissing}
-
           fetchRecipients={props.fetchRecipients}
           isFetchingRecipients={props.isFetchingRecipients}
-
           validateEidsr={props.validateEidsr}
           validateEidsrResult={props.validateEidsrResult}
           isLoadingValidateEidsr={props.isLoadingValidateEidsr}
-
           isPendingAlertState={props.isPendingAlertState}
-
           notificationEmails={props.notificationEmails}
           notificationPhoneNumbers={props.notificationPhoneNumbers}
         />
       </div>
     </Fragment>
   );
-}
-
-AlertsAssessmentPageComponent.propTypes = {
 };
+
+AlertsAssessmentPageComponent.propTypes = {};
 
 const mapStateToProps = (state, ownProps) => ({
   projectId: ownProps.match.params.projectId,
@@ -167,6 +218,8 @@ const mapStateToProps = (state, ownProps) => ({
   isPendingAlertState: state.alerts.isPendingAlertState,
   validateEidsrResult: state.alerts.formData?.validateEidsrResult,
   isLoadingValidateEidsr: state.alerts.isLoadingValidateEidsr,
+  title: state.appData.siteMap.parameters.title,
+  subTitle: state.appData.siteMap.parameters.subTitle,
 });
 
 const mapDispatchToProps = {
@@ -184,5 +237,5 @@ const mapDispatchToProps = {
 
 export const AlertsAssessmentPage = withLayout(
   Layout,
-  connect(mapStateToProps, mapDispatchToProps)(AlertsAssessmentPageComponent)
+  connect(mapStateToProps, mapDispatchToProps)(AlertsAssessmentPageComponent),
 );

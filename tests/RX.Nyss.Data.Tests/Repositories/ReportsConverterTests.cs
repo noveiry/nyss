@@ -22,23 +22,23 @@ public class ReportsConverterTests
         var rawReport = ReportsData.CreateRawReport();
         rawReport
             .AddLocation("Whiterun", "Skyrim", "ABC", "Tamriel")
-            .AddReport("123", new DateTime(2022,11,24), true)
+            .AddReport("123", new DateTime(2022, 11, 24), true)
             .AddHealthRisk(true)
-            .AddSuspectedDiseases(1, new List<string>{"stomachache", "headache"});
+            .AddSuspectedDiseases(1, new List<string> { "stomachache", "headache" });
 
         var rawReport2 = ReportsData.CreateRawReport();
         rawReport2
             .AddLocation("Soltitude", "Skyrim", "ABC", "Tamriel")
-            .AddReport("123", new DateTime(2022,11,24), true)
+            .AddReport("123", new DateTime(2022, 11, 24), true)
             .AddHealthRisk(true)
-            .AddSuspectedDiseases(1, new List<string>{"stomachache", "headache"});
+            .AddSuspectedDiseases(1, new List<string> { "stomachache", "headache" });
 
         var rawReport3 = ReportsData.CreateRawReport();
         rawReport3
             .AddLocation("Soltitude", "Skyrim", "ABC", "Tamriel")
-            .AddReport(null, new DateTime(2022,11,24), false)
+            .AddReport(null, new DateTime(2022, 11, 24), false)
             .AddHealthRisk(true)
-            .AddSuspectedDiseases(1, new List<string>{"stomachache", "headache"});
+            .AddSuspectedDiseases(1, new List<string> { "stomachache", "headache" });
 
         var rawReport4 = ReportsData.CreateRawReport();
         rawReport4
@@ -48,7 +48,7 @@ public class ReportsConverterTests
         // act
         var result = _reportConverter.ConvertReports(
             new List<RawReport> { rawReport, rawReport2, rawReport3, rawReport4 },
-            new DateTime(2022,11,20),
+            new DateTime(2022, 11, 20),
  1);
 
         // assert
@@ -73,7 +73,7 @@ public class ReportsConverterTests
         Assert.Equal("2022-11-25 00:00:00Z", result[1].DateOfOnset);
     }
 
-     [Fact]
+    [Fact]
     public async Task CreateRawReport_InValidRawReports_ShouldConvertPartially()
     {
         // arrange
@@ -92,11 +92,11 @@ public class ReportsConverterTests
         // act
         var result = _reportConverter.ConvertReports(
             new List<RawReport> { rawReport, rawReport2, rawReport3, rawReport4 },
-            new DateTime(2022,11,20),
+            new DateTime(2022, 11, 20),
  1);
 
         // assert
-        Assert.Equal(1, result.Count);
+        Assert.Single(result);
 
         Assert.Equal("", result[0].Gender);
         Assert.Equal("Tamriel/Skyrim/Whiterun", result[0].Location);

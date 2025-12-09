@@ -15,6 +15,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { sendFeedback } from "../app/logic/appActions";
 import GoBackToButton from "../common/buttons/goBackToButton/GoBackToButton";
 import { goBack } from "connected-react-router";
+import { trackPageView } from "../../utils/appInsightsHelper";
 
 const useStyles = makeStyles({
   input: {
@@ -31,15 +32,15 @@ const useStyles = makeStyles({
   },
   container: {
     height: "100%",
-  }
+  },
 });
 
 const Feedback = ({ openModule, match, goBack }) => {
   const isSendingFeedback = useSelector(
-    (state) => state.appData.feedback.isSending
+    (state) => state.appData.feedback.isSending,
   );
   const sendFeedbackResult = useSelector(
-    (state) => state.appData.feedback.result
+    (state) => state.appData.feedback.result,
   );
 
   const classes = useStyles();
@@ -57,6 +58,9 @@ const Feedback = ({ openModule, match, goBack }) => {
   useMount(() => {
     openModule(match.path, match.params);
     setHasSent(false);
+
+    // Track page view
+    trackPageView("FeedbackPage");
   });
 
   const handleSubmit = (e) => {
@@ -68,7 +72,7 @@ const Feedback = ({ openModule, match, goBack }) => {
     dispatch(
       sendFeedback.invoke({
         message: form.fields.message.value,
-      })
+      }),
     );
 
     setHasSent(true);
@@ -92,66 +96,96 @@ const Feedback = ({ openModule, match, goBack }) => {
   const handleSendNewFeedback = () => {
     resetForm();
     setHasSent(false);
-  }
+  };
 
   return (
-    <Grid container className={classes.container} justifyContent="center" alignItems="center">
+    <>
       {(!hasSent || isSendingFeedback) && (
-        <Grid container style={{ width: 600 }} spacing={3}>
-          <Grid item xs={12}>
-            <Typography variant={"h1"} className={classes.title}>
-              {strings(stringKeys.feedback.title)}
-            </Typography>
-            <TextInputField
-              label={strings(stringKeys.feedback.description)}
-              name="feedback"
-              multiline
-              rows="4"
-              disabled={isSendingFeedback}
-              field={form.fields.message}
-              classNameInput={classes.input}
-              classNameLabel={classes.label}
-              placeholder={strings(stringKeys.feedback.placeholder)}
-            />
-          </Grid>
-          <Grid item xs={12} style={{ textAlign: "right" }}>
-            <SubmitButton isFetching={isSendingFeedback} onClick={handleSubmit}>
-              {strings(stringKeys.feedback.submit)}
-            </SubmitButton>
-          </Grid>
+        <Grid>
+          <GoBackToButton onClick={handleGoBack} size={"large"}>
+            {strings(stringKeys.common.buttons.goBack)}
+          </GoBackToButton>
         </Grid>
       )}
+      <Grid
+        container
+        className={classes.container}
+        justifyContent="center"
+        alignItems="center"
+      >
+        <>
+          {(!hasSent || isSendingFeedback) && (
+            <Grid container style={{ width: 600 }} spacing={3}>
+              <Grid item xs={12}>
+                <Typography variant={"h1"} className={classes.title}>
+                  {strings(stringKeys.feedback.title)}
+                </Typography>
+                <TextInputField
+                  label={strings(stringKeys.feedback.description)}
+                  name="feedback"
+                  multiline
+                  rows="4"
+                  disabled={isSendingFeedback}
+                  field={form.fields.message}
+                  classNameInput={classes.input}
+                  classNameLabel={classes.label}
+                  placeholder={strings(stringKeys.feedback.placeholder)}
+                />
+              </Grid>
+              <Grid item container justifyContent={"flex-end"}>
+                <SubmitButton
+                  isFetching={isSendingFeedback}
+                  onClick={handleSubmit}
+                >
+                  {strings(stringKeys.feedback.submit)}
+                </SubmitButton>
+              </Grid>
+            </Grid>
+          )}
+          {hasSent && sendFeedbackResult === "ok" && (
+            <Grid container justifyContent="center" spacing={7}>
+              <Grid container direction="column" alignItems="center">
+                <Typography variant={"h1"} className={classes.title}>
+                  {strings(stringKeys.feedback.thankYouTitle)}
+                </Typography>
+                <Typography>
+                  {strings(stringKeys.feedback.thankYouDescription)}
+                </Typography>
+                <Grid item style={{ marginTop: "2rem" }}>
+                  <GoBackToButton onClick={handleGoBack}>
+                    {strings(stringKeys.common.buttons.goBack)}
+                  </GoBackToButton>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
 
-      {hasSent && sendFeedbackResult === "ok" && (
-        <Grid container justifyContent="center" spacing={7}>
-          <Grid container direction="column" alignItems="center">
-            <Typography variant={"h1"} className={classes.title}>
-              {strings(stringKeys.feedback.thankYouTitle)}
-            </Typography>
-            <Typography>
-              {strings(stringKeys.feedback.thankYouDescription)}
-            </Typography>
-            <GoBackToButton onClick={handleGoBack}>
-              {strings(stringKeys.common.buttons.goBack)}
-            </GoBackToButton>
-          </Grid>
-        </Grid>
-      )}
-
-      {hasSent && sendFeedbackResult === "error" && (
-        <Grid container direction="column" justifyContent="center" alignItems="center" spacing={7}>
-            <Typography variant={"h1"} className={classes.title}>
-              {strings(stringKeys.feedback.errorTitle)}
-            </Typography>
-            <Typography>
-              {strings(stringKeys.feedback.errorDescription)}
-            </Typography>
-            <TableActionsButton variant="contained" style={{marginTop: "30px"}} onClick={handleSendNewFeedback}>
-              {strings(stringKeys.common.buttons.tryAgain)}
-            </TableActionsButton>
-        </Grid>
-      )}
-    </Grid>
+          {hasSent && sendFeedbackResult === "error" && (
+            <Grid
+              container
+              direction="column"
+              justifyContent="center"
+              alignItems="center"
+              spacing={7}
+            >
+              <Typography variant={"h1"} className={classes.title}>
+                {strings(stringKeys.feedback.errorTitle)}
+              </Typography>
+              <Typography>
+                {strings(stringKeys.feedback.errorDescription)}
+              </Typography>
+              <TableActionsButton
+                variant="contained"
+                style={{ marginTop: "30px" }}
+                onClick={handleSendNewFeedback}
+              >
+                {strings(stringKeys.common.buttons.tryAgain)}
+              </TableActionsButton>
+            </Grid>
+          )}
+        </>
+      </Grid>
+    </>
   );
 };
 
@@ -162,5 +196,6 @@ const mapDispatchToProps = {
 
 export const FeedbackPage = withLayout(
   Layout,
-  connect(null, mapDispatchToProps)(Feedback), {fillPage: true}
+  connect(null, mapDispatchToProps)(Feedback),
+  { fillPage: true },
 );

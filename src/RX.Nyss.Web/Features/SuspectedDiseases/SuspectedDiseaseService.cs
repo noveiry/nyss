@@ -52,6 +52,7 @@ namespace RX.Nyss.Web.Features.SuspectedDiseases
                     SuspectedDiseaseCode = sd.SuspectedDiseaseCode
                 })
                 .OrderBy(sd => sd.SuspectedDiseaseId)
+                .AsSplitQuery()
                 .ToListAsync();
 
             return Success<IEnumerable<SuspectedDiseaseListItemResponseDto>>(suspectedDisease);

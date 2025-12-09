@@ -7,7 +7,7 @@ export const nationalSocietyLeftMenuOrder = {
   projects: 10,
   userlist: 20,
   nationalSocietyReports: 30,
-  settings: 40
+  settings: 40,
 };
 
 export const nationalSocietiesSiteMap = [
@@ -16,25 +16,25 @@ export const nationalSocietiesSiteMap = [
     title: () => strings(stringKeys.nationalSociety.title),
     placeholder: placeholders.generalMenu,
     access: accessMap.nationalSocieties.list,
-    icon: "NationalSocieties"
+    icon: "NationalSocieties",
   },
   {
     parentPath: "/nationalsocieties",
     path: "/nationalsocieties/add",
     title: () => strings(stringKeys.nationalSociety.form.creationTitle),
-    access: accessMap.nationalSocieties.add
+    access: accessMap.nationalSocieties.add,
   },
   {
     parentPath: "/nationalsocieties",
     path: "/nationalsocieties/:nationalSocietyId",
     title: () => "{nationalSocietyName}",
-    access: accessMap.nationalSocieties.get
+    access: accessMap.nationalSocieties.get,
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/overview",
     path: "/nationalsocieties/:nationalSocietyId/edit",
     title: () => strings(stringKeys.nationalSociety.form.editionTitle),
-    access: accessMap.nationalSocieties.edit
+    access: accessMap.nationalSocieties.edit,
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId",
@@ -43,7 +43,7 @@ export const nationalSocietiesSiteMap = [
     placeholder: placeholders.leftMenu,
     placeholderIndex: nationalSocietyLeftMenuOrder.settings,
     access: accessMap.nationalSocieties.edit,
-    icon: "Settings"
+    icon: "Settings",
   },
   {
     parentPath: "/nationalsocieties/:nationalSocietyId/settings",
@@ -52,6 +52,6 @@ export const nationalSocietiesSiteMap = [
     placeholder: placeholders.tabMenu,
     placeholderIndex: 1,
     access: accessMap.nationalSocieties.edit,
-    middleStepOnly: true
-  }
+    middleStepOnly: true,
+  },
 ];

@@ -5,5 +5,6 @@ public enum ReportSource
     SmsEagle,
     Nyss,
     Telerivet,
-    SmsGateway
+    SmsGateway,
+    MTNSmsGateway
 }

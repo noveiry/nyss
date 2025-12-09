@@ -37,13 +37,62 @@ public class DhisRegisterReportRequest
     {
         var dataValues = new List<DhisRegisterReportRequestBody.DataValue>();
 
-        AddDataElement(dataValues, template.ReportLocationDataElementId, data.ReportLocation);
-        AddDataElement(dataValues, template.ReportSuspectedDiseaseDataElementId, data.ReportSuspectedDisease);
-        AddDataElement(dataValues, template.ReportHealthRiskDataElementId, data.ReportHealthRisk);
-        AddDataElement(dataValues, template.ReportStatusDataElementId, data.ReportStatus);
-        AddDataElement(dataValues, template.ReportGenderDataElementId, data.ReportGender);
-        AddDataElement(dataValues, template.ReportAgeAtLeastFiveDataElementId, data.ReportAgeAtleastFive);
-        AddDataElement(dataValues, template.ReportAgeBelowFiveDataElementId, data.ReportAgeBelowFive);
+        if (template.ReportLocationDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportLocationDataElementId, data.ReportLocation);
+        }
+        if (template.ReportGeoLocationDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportGeoLocationDataElementId, data.ReportGeoLocation.ToString());
+        }
+        if (template.ReportSuspectedDiseaseDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportSuspectedDiseaseDataElementId, data.ReportSuspectedDisease);
+        }
+        if (template.ReportHealthRiskDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportHealthRiskDataElementId, data.ReportHealthRisk);
+        }
+        if (template.ReportStatusDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportStatusDataElementId, data.ReportStatus);
+        }
+        if (template.ReportGenderDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportGenderDataElementId, data.ReportGender);
+        }
+        if (template.ReportAgeGroupDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportAgeGroupDataElementId, data.ReportAgeGroup);
+        }
+        if (template.ReportCaseCountFemaleAgeAtLeastFiveDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportCaseCountFemaleAgeAtLeastFiveDataElementId, data.ReportCaseCountFemaleAgeAtLeastFive.ToString());
+        }
+        if (template.ReportCaseCountMaleAgeAtLeastFiveDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportCaseCountMaleAgeAtLeastFiveDataElementId, data.ReportCaseCountMaleAgeAtLeastFive.ToString());
+        }
+        if (template.ReportCaseCountFemaleAgeBelowFiveDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportCaseCountFemaleAgeBelowFiveDataElementId, data.ReportCaseCountFemaleAgeBelowFive.ToString());
+        }
+        if (template.ReportCaseCountMaleAgeBelowFiveDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportCaseCountMaleAgeBelowFiveDataElementId, data.ReportCaseCountMaleAgeBelowFive.ToString());
+        }
+        if (template.ReportDateDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportDateDataElementId, data.ReportDate);
+        }
+        if (template.ReportTimeDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportTimeDataElementId, data.ReportTime);
+        }
+        if (template.ReportDataCollectorIdDataElementId != "")
+        {
+            AddDataElement(dataValues, template.ReportDataCollectorIdDataElementId, data.ReportDataCollectorId.ToString());
+        }
 
         return dataValues;
     }

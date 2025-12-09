@@ -8,4 +8,9 @@ export const EDIT_HEALTH_RISK = action("EDIT_HEALTH_RISK");
 export const OPEN_EDITION_HEALTH_RISK = action("OPEN_EDITION_HEALTH_RISK");
 export const REMOVE_HEALTH_RISK = action("REMOVE_HEALTH_RISK");
 
-export const healthRiskTypes = ["Human", "NonHuman", "UnusualEvent", "Activity"];
+export const healthRiskTypes = [
+  "Human",
+  "NonHuman",
+  "UnusualEvent",
+  "Activity",
+];

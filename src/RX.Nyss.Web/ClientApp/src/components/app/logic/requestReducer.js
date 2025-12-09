@@ -16,15 +16,15 @@ export function requestReducer(state = initialState.requests, action) {
   if (action.type === CLOSE_MESSAGE.INVOKE) {
     return {
       ...state,
-      errorMessage: null
-    }
+      errorMessage: null,
+    };
   }
 
   if (action.type === LOCATION_CHANGE) {
     return {
       ...state,
-      errorMessage: null
-    }
+      errorMessage: null,
+    };
   }
 
   const actionType = getActionType(action.type);
@@ -37,9 +37,9 @@ export function requestReducer(state = initialState.requests, action) {
         isFetching: true,
         pending: {
           ...state.pending,
-          ...(action.id ? ({ [actionName + "_" + action.id]: true }) : {}),
-          [actionName]: true
-        }
+          ...(action.id ? { [actionName + "_" + action.id]: true } : {}),
+          [actionName]: true,
+        },
       };
 
     case "SUCCESS":
@@ -48,23 +48,25 @@ export function requestReducer(state = initialState.requests, action) {
         isFetching: false,
         pending: {
           ...state.pending,
-          ...(action.id ? ({ [actionName + "_" + action.id]: false }) : {}),
-          [actionName]: false
-        }
+          ...(action.id ? { [actionName + "_" + action.id]: false } : {}),
+          [actionName]: false,
+        },
       };
     case "FAILURE":
       return {
         ...state,
         isFetching: false,
-        errorMessage: action.suppressPopup ? null : (action.message || (action.error && action.error.message)),
+        errorMessage: action.suppressPopup
+          ? null
+          : action.message || (action.error && action.error.message),
         pending: {
           ...state.pending,
-          ...(action.id ? ({ [actionName + "_" + action.id]: false }) : {}),
-          [actionName]: false
-        }
+          ...(action.id ? { [actionName + "_" + action.id]: false } : {}),
+          [actionName]: false,
+        },
       };
 
     default:
       return state;
   }
-};
+}

@@ -237,7 +237,8 @@ namespace RX.Nyss.Web.Features.ProjectAlertRecipients
                         UserId = u.UserId,
                         Role = u.User.Role,
                         u.NationalSocietyId
-                    }).ToListAsync();
+                    })
+                    .AsSplitQuery().ToListAsync();
                 var nationalSocietyId = applicableLinkedUsers.Select(alu => alu.NationalSocietyId).Distinct().Single();
 
                 var applicableLinkedSupervisors = applicableLinkedUsers
@@ -310,7 +311,7 @@ namespace RX.Nyss.Web.Features.ProjectAlertRecipients
                 {
                     Id = o.Id,
                     Name = o.Name
-                }).ToListAsync();
+                }).AsSplitQuery().ToListAsync();
 
             var supervisors = _nyssContext.SupervisorUserProjects
                 .FilterAvailableUsers()
@@ -340,6 +341,7 @@ namespace RX.Nyss.Web.Features.ProjectAlertRecipients
 
             var supervisorFormData = await supervisors
                 .Concat(headSupervisors)
+                .AsSplitQuery()
                 .ToListAsync();
 
             var healthRisks = await _nyssContext.ProjectHealthRisks
@@ -348,7 +350,7 @@ namespace RX.Nyss.Web.Features.ProjectAlertRecipients
                 {
                     Id = phr.Id,
                     HealthRiskName = phr.HealthRisk.LanguageContents.Single(lc => lc.ContentLanguageId == phr.Project.NationalSociety.ContentLanguage.Id).Name
-                }).ToListAsync();
+                }).AsSplitQuery().ToListAsync();
 
             var gatewayModems = await _nyssContext.GatewayModems
                 .Where(gm => gm.GatewaySetting.NationalSocietyId == nationalSocietyId)
@@ -357,6 +359,7 @@ namespace RX.Nyss.Web.Features.ProjectAlertRecipients
                     Id = gm.Id,
                     Name = gm.Name
                 })
+                .AsSplitQuery()
                 .ToListAsync();
 
             var countryCode = await _nyssContext.NationalSocieties

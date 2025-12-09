@@ -8,28 +8,33 @@ import { strings, stringKeys } from "../../strings";
 import { NationalSocietyLocationList } from "./NationalSocietyLocationList";
 import * as roles from "../../authentication/roles";
 import { useSelector } from "react-redux";
+import { trackPageView } from "../../utils/appInsightsHelper";
+import { useMount } from "../../utils/lifecycle";
 
 const NationalSocietyStructurePageComponent = (props) => {
-  const {
-    openStructure,
-    nationalSocietyId,
-  } = props;
+  const { openStructure, nationalSocietyId } = props;
+
+  useMount(() => {
+    // Track page view
+    trackPageView("NationalSocietyStructurePage");
+  });
 
   useEffect(() => {
     openStructure(nationalSocietyId);
   }, [openStructure, nationalSocietyId]);
 
   const canModify =
-    !props.nationalSocietyIsArchived
-    && (
-      !props.nationalSocietyHasCoordinator
-      || props.callingUserRoles.some(r => r === roles.Coordinator || r === roles.Administrator)
-    );
+    !props.nationalSocietyIsArchived &&
+    (!props.nationalSocietyHasCoordinator ||
+      props.callingUserRoles.some(
+        (r) => r === roles.Coordinator || r === roles.Administrator,
+      ));
 
-  const useRtlDirection = useSelector(state => state.appData.user.languageCode === 'ar');
+  const useRtlDirection = useSelector(
+    (state) => state.appData.user.languageCode === "ar",
+  );
 
-
-  if(!props.regions) return null;
+  if (!props.regions) return null;
 
   const manageLocation = {
     region: {
@@ -37,30 +42,36 @@ const NationalSocietyStructurePageComponent = (props) => {
       edit: props.editRegion,
       remove: props.removeRegion,
       nextLocationType: "district",
-      nextLocations: (location) => props.districts.filter(
-        (district) => district.regionId === location.id
+      nextLocations: (location) =>
+        props.districts.filter((district) => district.regionId === location.id),
+      addLocationLabel: strings(
+        stringKeys.nationalSociety.structure.addRegion,
+        true,
       ),
-      addLocationLabel: strings(stringKeys.nationalSociety.structure.addRegion, true)
     },
     district: {
       create: props.createDistrict,
       edit: props.editDistrict,
       remove: props.removeDistrict,
       nextLocationType: "village",
-      nextLocations: (location) => props.villages.filter(
-        (village) => village.districtId === location.id
+      nextLocations: (location) =>
+        props.villages.filter((village) => village.districtId === location.id),
+      addLocationLabel: strings(
+        stringKeys.nationalSociety.structure.addDistrict,
+        true,
       ),
-      addLocationLabel: strings(stringKeys.nationalSociety.structure.addDistrict, true)
     },
     village: {
       create: props.createVillage,
       edit: props.editVillage,
       remove: props.removeVillage,
       nextLocationType: "zone",
-      nextLocations: (location) => props.zones.filter(
-        (zone) => zone.villageId === location.id
+      nextLocations: (location) =>
+        props.zones.filter((zone) => zone.villageId === location.id),
+      addLocationLabel: strings(
+        stringKeys.nationalSociety.structure.addVillage,
+        true,
       ),
-      addLocationLabel: strings(stringKeys.nationalSociety.structure.addVillage, true)
     },
     zone: {
       create: props.createZone,
@@ -68,9 +79,12 @@ const NationalSocietyStructurePageComponent = (props) => {
       remove: props.removeZone,
       nextLocationType: null,
       nextLocations: () => null,
-      addLocationLabel: strings(stringKeys.nationalSociety.structure.addZone, true)
-    }
-  }
+      addLocationLabel: strings(
+        stringKeys.nationalSociety.structure.addZone,
+        true,
+      ),
+    },
+  };
 
   return (
     <Fragment>
@@ -86,7 +100,7 @@ const NationalSocietyStructurePageComponent = (props) => {
         manageLocation={manageLocation}
         canModify={canModify}
         rtl={useRtlDirection}
-        />
+      />
     </Fragment>
   );
 };
@@ -129,6 +143,6 @@ export const NationalSocietyStructurePage = withLayout(
   Layout,
   connect(
     mapStateToProps,
-    mapDispatchToProps
-  )(NationalSocietyStructurePageComponent)
+    mapDispatchToProps,
+  )(NationalSocietyStructurePageComponent),
 );

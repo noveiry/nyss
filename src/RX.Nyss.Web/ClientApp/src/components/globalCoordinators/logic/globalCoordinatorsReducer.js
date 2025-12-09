@@ -1,12 +1,15 @@
 import * as actions from "./globalCoordinatorsConstants";
 import { initialState } from "../../../initialState";
 import { setProperty } from "../../../utils/immutable";
-import { LOCATION_CHANGE } from 'connected-react-router'
+import { LOCATION_CHANGE } from "connected-react-router";
 
-export function globalCoordinatorsReducer(state = initialState.globalCoordinators, action) {
+export function globalCoordinatorsReducer(
+  state = initialState.globalCoordinators,
+  action,
+) {
   switch (action.type) {
     case LOCATION_CHANGE: // cleanup
-      return { ...state, formData: null, formError: null }
+      return { ...state, formData: null, formError: null };
 
     case actions.GET_GLOBAL_COORDINATORS.REQUEST:
       return { ...state, listFetching: true, listData: [] };
@@ -48,13 +51,19 @@ export function globalCoordinatorsReducer(state = initialState.globalCoordinator
       return { ...state, formSaving: false };
 
     case actions.REMOVE_GLOBAL_COORDINATOR.REQUEST:
-      return { ...state, listRemoving: setProperty(state.listRemoving, action.id, true) };
+      return {
+        ...state,
+        listRemoving: setProperty(state.listRemoving, action.id, true),
+      };
 
     case actions.REMOVE_GLOBAL_COORDINATOR.SUCCESS:
     case actions.REMOVE_GLOBAL_COORDINATOR.FAILURE:
-      return { ...state, listRemoving: setProperty(state.listRemoving, action.id, undefined) };
+      return {
+        ...state,
+        listRemoving: setProperty(state.listRemoving, action.id, undefined),
+      };
 
     default:
       return state;
   }
-};
+}

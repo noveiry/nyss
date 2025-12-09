@@ -1,10 +1,12 @@
-.rowHeader, .columnHeader {
-    background: inherit !important;
-    font-weight: bold !important;
+.rowHeader,
+.columnHeader {
+  background: inherit !important;
+  font-weight: bold !important;
 }
 
 .table {
-  td, th {
+  td,
+  th {
     text-align: center;
     background: #fff;
   }

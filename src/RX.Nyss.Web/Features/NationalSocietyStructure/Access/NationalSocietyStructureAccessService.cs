@@ -9,7 +9,7 @@ namespace RX.Nyss.Web.Features.NationalSocietyStructure.Access
     public interface INationalSocietyStructureAccessService
     {
         Task<bool> HasCurrentUserAccessToRegion(int regionId, bool readOnly = false);
-        Task<bool> HasCurrentUserAccessToDistrict(int districtId, bool readOnly=false);
+        Task<bool> HasCurrentUserAccessToDistrict(int districtId, bool readOnly = false);
         Task<bool> HasCurrentUserAccessToVillage(int villageId, bool readOnly = false);
         Task<bool> HasCurrentUserAccessToZone(int zoneId, bool readOnly = false);
     }

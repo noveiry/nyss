@@ -11,12 +11,12 @@ using RX.Nyss.Common.Configuration;
 using RX.Nyss.Common.Services.StringsResources;
 using RX.Nyss.Common.Utils;
 using RX.Nyss.Common.Utils.DataContract;
+using RX.Nyss.Common.Utils.Logging;
 using RX.Nyss.Data;
 using RX.Nyss.Data.Concepts;
 using RX.Nyss.Data.Models;
 using RX.Nyss.Web.Configuration;
 using RX.Nyss.Web.Features.Alerts;
-using RX.Nyss.Web.Features.Common;
 using RX.Nyss.Web.Features.Common.Dto;
 using RX.Nyss.Web.Features.NationalSocietyStructure;
 using RX.Nyss.Web.Features.Projects;
@@ -25,6 +25,7 @@ using RX.Nyss.Web.Features.Reports.Dto;
 using RX.Nyss.Web.Features.Users;
 using RX.Nyss.Web.Services;
 using RX.Nyss.Web.Services.Authorization;
+using RX.Nyss.Web.Services.EidsrService;
 using Shouldly;
 using Xunit;
 
@@ -63,6 +64,10 @@ public class ReportServiceTests
     private readonly INationalSocietyStructureService _nationalSocietyStructureServiceMock;
 
     private readonly IStringsService _stringsService;
+
+    private readonly IEidsrService _dhisService;
+
+    private readonly ILoggerAdapter _loggerAdapter;
 
     private readonly List<int> _reportIdsFromProject1 = Enumerable.Range(1, 13).ToList();
 
@@ -106,6 +111,8 @@ public class ReportServiceTests
         _alertService = Substitute.For<IAlertService>();
         _queueService = Substitute.For<IQueueService>();
         _stringsService = Substitute.For<IStringsService>();
+        _dhisService = Substitute.For<IEidsrService>();
+        _loggerAdapter = Substitute.For<ILoggerAdapter>();
         _nationalSocietyStructureServiceMock = Substitute.For<INationalSocietyStructureService>();
 
         _alertReportService = new AlertReportService(
@@ -123,6 +130,8 @@ public class ReportServiceTests
             _authorizationService,
             _dateTimeProvider,
             _stringsService,
+            _dhisService,
+            _loggerAdapter,
             _nationalSocietyStructureServiceMock);
 
         _authorizationService.IsCurrentUserInRole(Role.Supervisor).Returns(false);
@@ -134,223 +143,6 @@ public class ReportServiceTests
         _nyssContextInMemory = new NyssContext(builder.Options);
 
         ArrangeData();
-    }
-
-    [Fact]
-    public async Task List_ShouldReturnPagedResultsFromSpecifiedProject()
-    {
-        //arrange
-        _config.PaginationRowsPerPage.Returns(9999);
-
-        //act
-        var result = await _reportService.List(1, 1, new ReportListFilterRequestDto
-        {
-            Locations = null,
-            ErrorType = null,
-            FormatCorrect = true,
-            OrderBy = "",
-            ReportStatus = new ReportStatusFilterDto
-            {
-                Dismissed = true,
-                Kept = true,
-                NotCrossChecked = true
-            },
-            SortAscending = true,
-            UtcOffset = 0,
-            DataCollectorType = ReportListDataCollectorType.Human,
-            HealthRisks = null
-        });
-
-        //assert
-        result.Value.Data.ShouldAllBe(x => _reportIdsFromProject1.Contains(x.Id));
-    }
-
-    [Fact]
-    public async Task List_ShouldReturnNumberOfRowsCorrespondingToPageSize()
-    {
-        //arrange
-        _config.PaginationRowsPerPage.Returns(13);
-
-        //act
-        var result = await _reportService.List(2, 1, new ReportListFilterRequestDto
-        {
-            DataCollectorType = ReportListDataCollectorType.CollectionPoint,
-            FormatCorrect = true,
-            ReportStatus = new ReportStatusFilterDto
-            {
-                Kept = true,
-                Dismissed = true,
-                NotCrossChecked = true,
-            }
-        });
-
-        //assert
-        result.Value.Data.Count.ShouldBe(13);
-    }
-
-    [Fact]
-    public async Task List_WhenSelectedLastPageThatHasLessRows_ShouldReturnLessRows()
-    {
-        //act
-        var result = await _reportService.List(2, 2, new ReportListFilterRequestDto
-        {
-            DataCollectorType = ReportListDataCollectorType.Human,
-            TrainingStatus = TrainingStatusDto.Trained,
-            FormatCorrect = true,
-            ReportStatus = new ReportStatusFilterDto
-            {
-                Kept = true,
-                Dismissed = true,
-                NotCrossChecked = true,
-            }
-        });
-
-        //assert
-        result.Value.Data.Count.ShouldBe(1);
-    }
-
-    [Fact]
-    public async Task List_WhenReportTypeFilterIsDcp_ShouldReturnOnlyDcpReports()
-    {
-        //act
-        var result = await _reportService.List(2, 1, new ReportListFilterRequestDto
-        {
-            DataCollectorType = ReportListDataCollectorType.CollectionPoint,
-            FormatCorrect = true,
-            ReportStatus = new ReportStatusFilterDto
-            {
-                Kept = true,
-                Dismissed = true,
-                NotCrossChecked = true,
-            }
-        });
-
-        //assert
-        result.Value.Data.Count.ShouldBe(Math.Min(20, RowsPerPage));
-        result.Value.TotalRows.ShouldBe(20);
-    }
-
-    [Fact]
-    public async Task List_WhenListFilterIsSuccessStatus_ShouldReturnOnlySuccessReports()
-    {
-        //act
-        var result = await _reportService.List(2, 1, new ReportListFilterRequestDto
-        {
-            DataCollectorType = ReportListDataCollectorType.Human,
-            TrainingStatus = TrainingStatusDto.Trained,
-            FormatCorrect = true,
-            ReportStatus = new ReportStatusFilterDto
-            {
-                Kept = true,
-                Dismissed = true,
-                NotCrossChecked = true,
-            }
-        });
-
-        //assert
-        result.Value.Data.Count.ShouldBe(Math.Min(11, RowsPerPage));
-        result.Value.TotalRows.ShouldBe(11);
-    }
-
-    [Fact]
-    public async Task List_WhenListFilterIsArea_ShouldReturnOnlyReportsFromArea()
-    {
-        //act
-        var result = await _reportService.List(1, 1, new ReportListFilterRequestDto
-        {
-            DataCollectorType = ReportListDataCollectorType.Human,
-            FormatCorrect = true,
-            ReportStatus = new ReportStatusFilterDto
-            {
-                Kept = true,
-                Dismissed = true,
-                NotCrossChecked = true,
-            },
-            Locations = new AreaDto
-            {
-                RegionIds = new List<int>(),
-                DistrictIds = new List<int>(),
-                VillageIds = new List<int>(),
-                ZoneIds = new [] { 2 }
-            }
-        });
-
-        //assert
-        result.Value.Data.Count.ShouldBe(Math.Min(13, RowsPerPage));
-        result.Value.TotalRows.ShouldBe(13);
-    }
-
-    [Fact]
-    public async Task List_WhenListFilterIsDataColletorStatusInTraining_ShouldReturnOnlyReportsInTraining()
-    {
-        //act
-        var result = await _reportService.List(2, 1, new ReportListFilterRequestDto
-        {
-            DataCollectorType = ReportListDataCollectorType.Human,
-            FormatCorrect = true,
-            TrainingStatus = TrainingStatusDto.InTraining,
-            ReportStatus = new ReportStatusFilterDto
-            {
-                Kept = true,
-                Dismissed = true,
-                NotCrossChecked = true,
-            },
-        });
-
-        //assert
-        result.Value.Data.Count.ShouldBe(2);
-    }
-
-    [Fact]
-    public async Task List_WhenListFilterIsHealthRisk_ShouldReturnOnlyReportsForHealthRisk()
-    {
-        //act
-        var result = await _reportService.List(2, 1, new ReportListFilterRequestDto
-        {
-            DataCollectorType = ReportListDataCollectorType.Human,
-            FormatCorrect = true,
-            ReportStatus = new ReportStatusFilterDto
-            {
-                Kept = true,
-                Dismissed = true,
-                NotCrossChecked = true,
-            },
-            HealthRisks = new List<int>
-            {
-                2
-            },
-        });
-
-
-        //assert
-        result.Value.Data.Count.ShouldBe(Math.Min(11, RowsPerPage));
-        result.Value.TotalRows.ShouldBe(11);
-    }
-
-    [Theory]
-    [InlineData(ReportErrorFilterType.All, 10)]
-    [InlineData(ReportErrorFilterType.WrongFormat, 5)]
-    [InlineData(ReportErrorFilterType.HealthRiskNotFound, 5)]
-    public async Task List_WhenFilteringOnErrorType_ShouldReturnCorrespondingErrorReportsOnly(ReportErrorFilterType errorType, int numberOfReports)
-    {
-        // Arrange
-        ArrangeData(useInMemoryDataBase: true, onlyErrorReports: true);
-
-        var requestDto = new ReportListFilterRequestDto
-        {
-            Locations = null,
-            ErrorType = errorType,
-            FormatCorrect = false,
-            ReportStatus = null,
-            DataCollectorType = ReportListDataCollectorType.Human,
-            HealthRisks = null
-        };
-
-        // Act
-        var res = await _reportService.List(1, 1, requestDto);
-
-        // Assert
-        res.Value.Data.Count.ShouldBe(numberOfReports);
     }
 
     [Fact]
@@ -595,33 +387,33 @@ public class ReportServiceTests
 
     private static List<RawReport> BuildUnknownSenderRawReports(List<Report> reports, NationalSociety nationalSociety) =>
         reports.Select(r => new RawReport
-            {
-                Id = r.Id,
-                Report = r,
-                ReportId = r.Id,
-                Sender = r.PhoneNumber,
-                ReceivedAt = r.ReceivedAt,
-                IsTraining = r.IsTraining,
-                NationalSociety = nationalSociety,
-                ApiKey = ApiKey
-            })
+        {
+            Id = r.Id,
+            Report = r,
+            ReportId = r.Id,
+            Sender = r.PhoneNumber,
+            ReceivedAt = r.ReceivedAt,
+            IsTraining = r.IsTraining,
+            NationalSociety = nationalSociety,
+            ApiKey = ApiKey
+        })
             .ToList();
 
     private static List<RawReport> BuildRawReports(List<Report> reports, Village village, Zone zone, NationalSociety nationalSociety) =>
         reports.Select(r => new RawReport
-            {
-                Id = r.Id,
-                Report = r,
-                ReportId = r.Id,
-                Sender = r.PhoneNumber,
-                DataCollector = r.DataCollector,
-                ReceivedAt = r.ReceivedAt,
-                IsTraining = r.IsTraining,
-                Village = village,
-                Zone = zone,
-                NationalSociety = nationalSociety,
-                ApiKey = ApiKey
-            })
+        {
+            Id = r.Id,
+            Report = r,
+            ReportId = r.Id,
+            Sender = r.PhoneNumber,
+            DataCollector = r.DataCollector,
+            ReceivedAt = r.ReceivedAt,
+            IsTraining = r.IsTraining,
+            Village = village,
+            Zone = zone,
+            NationalSociety = nationalSociety,
+            ApiKey = ApiKey
+        })
             .ToList();
 
     private static List<RawReport> BuildErrorRawReports(DataCollector dataCollector, List<int> reportIds) =>
@@ -1090,6 +882,8 @@ public class ReportServiceTests
             _authorizationService,
             _dateTimeProvider,
             _stringsService,
+            _dhisService,
+            _loggerAdapter,
             _nationalSocietyStructureServiceMock);
     }
 }

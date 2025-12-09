@@ -1,44 +1,58 @@
 import styles from "./ReportsListPage.module.scss";
 
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import { connect, useSelector } from "react-redux";
-import * as reportsActions from './logic/reportsActions';
-import TableActions from '../common/tableActions/TableActions';
-import { withLayout } from '../../utils/layout';
-import Layout from '../layout/Layout';
-import CorrectReportsTable from './CorrectReportsTable';
-import { useMount } from '../../utils/lifecycle';
-import { ReportFilters } from '../common/filters/ReportFilters';
+import * as reportsActions from "./logic/reportsActions";
+import TableActions from "../common/tableActions/TableActions";
+import { withLayout } from "../../utils/layout";
+import Layout from "../layout/Layout";
+import CorrectReportsTable from "./CorrectReportsTable";
+import { useMount } from "../../utils/lifecycle";
+import { ReportFilters } from "../common/filters/ReportFilters";
 import { strings, stringKeys } from "../../strings";
 import { TableActionsButton } from "../common/buttons/tableActionsButton/TableActionsButton";
 import { Hidden, Icon } from "@material-ui/core";
-import * as roles from '../../authentication/roles';
+import * as roles from "../../authentication/roles";
 import { SendReportDialog } from "./SendReportDialog";
 import * as appActions from "../app/logic/appActions";
+import TableHeader from "../common/tableHeader/TableHeader";
+import { trackEvent, trackPageView } from "../../utils/appInsightsHelper";
 
 const Page = "correct";
 
 const CorrectReportsListPageComponent = (props) => {
   const [open, setOpen] = useState(false);
-  const useRtlDirection = useSelector(state => state.appData.direction === 'rtl');
+  const useRtlDirection = useSelector(
+    (state) => state.appData.direction === "rtl",
+  );
 
-  const canSendReport = props.user && [roles.Administrator, roles.Manager, roles.TechnicalAdvisor, roles.Supervisor, roles.HeadSupervisor]
-    .some(neededRole => props.user.roles.some(userRole => userRole === neededRole));
+  const canSendReport =
+    props.user &&
+    [
+      roles.Administrator,
+      roles.Manager,
+      roles.TechnicalAdvisor,
+      roles.Supervisor,
+      roles.HeadSupervisor,
+    ].some((neededRole) =>
+      props.user.roles.some((userRole) => userRole === neededRole),
+    );
 
   useMount(() => {
     props.openReportsList(props.projectId);
+
+    // Track page view
+    trackPageView("CorrectReportsListPage");
   });
 
-  if (!props.data || !props.filters || !props.sorting) {
-    return null;
-  }
+  const handleRefresh = () => props.getList(props.projectId, 1);
 
-  const handleRefresh = () =>
-    props.getList(props.projectId, 1);
-
-  const handleFiltersChange = (filters) =>
-    props.getList(props.projectId, 1, filters, props.sorting);
+  //useCallback important to avoid infinite loop from useEffect in ReportFilters
+  const handleFiltersChange = useCallback(
+    (filters) => props.getList(props.projectId, 1, filters, props.sorting),
+    [props.getList, props.projectId, props.sorting],
+  );
 
   const handlePageChange = (page) =>
     props.getList(props.projectId, page, props.filters, props.sorting);
@@ -50,60 +64,69 @@ const CorrectReportsListPageComponent = (props) => {
     e.stopPropagation();
     props.openSendReport(props.projectId);
     setOpen(true);
-  }
+  };
 
-  function exportToCsv() {
-    props.trackReportExport(Page, "Csv", props.projectId);
+  function handleExportToCsv() {
+    trackEvent("exportCorrectReportsCsv", { exportFileType: "Csv" });
+    props.trackReportExport(Page, "Csv", props.projectId); //Uses old AppInsights tracking method (could be redundant, mabye remove)
+
     props.exportToCsv(props.projectId, props.filters, props.sorting);
   }
 
-  function exportToExcel() {
-    props.trackReportExport(Page, "Excel", props.projectId);
+  function handleExportToExcel() {
+    trackEvent("exportCorrectReportsExcel", { exportFileType: "Excel" });
+    props.trackReportExport(Page, "Excel", props.projectId); //Uses old AppInsights tracking method (could be redundant, mabye remove)
+
     props.exportToExcel(props.projectId, props.filters, props.sorting);
+  }
+
+  if (!props.data || !props.filters || !props.sorting) {
+    return null;
   }
 
   return (
     <Fragment>
-      <TableActions>
-        <Hidden xsDown>
-          <TableActionsButton
-            variant={"text"}
-            onClick={handleRefresh}
-            isFetching={props.isListFetching}
-          >
-            <Icon>refresh</Icon>
+      <TableHeader>
+        <TableActions>
+          <Hidden xsDown>
+            <TableActionsButton
+              variant={"text"}
+              onClick={handleRefresh}
+              isFetching={props.isListFetching}
+            >
+              <Icon>refresh</Icon>
+            </TableActionsButton>
+          </Hidden>
+
+          <TableActionsButton onClick={handleExportToCsv} variant={"outlined"}>
+            {strings(stringKeys.reports.list.exportToCsv)}
           </TableActionsButton>
-        </Hidden>
 
-        <TableActionsButton
-          onClick={exportToCsv}
-          variant={"outlined"}
-        >
-          {strings(stringKeys.reports.list.exportToCsv)}
-        </TableActionsButton>
-
-        <TableActionsButton
-          onClick={exportToExcel}
-          variant={"outlined"}
-        >
-          {strings(stringKeys.reports.list.exportToExcel)}
-        </TableActionsButton>
-
-        {canSendReport &&
           <TableActionsButton
-            onClick={handleSendReport}
-            variant={"contained"}
+            onClick={handleExportToExcel}
+            variant={"outlined"}
           >
-            {strings(stringKeys.reports.list.sendReport)}
+            {strings(stringKeys.reports.list.exportToExcel)}
           </TableActionsButton>
-        }
-      </TableActions>
+
+          {canSendReport && (
+            <TableActionsButton
+              onClick={handleSendReport}
+              variant={"contained"}
+            >
+              {strings(stringKeys.reports.list.sendReport)}
+            </TableActionsButton>
+          )}
+        </TableActions>
+      </TableHeader>
 
       {open && (
-        <SendReportDialog close={() => setOpen(false)}
+        <SendReportDialog
+          close={() => setOpen(false)}
           projectId={props.projectId}
           openSendReport={props.openSendReport}
-          showMessage={props.showMessage} />
+          showMessage={props.showMessage}
+        />
       )}
 
       <div className={styles.filtersGrid}>
@@ -115,6 +138,7 @@ const CorrectReportsListPageComponent = (props) => {
           filters={props.filters}
           showCorrectReportFilters={true}
           rtl={useRtlDirection}
+          isListFetching={props.isListFetching}
         />
       </div>
 
@@ -141,12 +165,12 @@ const CorrectReportsListPageComponent = (props) => {
       />
     </Fragment>
   );
-}
+};
 
 CorrectReportsListPageComponent.propTypes = {
   getReports: PropTypes.func,
   isFetching: PropTypes.bool,
-  list: PropTypes.array
+  list: PropTypes.array,
 };
 
 const mapStateToProps = (state, ownProps) => ({
@@ -180,5 +204,5 @@ const mapDispatchToProps = {
 
 export const CorrectReportsListPage = withLayout(
   Layout,
-  connect(mapStateToProps, mapDispatchToProps)(CorrectReportsListPageComponent)
+  connect(mapStateToProps, mapDispatchToProps)(CorrectReportsListPageComponent),
 );

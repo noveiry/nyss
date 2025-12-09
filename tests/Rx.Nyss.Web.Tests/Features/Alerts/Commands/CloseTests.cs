@@ -10,7 +10,7 @@ using Xunit;
 
 namespace RX.Nyss.Web.Tests.Features.Alerts.Commands;
 
-public class CloseTests  : AlertFeatureBase
+public class CloseTests : AlertFeatureBase
 {
 
     [Theory]

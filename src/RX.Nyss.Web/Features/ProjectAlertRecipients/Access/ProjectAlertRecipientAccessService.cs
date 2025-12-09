@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RX.Nyss.Data;
 using RX.Nyss.Data.Concepts;
-using RX.Nyss.Web.Features.Authentication;
 using RX.Nyss.Web.Features.Projects.Access;
 using RX.Nyss.Web.Services.Authorization;
 

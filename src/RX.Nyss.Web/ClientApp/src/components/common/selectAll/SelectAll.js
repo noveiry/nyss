@@ -1,5 +1,11 @@
 import { stringKeys, strings } from "../../../strings";
-import { Button, Checkbox, FormControlLabel, Grid } from "@material-ui/core";
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  useMediaQuery,
+} from "@material-ui/core";
 import styles from "../filters/LocationFilter.module.scss";
 
 export const SelectAll = ({
@@ -7,6 +13,7 @@ export const SelectAll = ({
   toggleSelectAll,
   showResults,
 }) => {
+  const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   return (
     <Grid
       container
@@ -26,8 +33,15 @@ export const SelectAll = ({
         }
         label={strings(stringKeys.filters.area.selectAll)}
       />
-      <Button size="small" variant="outlined" color="primary" onClick={showResults}>
-        {strings(stringKeys.filters.area.showResults)}
+      <Button
+        size="small"
+        variant="outlined"
+        color="primary"
+        onClick={showResults}
+      >
+        {isSmallScreen
+          ? strings(stringKeys.common.buttons.update)
+          : strings(stringKeys.filters.area.showResults)}
       </Button>
       <hr className={styles.divider} />
     </Grid>

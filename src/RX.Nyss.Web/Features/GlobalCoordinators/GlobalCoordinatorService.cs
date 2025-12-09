@@ -117,8 +117,8 @@ namespace RX.Nyss.Web.Features.GlobalCoordinators
                     Name = u.Name,
                     Email = u.EmailAddress,
                     PhoneNumber = u.PhoneNumber,
-                    AdditionalPhoneNumber = u.AdditionalPhoneNumber,
-                    Organization = u.Organization
+                    AdditionalPhoneNumber = u.AdditionalPhoneNumber ?? string.Empty,
+                    Organization = u.Organization ?? string.Empty
                 })
                 .SingleOrDefaultAsync();
 
@@ -141,10 +141,11 @@ namespace RX.Nyss.Web.Features.GlobalCoordinators
                     Name = u.Name,
                     Email = u.EmailAddress,
                     PhoneNumber = u.PhoneNumber,
-                    AdditionalPhoneNumber = u.AdditionalPhoneNumber,
-                    Organization = u.Organization
+                    AdditionalPhoneNumber = u.AdditionalPhoneNumber ?? string.Empty,
+                    Organization = u.Organization ?? string.Empty
                 })
                 .OrderBy(gc => gc.Name)
+                .AsSplitQuery()
                 .ToListAsync();
 
             return Success(globalCoordinators);

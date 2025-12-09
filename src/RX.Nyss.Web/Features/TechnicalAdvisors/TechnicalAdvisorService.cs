@@ -13,6 +13,7 @@ using RX.Nyss.Data.Models;
 using RX.Nyss.Data.Queries;
 using RX.Nyss.Web.Features.Organizations;
 using RX.Nyss.Web.Features.TechnicalAdvisors.Dto;
+using RX.Nyss.Web.Features.Users;
 using RX.Nyss.Web.Services;
 using RX.Nyss.Web.Services.Authorization;
 using static RX.Nyss.Common.Utils.DataContract.Result;
@@ -38,9 +39,11 @@ namespace RX.Nyss.Web.Features.TechnicalAdvisors
         private readonly IDeleteUserService _deleteUserService;
         private readonly IAuthorizationService _authorizationService;
         private readonly IOrganizationService _organizationService;
+        private readonly IUserService _userService;
 
         public TechnicalAdvisorService(IIdentityUserRegistrationService identityUserRegistrationService, INationalSocietyUserService nationalSocietyUserService, INyssContext nyssContext,
-            ILoggerAdapter loggerAdapter, IVerificationEmailService verificationEmailService, IDeleteUserService deleteUserService, IAuthorizationService authorizationService, IOrganizationService organizationService)
+            ILoggerAdapter loggerAdapter, IVerificationEmailService verificationEmailService, IDeleteUserService deleteUserService, IAuthorizationService authorizationService,
+            IOrganizationService organizationService, IUserService userService)
         {
             _identityUserRegistrationService = identityUserRegistrationService;
             _nyssContext = nyssContext;
@@ -50,6 +53,7 @@ namespace RX.Nyss.Web.Features.TechnicalAdvisors
             _deleteUserService = deleteUserService;
             _authorizationService = authorizationService;
             _organizationService = organizationService;
+            _userService = userService;
         }
 
         public async Task<Result> Create(int nationalSocietyId, CreateTechnicalAdvisorRequestDto createTechnicalAdvisorRequestDto)
@@ -112,43 +116,39 @@ namespace RX.Nyss.Web.Features.TechnicalAdvisors
             try
             {
                 var user = await _nationalSocietyUserService.GetNationalSocietyUser<TechnicalAdvisorUser>(technicalAdvisorId);
-                var oldEmail = user.EmailAddress;
                 if (user == null)
                 {
                     throw new ResultException(ResultKey.User.Registration.UserNotFound);
                 }
-                else
+
+                var oldEmail = user.EmailAddress;
+
+                await _userService.UpdateUserEmail(user, editDto.Email);
+                user.Name = editDto.Name;
+                user.PhoneNumber = editDto.PhoneNumber;
+                user.Organization = editDto.Organization;
+                user.AdditionalPhoneNumber = editDto.AdditionalPhoneNumber;
+
+                if (editDto.OrganizationId.HasValue)
                 {
-                    user.Name = editDto.Name;
-                    user.EmailAddress = editDto.Email;
-                    user.PhoneNumber = editDto.PhoneNumber;
-                    user.Organization = editDto.Organization;
-                    user.AdditionalPhoneNumber = editDto.AdditionalPhoneNumber;
-                    user.IsFirstLogin = oldEmail != editDto.Email ? true : false;
+                    var userLink = await _nyssContext.UserNationalSocieties
+                        .Where(un => un.UserId == technicalAdvisorId && un.NationalSociety.Id == editDto.NationalSocietyId)
+                        .SingleOrDefaultAsync();
 
-                    if (editDto.OrganizationId.HasValue)
+                    if (editDto.OrganizationId.Value != userLink.OrganizationId)
                     {
-                        var userLink = await _nyssContext.UserNationalSocieties
-                            .Where(un => un.UserId == technicalAdvisorId && un.NationalSociety.Id == editDto.NationalSocietyId)
-                            .SingleOrDefaultAsync();
+                        var validationResult = await _organizationService.CheckAccessForOrganizationEdition(userLink);
 
-                        if (editDto.OrganizationId.Value != userLink.OrganizationId)
+                        if (!validationResult.IsSuccess)
                         {
-                            var validationResult = await _organizationService.CheckAccessForOrganizationEdition(userLink);
-
-                            if (!validationResult.IsSuccess)
-                            {
-                                return validationResult;
-                            }
-
-                            userLink.Organization = await _nyssContext.Organizations.FindAsync(editDto.OrganizationId.Value);
+                            return validationResult;
                         }
+
+                        userLink.Organization = await _nyssContext.Organizations.FindAsync(editDto.OrganizationId.Value);
                     }
-
-                    await UpdateModem(user, editDto.ModemId, editDto.NationalSocietyId);
-
-                    await _nyssContext.SaveChangesAsync();
                 }
+
+                await UpdateModem(user, editDto.ModemId, editDto.NationalSocietyId);
 
                 if (oldEmail != editDto.Email)
                 {
@@ -157,6 +157,8 @@ namespace RX.Nyss.Web.Features.TechnicalAdvisors
                     securityStamp = await _identityUserRegistrationService.GenerateEmailVerification(identityUser.Email);
                     await _verificationEmailService.SendVerificationEmail(user, securityStamp);
                 }
+
+                await _nyssContext.SaveChangesAsync();
 
                 return Success();
             }
@@ -286,6 +288,7 @@ namespace RX.Nyss.Web.Features.TechnicalAdvisors
                     .Include(tam => tam.GatewayModem)
                     .ThenInclude(gm => gm.GatewaySetting)
                     .Where(tam => tam.TechnicalAdvisorUserId == user.Id)
+                    .AsSplitQuery()
                     .ToListAsync();
                 var existingModemForCurrentNationalSociety = allModemsForUser
                     .FirstOrDefault(tam => tam.GatewayModem.GatewaySetting.NationalSocietyId == nationalSocietyId);
@@ -307,6 +310,7 @@ namespace RX.Nyss.Web.Features.TechnicalAdvisors
                 .Include(tam => tam.GatewayModem)
                 .ThenInclude(gm => gm.GatewaySetting)
                 .Where(tam => tam.TechnicalAdvisorUserId == user.Id)
+                .AsSplitQuery()
                 .ToListAsync();
             var existingModemForCurrentNationalSociety = allModemsForUser
                 .FirstOrDefault(tam => tam.GatewayModem.GatewaySetting.NationalSocietyId == nationalSocietyId);

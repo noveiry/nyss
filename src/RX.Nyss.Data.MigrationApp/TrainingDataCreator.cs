@@ -30,9 +30,9 @@ namespace RX.Nyss.Data.MigrationApp
                 {
                     RoleName = "GlobalCoordinator",
                     Id = Guid.NewGuid().ToString(),
-                    Name = $"Global Coordinator {i+1}",
-                    Phone = $"+123456{i+1}",
-                    OrganizationId =  1
+                    Name = $"Global Coordinator {i + 1}",
+                    Phone = $"+123456{i + 1}",
+                    OrganizationId = 1
                 };
             }
 

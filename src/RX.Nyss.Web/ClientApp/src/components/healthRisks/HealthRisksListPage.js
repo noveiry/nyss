@@ -1,23 +1,29 @@
-import React, { Fragment } from 'react';
+import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import { connect, useSelector } from "react-redux";
-import * as healthRisksActions from './logic/healthRisksActions';
-import * as appActions from '../app/logic/appActions';
-import { withLayout } from '../../utils/layout';
-import Layout from '../layout/Layout';
-import TableActions from '../common/tableActions/TableActions';
-import HealthRisksTable from './HealthRisksTable';
-import { useMount } from '../../utils/lifecycle';
-import { strings, stringKeys } from '../../strings';
-import { TableActionsButton } from '../common/buttons/tableActionsButton/TableActionsButton';
+import * as healthRisksActions from "./logic/healthRisksActions";
+import * as appActions from "../app/logic/appActions";
+import { withLayout } from "../../utils/layout";
+import Layout from "../layout/Layout";
+import TableActions from "../common/tableActions/TableActions";
+import HealthRisksTable from "./HealthRisksTable";
+import { useMount } from "../../utils/lifecycle";
+import { strings, stringKeys } from "../../strings";
+import { TableActionsButton } from "../common/buttons/tableActionsButton/TableActionsButton";
+import { trackPageView } from "../../utils/appInsightsHelper";
 
 const HealthRisksListPageComponent = (props) => {
   useMount(() => {
     props.openModule(props.match.path, props.match.params);
     props.getList();
+
+    // Track page view
+    trackPageView("HealthRisksListPage");
   });
 
-  const userLanguageCode = useSelector(state => state.appData.user.languageCode);
+  const userLanguageCode = useSelector(
+    (state) => state.appData.user.languageCode,
+  );
 
   return (
     <Fragment>
@@ -26,7 +32,7 @@ const HealthRisksListPageComponent = (props) => {
           onClick={props.goToCreation}
           add
           variant={"contained"}
-          rtl={userLanguageCode === 'ar'}
+          rtl={userLanguageCode === "ar"}
         >
           {strings(stringKeys.common.buttons.add)}
         </TableActionsButton>
@@ -39,11 +45,11 @@ const HealthRisksListPageComponent = (props) => {
         isListFetching={props.isListFetching}
         isRemoving={props.isRemoving}
         remove={props.remove}
-        rtl={userLanguageCode === 'ar'}
+        rtl={userLanguageCode === "ar"}
       />
     </Fragment>
   );
-}
+};
 
 HealthRisksListPageComponent.propTypes = {
   getHealthRisks: PropTypes.func,
@@ -51,13 +57,13 @@ HealthRisksListPageComponent.propTypes = {
   goToEdition: PropTypes.func,
   remove: PropTypes.func,
   isFetching: PropTypes.bool,
-  list: PropTypes.array
+  list: PropTypes.array,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   list: state.healthRisks.listData,
   isListFetching: state.healthRisks.listFetching,
-  isRemoving: state.healthRisks.listRemoving
+  isRemoving: state.healthRisks.listRemoving,
 });
 
 const mapDispatchToProps = {
@@ -65,10 +71,10 @@ const mapDispatchToProps = {
   goToCreation: healthRisksActions.goToCreation,
   goToEdition: healthRisksActions.goToEdition,
   remove: healthRisksActions.remove.invoke,
-  openModule: appActions.openModule.invoke
+  openModule: appActions.openModule.invoke,
 };
 
 export const HealthRisksListPage = withLayout(
   Layout,
-  connect(mapStateToProps, mapDispatchToProps)(HealthRisksListPageComponent)
+  connect(mapStateToProps, mapDispatchToProps)(HealthRisksListPageComponent),
 );

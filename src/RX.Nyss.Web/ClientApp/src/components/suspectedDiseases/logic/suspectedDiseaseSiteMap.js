@@ -8,18 +8,18 @@ export const suspectedDiseaseSiteMap = [
     title: () => strings(stringKeys.suspectedDisease.title),
     placeholder: placeholders.tabMenu,
     access: accessMap.suspectedDiseases.list,
-    placeholderIndex: 2
+    placeholderIndex: 2,
   },
   {
     parentPath: "/suspecteddiseases",
     path: "/suspecteddiseases/add",
     title: () => strings(stringKeys.suspectedDisease.form.creationTitle),
-    access: accessMap.suspectedDiseases.add
+    access: accessMap.suspectedDiseases.add,
   },
   {
     parentPath: "/suspecteddiseases",
     path: "/suspecteddiseases/:suspecteddiseaseId/edit",
     title: () => strings(stringKeys.suspectedDisease.form.editionTitle),
-    access: accessMap.suspectedDiseases.edit
-  }
+    access: accessMap.suspectedDiseases.edit,
+  },
 ];

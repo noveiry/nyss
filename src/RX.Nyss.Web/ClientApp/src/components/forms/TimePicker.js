@@ -1,12 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { TextField } from '@material-ui/core';
+import { TextField } from "@material-ui/core";
 
 const TimePicker = ({ name, label, value, error, onChange }) => {
-
   const handleChange = (e) => {
     onChange(e.target.value);
-  }
+  };
 
   return (
     <TextField
@@ -17,7 +16,7 @@ const TimePicker = ({ name, label, value, error, onChange }) => {
       value={value}
       fullWidth
       InputLabelProps={{ shrink: true }}
-      type='time'
+      type="time"
       pattern="[0-9]{2}:[0-9]{2}"
       onChange={handleChange}
     />
@@ -29,7 +28,7 @@ TimePicker.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string,
   error: PropTypes.string,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
 };
 
 export default TimePicker;

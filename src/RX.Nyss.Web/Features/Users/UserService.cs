@@ -23,6 +23,8 @@ namespace RX.Nyss.Web.Features.Users
         Task<string> GetUserApplicationLanguageCode(string userIdentityName);
 
         Task<Result<NationalSocietyUsersEditFormDataResponseDto>> GetEditFormData(int nationalSocietyUserId, int nationalSocietyId);
+
+        Task UpdateUserEmail(User user, string email);
     }
 
     public class UserService : IUserService
@@ -68,6 +70,7 @@ namespace RX.Nyss.Web.Features.Users
                     IsVerified = !uns.User.IsFirstLogin,
                 })
                 .OrderByDescending(u => u.IsHeadManager).ThenBy(u => u.Name)
+                .AsSplitQuery()
                 .ToListAsync();
 
             return new Result<List<GetNationalSocietyUsersResponseDto>>(users, true);
@@ -172,10 +175,10 @@ namespace RX.Nyss.Web.Features.Users
             return currentUser switch
             {
                 AdministratorUser _ => query,
-                GlobalCoordinatorUser _ => (query.Any(uns => uns.User is CoordinatorUser)
+                GlobalCoordinatorUser _ => query.Any(uns => uns.User is CoordinatorUser)
                     ? query.Where(uns => uns.User is CoordinatorUser)
                     : query.Where(uns => uns.NationalSociety.DefaultOrganization.HeadManager == uns.User
-                        || uns.NationalSociety.DefaultOrganization.PendingHeadManager == uns.User)),
+                        || uns.NationalSociety.DefaultOrganization.PendingHeadManager == uns.User),
                 CoordinatorUser _ => query.Where(u => u.User is CoordinatorUser || u.User is DataConsumerUser
                     || u.Organization.HeadManager == u.User || u.Organization.PendingHeadManager == u.User),
                 ManagerUser _ => query.Where(uns =>
@@ -185,6 +188,24 @@ namespace RX.Nyss.Web.Features.Users
                     || uns.OrganizationId == query.Where(x => x.User == currentUser).Select(x => x.OrganizationId).FirstOrDefault()),
                 _ => query.Where(uns => uns.OrganizationId == query.Where(x => x.User == currentUser).Select(x => x.OrganizationId).FirstOrDefault())
             };
+        }
+
+        public async Task UpdateUserEmail(User user, string newEmail)
+        {
+            var oldEmail = user.EmailAddress;
+
+            if (newEmail != null && newEmail != oldEmail) // email is changed
+            {
+                if (await _nyssContext.Users.AnyAsync(usr => usr.EmailAddress == newEmail)) // new email already exists in nyssContext
+                {
+                    throw new ResultException(ResultKey.User.Registration.EmailIsTaken);
+                }
+
+                // Update user email address and isFirstLogin state
+                user.EmailAddress = newEmail;
+                user.IsFirstLogin = true;
+            }
+
         }
     }
 }

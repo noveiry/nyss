@@ -12,7 +12,7 @@ using static RX.Nyss.Common.Utils.DataContract.Result;
 
 namespace RX.Nyss.Web.Features.Alerts.Queries;
 
-public class GetAlertRecipientsByAlertIdQuery  : IRequest<Result<AlertRecipientsResponseDto>>
+public class GetAlertRecipientsByAlertIdQuery : IRequest<Result<AlertRecipientsResponseDto>>
 {
     public GetAlertRecipientsByAlertIdQuery(int alertId)
     {
