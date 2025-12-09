@@ -8,7 +8,7 @@ Nyss is a reimplementation of [the previous CBS solution](https://github.com/IFR
 
 ## Getting started
 
-How to run and develop everything on your local machine.
+1. How to run and develop everything on your local machine. 
 
 ### Prerequisites
 
