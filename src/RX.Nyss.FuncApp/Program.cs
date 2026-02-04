@@ -1,5 +1,6 @@
 using System.IO;
 using System.Reflection;
+using Azure.Storage.Blobs;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +16,7 @@ public class Program
     public static void Main()
     {
         var host = new HostBuilder()
-            //.ConfigureFunctionsWebApplication()
+            .ConfigureFunctionsWorkerDefaults()
             .ConfigureAppConfiguration((context, config) =>
             {
                 var currentDirectory = Directory.GetCurrentDirectory();
@@ -30,18 +31,26 @@ public class Program
             {
                 var configuration = context.Configuration;
 
-                // Application Insights for Azure Functions
+                // Application Insights
                 services.AddApplicationInsightsTelemetryWorkerService();
                 services.ConfigureFunctionsApplicationInsights();
 
                 // Bind configuration
-                var nyssFuncAppConfig = configuration.Get<NyssFuncAppConfig>();
+                var nyssFuncAppConfig = configuration.Get<NyssFuncAppConfig>()
+                    ?? throw new InvalidOperationException("NyssFuncAppConfig is not configured");
                 services.AddSingleton<IConfig>(nyssFuncAppConfig);
 
-                // Azure Service Bus
-                services.AddAzureClients(clientFactoryBuilder => clientFactoryBuilder.AddServiceBusClient(configuration["SERVICEBUS_CONNECTIONSTRING"]));
+                //  Azure Blob Storage 
+                services.AddAzureClients(builder =>
+                    builder.AddBlobServiceClient(
+                        configuration["AzureWebJobsStorage"]));
 
-                // HTTP Client
+                // Azure Service Bus
+                services.AddAzureClients(builder =>
+                    builder.AddServiceBusClient(
+                        configuration["SERVICEBUS_CONNECTIONSTRING"]));
+
+                // HTTP
                 services.AddHttpClient();
                 services.AddSingleton<IHttpPostClient, HttpPostClient>();
 
@@ -55,9 +64,8 @@ public class Program
                 services.AddScoped<ITelerivetReportPublisherService, TelerivetReportPublisherService>();
                 services.AddScoped<IMTNReportPublisherService, MTNReportPublisherService>();
 
-                // Email Client (Development vs Production)
-                // https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#azure_functions_environment
-                services.AddScoped(typeof(IEmailClient), 
+                // Email Client (Dev vs Prod)
+                services.AddScoped(typeof(IEmailClient),
                     configuration["AZURE_FUNCTIONS_ENVIRONMENT"] == "Development"
                         ? typeof(DummyConsoleEmailClient)
                         : typeof(SendGridEmailClient));

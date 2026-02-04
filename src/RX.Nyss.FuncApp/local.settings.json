@@ -3,7 +3,7 @@
   "Values": {
     "AzureFunctionsJobHost__logging__logLevel__default": "Debug",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "SERVICEBUS_CONNECTIONSTRING": "",
     "GENERALBLOBSTORAGE_CONNECTIONSTRING": "UseDevelopmentStorage=true",
     "SERVICEBUS_REPORTQUEUE": "nrx-cbs-nyss-bus-report-queue-dev",

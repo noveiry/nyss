@@ -1,5 +1,4 @@
-﻿using System;
-using RX.Nyss.Data.Concepts;
+﻿using RX.Nyss.Data.Concepts;
 
 namespace RX.Nyss.Data.Models
 {
@@ -33,14 +32,14 @@ namespace RX.Nyss.Data.Models
 
         public ReportErrorType? ErrorType { get; set; }
 
-        public virtual Village Village { get; set; }
+        public virtual Village? Village { get; set; }
 
-        public virtual Zone Zone { get; set; }
+        public virtual Zone? Zone { get; set; }
 
-        public virtual Report Report { get; set; }
+        public virtual Report? Report { get; set; }
 
-        public virtual DataCollector DataCollector { get; set; }
+        public virtual DataCollector? DataCollector { get; set; }
 
-        public virtual NationalSociety NationalSociety { get; set; }
+        public virtual NationalSociety? NationalSociety { get; set; }
     }
 }

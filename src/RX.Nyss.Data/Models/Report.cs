@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
 using RX.Nyss.Data.Concepts;
 
 namespace RX.Nyss.Data.Models
@@ -19,15 +17,15 @@ namespace RX.Nyss.Data.Models
 
         public DateTime? AcceptedAt { get; set; }
 
-        public virtual User AcceptedBy { get; set; }
+        public virtual User? AcceptedBy { get; set; }
 
         public DateTime? RejectedAt { get; set; }
 
-        public virtual User RejectedBy { get; set; }
+        public virtual User? RejectedBy { get; set; }
 
         public DateTime? ResetAt { get; set; }
 
-        public virtual User ResetBy { get; set; }
+        public virtual User? ResetBy { get; set; }
 
         public string? ModifiedBy { get; set; }
 
@@ -53,13 +51,13 @@ namespace RX.Nyss.Data.Models
 
         public DateTime? CorrectedAt { get; set; }
 
-        public virtual User CorrectedBy { get; set; }
+        public virtual User? CorrectedBy { get; set; }
 
         public virtual RawReport RawReport { get; set; }
 
-        public virtual ProjectHealthRisk ProjectHealthRisk { get; set; }
+        public virtual ProjectHealthRisk? ProjectHealthRisk { get; set; }
 
-        public virtual DataCollector DataCollector { get; set; }
+        public virtual DataCollector? DataCollector { get; set; }
 
         public virtual ICollection<AlertReport> ReportAlerts { get; set; } = new List<AlertReport>();
     }

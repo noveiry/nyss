@@ -24,12 +24,11 @@ namespace RX.Nyss.Data.Models
 
         public EscalatedAlertOutcomes? EscalatedOutcome { get; set; }
 
-        public virtual User ClosedBy { get; set; }
+        public virtual User? ClosedBy { get; set; }
 
-        public virtual User DismissedBy { get; set; }
+        public virtual User? DismissedBy { get; set; }
 
-        public virtual User EscalatedBy { get; set; }
-
+        public virtual User? EscalatedBy { get; set; }
         public virtual ProjectHealthRisk ProjectHealthRisk { get; set; }
 
         public virtual ICollection<AlertReport> AlertReports { get; set; }

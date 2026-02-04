@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using RX.Nyss.Data;
@@ -12,9 +13,11 @@ using RX.Nyss.Data;
 namespace RX.Nyss.Data.Migrations
 {
     [DbContext(typeof(NyssContext))]
-    partial class NyssContextModelSnapshot : ModelSnapshot
+    [Migration("20260204122434_UpdateReportsAndRawreportsWithNullValues")]
+    partial class UpdateReportsAndRawreportsWithNullValues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,7 +38,7 @@ namespace RX.Nyss.Data.Migrations
                     b.Property<DateTime?>("ClosedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ClosedById")
+                    b.Property<int>("ClosedById")
                         .HasColumnType("int");
 
                     b.Property<string>("Comments")
@@ -48,13 +51,13 @@ namespace RX.Nyss.Data.Migrations
                     b.Property<DateTime?>("DismissedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DismissedById")
+                    b.Property<int>("DismissedById")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("EscalatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("EscalatedById")
+                    b.Property<int>("EscalatedById")
                         .HasColumnType("int");
 
                     b.Property<string>("EscalatedOutcome")
@@ -3421,17 +3424,20 @@ namespace RX.Nyss.Data.Migrations
                     b.HasOne("RX.Nyss.Data.Models.User", "ClosedBy")
                         .WithMany()
                         .HasForeignKey("ClosedById")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("RX.Nyss.Data.Models.User", "DismissedBy")
                         .WithMany()
                         .HasForeignKey("DismissedById")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("RX.Nyss.Data.Models.User", "EscalatedBy")
                         .WithMany()
                         .HasForeignKey("EscalatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("RX.Nyss.Data.Models.ProjectHealthRisk", "ProjectHealthRisk")
                         .WithMany("Alerts")
