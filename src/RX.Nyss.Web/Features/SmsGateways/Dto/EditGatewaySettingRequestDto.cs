@@ -11,20 +11,20 @@ namespace RX.Nyss.Web.Features.SmsGateways.Dto
         public int Id { get; set; }
         public string Name { get; set; }
         public string ApiKey { get; set; }
-        public string EmailAddress { get; set; }
+        public string? EmailAddress { get; set; }
         public GatewayType GatewayType { get; set; }
-        public string IotHubDeviceName { get; set; }
-        public string ModemOneName { get; set; }
-        public string ModemTwoName { get; set; }
-        public string TelerivetApiKey { get; set; }
-        public string TelerivetProjectId { get; set; }
-        public string GatewayApiKey { get; set; }
-        public string GatewayApiKeyName { get; set; }
-        public string GatewayExtraKey { get; set; }
-        public string GatewayExtraKeyName { get; set; }
-        public string GatewayUrl { get; set; }
-        public string GatewayAuthUrl { get; set; }
-        public string GatewaySenderId { get; set; }
+        public string? IotHubDeviceName { get; set; }
+        public string? ModemOneName { get; set; }
+        public string? ModemTwoName { get; set; }
+        public string? TelerivetApiKey { get; set; }
+        public string? TelerivetProjectId { get; set; }
+        public string? GatewayApiKey { get; set; }
+        public string? GatewayApiKeyName { get; set; }
+        public string? GatewayExtraKey { get; set; }
+        public string? GatewayExtraKeyName { get; set; }
+        public string? GatewayUrl { get; set; }
+        public string? GatewayAuthUrl { get; set; }
+        public string? GatewaySenderId { get; set; }
 
         public class GatewaySettingRequestValidator : AbstractValidator<EditGatewaySettingRequestDto>
         {

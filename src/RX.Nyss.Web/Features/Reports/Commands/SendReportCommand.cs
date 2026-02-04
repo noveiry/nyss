@@ -91,6 +91,9 @@ namespace RX.Nyss.Web.Features.Reports.Commands
                     { "Apikey", gatewayData.ApiKey }
                 };
                 var content = new FormUrlEncodedContent(reportProps);
+                Console.WriteLine($"Posting to: ------------------------------");
+                Console.WriteLine($"Posting to: {requestUri}");
+                Console.WriteLine($"Posting to: ------------------------------");
 
                 var responseMessage = await httpClient.PostAsync(requestUri, content, cancellationToken);
 

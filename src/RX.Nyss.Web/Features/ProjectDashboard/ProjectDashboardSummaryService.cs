@@ -93,16 +93,19 @@ namespace RX.Nyss.Web.Features.ProjectDashboard
             {
                 TotalReportCount = dashboardReportsList.Sum(r => r.ReportedCaseCount),
                 ActiveDataCollectorCount = rawReportsList
+                    .Where(r => r.DataCollector != null)
                     .Select(r => r.DataCollector.Id)
                     .Distinct()
                     .Count(),
                 DataCollectionPointSummary = _reportsDashboardSummaryService.DataCollectionPointsSummary(dashboardReports),
                 AlertsSummary = _reportsDashboardSummaryService.AlertsSummary(filters),
                 NumberOfDistricts = rawReportsList
+                    .Where(r => r.Village?.District != null)
                     .Select(r => r.Village.District)
                     .Distinct()
                     .Count(),
                 NumberOfVillages = rawReportsList
+                    .Where(r => r.Village != null)
                     .Select(r => r.Village)
                     .Distinct()
                     .Count()

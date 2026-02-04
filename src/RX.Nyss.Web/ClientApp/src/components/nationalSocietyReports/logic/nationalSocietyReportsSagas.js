@@ -10,6 +10,7 @@ import {
 } from "../../common/filters/logic/reportFilterConstsants";
 import { DateColumnName } from "./nationalSocietyReportsConstants";
 import { getUtcOffset } from "../../../utils/date";
+import dayjs from "dayjs";
 
 export const nationalSocietyReportsSagas = () => [
   takeEvery(
@@ -43,6 +44,14 @@ function* openNationalSocietyCorrectReportsList({ nationalSocietyId }) {
       http.get,
       `/api/nationalSocietyReport/filters?nationalSocietyId=${nationalSocietyId}`,
     );
+
+    const localDate = dayjs();
+    const utcOffset = getUtcOffset();
+    let endDate = localDate.add(-utcOffset, "hour");
+    endDate = endDate.set("hour", 0);
+    endDate = endDate.set("minute", 0);
+    endDate = endDate.set("second", 0);
+
     const filters = {
       dataCollectorType: DataCollectorType.human,
       healthRisks: [],
@@ -54,6 +63,8 @@ function* openNationalSocietyCorrectReportsList({ nationalSocietyId }) {
         notCrossChecked: true,
       },
       utcOffset: getUtcOffset(),
+      startDate: endDate.add(-30, "day"),
+      endDate: endDate,
     };
     const sorting = (yield select(
       (state) => state.nationalSocietyReports.correctReportsSorting,
@@ -87,14 +98,24 @@ function* openNationalSocietyIncorrectReportsList({ nationalSocietyId }) {
   try {
     yield openNationalSocietyReportsModule(nationalSocietyId);
 
+    const localDate = dayjs();
+    const utcOffset = getUtcOffset();
+    let endDate = localDate.add(-utcOffset, "hour");
+    endDate = endDate.set("hour", 0);
+    endDate = endDate.set("minute", 0);
+    endDate = endDate.set("second", 0);
+
     const filters = (yield select(
       (state) => state.nationalSocietyReports.incorrectReportsFilters,
     )) || {
       dataCollectorType: DataCollectorType.human,
       errorType: ReportErrorFilterType.all,
-      area: null,
+      locations: null,
+      healthRisks: [],
       formatCorrect: false,
       utcOffset: getUtcOffset(),
+      startDate: endDate.add(-30, "day"),
+      endDate: endDate,
     };
     const sorting = (yield select(
       (state) => state.nationalSocietyReports.incorrectReportsSorting,
@@ -125,12 +146,41 @@ function* getNationalSocietyCorrectReports({
 }) {
   yield put(actions.getCorrectList.request());
   try {
+    const localDate = dayjs();
+    const utcOffset = getUtcOffset();
+    let endDate = localDate.add(-utcOffset, "hour");
+    endDate = endDate.set("hour", 0);
+    endDate = endDate.set("minute", 0);
+    endDate = endDate.set("second", 0);
+
+    const requestFilters = filters ||
+      (yield select((state) => state.nationalSocietyReports.correctReportsFilters)) || {
+      dataCollectorType: DataCollectorType.human,
+      healthRisks: [],
+      locations: null,
+      formatCorrect: true,
+      reportStatus: {
+        kept: true,
+        dismissed: true,
+        notCrossChecked: true,
+      },
+      utcOffset: getUtcOffset(),
+      startDate: endDate.add(-30, "day"),
+      endDate: endDate,
+    };
+
+    const requestSorting = sorting ||
+      (yield select((state) => state.nationalSocietyReports.correctReportsSorting)) || {
+      orderBy: DateColumnName,
+      sortAscending: false,
+    };
+
     const response = yield call(
       http.post,
       `/api/nationalSocietyReport/list?nationalSocietyId=${nationalSocietyId}&pageNumber=${
         pageNumber || 1
       }`,
-      { ...filters, ...sorting },
+      { ...requestFilters, ...requestSorting },
     );
     yield put(
       actions.getCorrectList.success(
@@ -138,8 +188,8 @@ function* getNationalSocietyCorrectReports({
         response.value.page,
         response.value.rowsPerPage,
         response.value.totalRows,
-        filters,
-        sorting,
+        requestFilters,
+        requestSorting,
       ),
     );
   } catch (error) {
@@ -155,12 +205,37 @@ function* getNationalSocietyIncorrectReports({
 }) {
   yield put(actions.getIncorrectList.request());
   try {
+    const localDate = dayjs();
+    const utcOffset = getUtcOffset();
+    let endDate = localDate.add(-utcOffset, "hour");
+    endDate = endDate.set("hour", 0);
+    endDate = endDate.set("minute", 0);
+    endDate = endDate.set("second", 0);
+
+    const requestFilters = filters ||
+      (yield select((state) => state.nationalSocietyReports.incorrectReportsFilters)) || {
+      dataCollectorType: DataCollectorType.human,
+      errorType: ReportErrorFilterType.all,
+      locations: null,
+      healthRisks: [],
+      formatCorrect: false,
+      utcOffset: getUtcOffset(),
+      startDate: endDate.add(-30, "day"),
+      endDate: endDate,
+    };
+
+    const requestSorting = sorting ||
+      (yield select((state) => state.nationalSocietyReports.incorrectReportsSorting)) || {
+      orderBy: DateColumnName,
+      sortAscending: false,
+    };
+
     const response = yield call(
       http.post,
       `/api/nationalSocietyReport/list?nationalSocietyId=${nationalSocietyId}&pageNumber=${
         pageNumber || 1
       }`,
-      { ...filters, ...sorting },
+      { ...requestFilters, ...requestSorting },
     );
     yield put(
       actions.getIncorrectList.success(
@@ -168,8 +243,8 @@ function* getNationalSocietyIncorrectReports({
         response.value.page,
         response.value.rowsPerPage,
         response.value.totalRows,
-        filters,
-        sorting,
+        requestFilters,
+        requestSorting,
       ),
     );
   } catch (error) {

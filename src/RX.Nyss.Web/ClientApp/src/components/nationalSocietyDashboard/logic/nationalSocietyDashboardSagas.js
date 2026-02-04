@@ -1,3 +1,32 @@
+// Ensure filters use backend enum casing
+const normalizeDataCollectorType = (value) => {
+  const map = {
+    all: "All",
+    All: "All",
+    dataCollector: "DataCollector",
+    DataCollector: "DataCollector",
+    dataCollectionPoint: "DataCollectionPoint",
+    DataCollectionPoint: "DataCollectionPoint",
+  };
+  return map[value] || "All";
+};
+
+const normalizeFilters = (filters) => {
+  const normalizedLocations =
+    filters?.locations || {
+      regionIds: [],
+      districtIds: [],
+      villageIds: [],
+      zoneIds: [],
+      includeUnknownLocation: true,
+    };
+
+  return {
+    ...filters,
+    locations: normalizedLocations,
+    dataCollectorType: normalizeDataCollectorType(filters?.dataCollectorType),
+  };
+};
 import { call, put, takeEvery, select } from "redux-saga/effects";
 import * as consts from "./nationalSocietyDashboardConstants";
 import * as actions from "./nationalSocietyDashboardActions";
@@ -56,7 +85,8 @@ function* openNationalSocietyDashboard({ nationalSocietyId }) {
         dismissed: false,
         notCrossChecked: true,
       },
-      dataCollectorType: "all",
+      // Server enum values are PascalCase; use matching casing to avoid 400
+      dataCollectorType: "All",
       utcOffset: utcOffset,
     };
 
@@ -74,14 +104,15 @@ function* openNationalSocietyDashboard({ nationalSocietyId }) {
 function* getNationalSocietyDashboardData({ nationalSocietyId, filters }) {
   yield put(actions.getDashboardData.request());
   try {
+    const normalizedFilters = normalizeFilters(filters);
     const response = yield call(
       http.post,
       `/api/nationalSocietyDashboard/data?nationalSocietyId=${nationalSocietyId}`,
-      filters,
+      normalizedFilters,
     );
     yield put(
       actions.getDashboardData.success(
-        filters,
+        normalizedFilters,
         response.value.summary,
         response.value.reportsGroupedByLocation,
         response.value.reportsGroupedByVillageAndDate,

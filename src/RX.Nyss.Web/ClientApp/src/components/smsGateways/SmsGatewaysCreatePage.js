@@ -41,6 +41,7 @@ const SmsGatewaysCreatePageComponent = (props) => {
   const [pingIsRequired, setPingIsRequired] = useState(null);
   const [, setUseDualModem] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [selectedGatewayType, setSelectedGatewayType] = useState(smsEagle);
 
   const [form] = useState(() => {
     const fields = {
@@ -127,9 +128,14 @@ const SmsGatewaysCreatePageComponent = (props) => {
         ),
       ],
       iotHubDeviceName: [validators.requiredWhen((x) => x.useIotHub === true)],
-      modemOneName: [validators.maxLength(100)],
-      modemTwoName: [validators.maxLength(100)],
-      useIotHub: [validators.requiredWhen((x) => x.useDualModem === true)],
+      modemOneName: [
+        validators.requiredWhen((x) => x.useDualModem === true),
+        validators.maxLength(100),
+      ],
+      modemTwoName: [
+        validators.requiredWhen((x) => x.useDualModem === true),
+        validators.maxLength(100),
+      ],
     };
 
     const newForm = createForm(fields, validation);
@@ -141,6 +147,9 @@ const SmsGatewaysCreatePageComponent = (props) => {
     );
     newForm.fields.useDualModem.subscribe(({ newValue }) =>
       setUseDualModem(newValue),
+    );
+    newForm.fields.gatewayType.subscribe(({ newValue }) =>
+      setSelectedGatewayType(newValue),
     );
     return newForm;
   });
@@ -236,6 +245,13 @@ const SmsGatewaysCreatePageComponent = (props) => {
 
   useCustomErrors(form, props.error);
 
+  const gatewayType = selectedGatewayType;
+  const isSmsEagle = gatewayType === smsEagle;
+  const isTelerivet = gatewayType === telerivet;
+  const isSmsGatewayType =
+    gatewayType === smsGateway || gatewayType === mtnSmsGateway;
+  const isMtn = gatewayType === mtnSmsGateway;
+
   return (
     <Fragment>
       {props.error && !props.error.data && (
@@ -285,76 +301,94 @@ const SmsGatewaysCreatePageComponent = (props) => {
             </SelectInput>
           </Grid>
 
-          <Grid item xs={12}>
-            <TextInputField
-              label={strings(stringKeys.smsGateway.form.emailAddress)}
-              name="emailAddress"
-              field={form.fields.emailAddress}
-              inputMode={"email"}
-            />
-          </Grid>
+          {isSmsEagle && (
+            <Grid item xs={12}>
+              <TextInputField
+                label={strings(stringKeys.smsGateway.form.emailAddress)}
+                name="emailAddress"
+                field={form.fields.emailAddress}
+                inputMode={"email"}
+              />
+            </Grid>
+          )}
 
-          <Grid item xs={12}>
-            <TextInputField
-              label={strings(stringKeys.smsGateway.form.telerivetApiKey)}
-              name="telerivetApiKey"
-              field={form.fields.telerivetApiKey}
-            />
-          </Grid>
+          {isTelerivet && (
+            <Fragment>
+              <Grid item xs={12}>
+                <TextInputField
+                  label={strings(stringKeys.smsGateway.form.telerivetApiKey)}
+                  name="telerivetApiKey"
+                  field={form.fields.telerivetApiKey}
+                />
+              </Grid>
 
-          <Grid item xs={12}>
-            <TextInputField
-              label={strings(stringKeys.smsGateway.form.telerivetProjectId)}
-              name="telerivetProjectId"
-              field={form.fields.telerivetProjectId}
-            />
-          </Grid>
+              <Grid item xs={12}>
+                <TextInputField
+                  label={strings(
+                    stringKeys.smsGateway.form.telerivetProjectId,
+                  )}
+                  name="telerivetProjectId"
+                  field={form.fields.telerivetProjectId}
+                />
+              </Grid>
+            </Fragment>
+          )}
 
-          <Grid item xs={12}>
-            <TextInputField
-              label={strings(stringKeys.smsGateway.form.gatewayApiKeyName)}
-              name="gatewayApiKeyName"
-              field={form.fields.gatewayApiKeyName}
-            />
-            <TextInputField
-              label={strings(stringKeys.smsGateway.form.gatewayApiKey)}
-              name="gatewayApiKey"
-              field={form.fields.gatewayApiKey}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextInputField
-              label={strings(stringKeys.smsGateway.form.gatewayExtraKeyName)}
-              name="gatewayExtraKeyName"
-              field={form.fields.gatewayExtraKeyName}
-            />
-            <TextInputField
-              label={strings(stringKeys.smsGateway.form.gatewayExtraKey)}
-              name="gatewayExtraKey"
-              field={form.fields.gatewayExtraKey}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextInputField
-              label={strings(stringKeys.smsGateway.form.gatewayUrl)}
-              name="gatewayUrl"
-              field={form.fields.gatewayUrl}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextInputField
-              label={strings(stringKeys.smsGateway.form.gatewayAuthUrl)}
-              name="gatewayAuthUrl"
-              field={form.fields.gatewayAuthUrl}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextInputField
-              label={strings(stringKeys.smsGateway.form.gatewaySenderId)}
-              name="gatewaySenderId"
-              field={form.fields.gatewaySenderId}
-            />
-          </Grid>
+          {isSmsGatewayType && (
+            <Fragment>
+              <Grid item xs={12}>
+                <TextInputField
+                  label={strings(
+                    stringKeys.smsGateway.form.gatewayApiKeyName,
+                  )}
+                  name="gatewayApiKeyName"
+                  field={form.fields.gatewayApiKeyName}
+                />
+                <TextInputField
+                  label={strings(stringKeys.smsGateway.form.gatewayApiKey)}
+                  name="gatewayApiKey"
+                  field={form.fields.gatewayApiKey}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextInputField
+                  label={strings(
+                    stringKeys.smsGateway.form.gatewayExtraKeyName,
+                  )}
+                  name="gatewayExtraKeyName"
+                  field={form.fields.gatewayExtraKeyName}
+                />
+                <TextInputField
+                  label={strings(stringKeys.smsGateway.form.gatewayExtraKey)}
+                  name="gatewayExtraKey"
+                  field={form.fields.gatewayExtraKey}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextInputField
+                  label={strings(stringKeys.smsGateway.form.gatewayUrl)}
+                  name="gatewayUrl"
+                  field={form.fields.gatewayUrl}
+                />
+              </Grid>
+              {isMtn && (
+                <Grid item xs={12}>
+                  <TextInputField
+                    label={strings(stringKeys.smsGateway.form.gatewayAuthUrl)}
+                    name="gatewayAuthUrl"
+                    field={form.fields.gatewayAuthUrl}
+                  />
+                </Grid>
+              )}
+              <Grid item xs={12}>
+                <TextInputField
+                  label={strings(stringKeys.smsGateway.form.gatewaySenderId)}
+                  name="gatewaySenderId"
+                  field={form.fields.gatewaySenderId}
+                />
+              </Grid>
+            </Fragment>
+          )}
 
           <Grid item xs={12}>
             <CheckboxField

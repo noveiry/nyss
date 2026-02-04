@@ -9,6 +9,20 @@ import dayjs from "dayjs";
 import { downloadFile } from "../../../utils/downloadFile";
 import { formatDate, getUtcOffset } from "../../../utils/date";
 
+// Helper to ensure Locations is always a valid AreaDto object (required by API)
+const normalizeLocations = (locations) => {
+  if (!locations || typeof locations !== 'object') {
+    return {
+      regionIds: [],
+      districtIds: [],
+      villageIds: [],
+      zoneIds: [],
+      includeUnknownLocation: true
+    };
+  }
+  return locations;
+};
+
 export const alertsSagas = () => [
   takeEvery(consts.OPEN_ALERTS_LIST.INVOKE, openAlertsList),
   takeEvery(consts.GET_ALERTS.INVOKE, getAlerts),
@@ -42,7 +56,7 @@ function* openAlertsList({ projectId }) {
     endDate = endDate.set("second", 0);
 
     const filters = {
-      locations: null,
+      locations: normalizeLocations(null),
       healthRiskId: null,
       startDate: endDate.add(-30, "day"),
       endDate: endDate,
@@ -63,10 +77,15 @@ function* openAlertsList({ projectId }) {
 function* getAlerts({ projectId, pageNumber, filters }) {
   yield put(actions.getAlerts.request());
   try {
+    // Normalize filters to ensure Locations is always a valid object
+    const normalizedFilters = {
+      ...filters,
+      locations: normalizeLocations(filters?.locations),
+    };
     const response = yield call(
       http.post,
       `/api/alert/list?projectId=${projectId}&pageNumber=${pageNumber || 1}`,
-      filters,
+      normalizedFilters,
     );
     yield put(
       actions.getAlerts.success(

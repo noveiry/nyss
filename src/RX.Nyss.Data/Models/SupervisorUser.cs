@@ -11,8 +11,8 @@ namespace RX.Nyss.Data.Models
         public int? ModemId { get; set; }
         public virtual ICollection<SupervisorUserProject> SupervisorUserProjects { get; set; } = new List<SupervisorUserProject>();
         public virtual Project CurrentProject { get; set; }
-        public virtual ICollection<SupervisorUserAlertRecipient> SupervisorAlertRecipients { get; set; }
-        public virtual HeadSupervisorUser HeadSupervisor { get; set; }
-        public virtual GatewayModem Modem { get; set; }
+        public virtual ICollection<SupervisorUserAlertRecipient>? SupervisorAlertRecipients { get; set; }
+        public virtual HeadSupervisorUser? HeadSupervisor { get; set; }
+        public virtual GatewayModem? Modem { get; set; }
     }
 }

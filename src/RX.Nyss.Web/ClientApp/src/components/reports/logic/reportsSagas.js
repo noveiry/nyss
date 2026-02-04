@@ -15,6 +15,20 @@ import { formatDate, getUtcOffset } from "../../../utils/date";
 import { trackTrace } from "../../../utils/tracking";
 import dayjs from "dayjs";
 
+// Helper to ensure Locations is always a valid AreaDto object (required by API)
+const normalizeLocations = (locations) => {
+  if (!locations || typeof locations !== 'object') {
+    return {
+      regionIds: [],
+      districtIds: [],
+      villageIds: [],
+      zoneIds: [],
+      includeUnknownLocation: true
+    };
+  }
+  return locations;
+};
+
 export const reportsSagas = () => [
   takeEvery(consts.OPEN_CORRECT_REPORTS_LIST.INVOKE, openCorrectReportsList),
   takeEvery(
@@ -101,7 +115,7 @@ function* getCorrectReports({ projectId, pageNumber, filters, sorting }) {
     dataCollectorType: DataCollectorType.human,
     errorType: null,
     healthRisks: [],
-    locations: null,
+    locations: normalizeLocations(null),
     formatCorrect: true,
     isTraining: false,
     reportStatus: {
@@ -133,10 +147,15 @@ function* getCorrectReports({ projectId, pageNumber, filters, sorting }) {
 
   yield put(actions.getCorrectList.request());
   try {
+    // Normalize filters to ensure Locations is always a valid object
+    const normalizedFilters = {
+      ...requestFilters,
+      locations: normalizeLocations(requestFilters.locations),
+    };
     const response = yield call(
       http.post,
       `/api/report/list?projectId=${projectId}&pageNumber=${page}`,
-      { ...requestFilters, ...requestSorting },
+      { ...normalizedFilters, ...requestSorting },
     );
     yield put(
       actions.getCorrectList.success(
@@ -166,10 +185,15 @@ function* getIncorrectReports({ projectId, pageNumber, filters, sorting }) {
     (yield select((state) => state.reports.incorrectReportsFilters)) || {
     dataCollectorType: DataCollectorType.human,
     errorType: ReportErrorFilterType.all,
-    area: null,
+    locations: normalizeLocations(null),
+    healthRisks: [],
     formatCorrect: false,
     isTraining: false,
-    reportStatus: null,
+    reportStatus: {
+      kept: false,
+      dismissed: false,
+      notCrossChecked: false,
+    },
     correctedState: "All",
     reportType: {
       real: true,
@@ -197,10 +221,24 @@ function* getIncorrectReports({ projectId, pageNumber, filters, sorting }) {
 
   yield put(actions.getIncorrectList.request());
   try {
+    // Normalize filters to ensure required fields are always valid
+    // Also map 'area' to 'locations' if present (legacy support)
+    const normalizedFilters = {
+      ...requestFilters,
+      locations: normalizeLocations(requestFilters.locations || requestFilters.area),
+      healthRisks: Array.isArray(requestFilters.healthRisks) ? requestFilters.healthRisks : [],
+      reportStatus: requestFilters.reportStatus || {
+        kept: false,
+        dismissed: false,
+        notCrossChecked: false,
+      },
+    };
+    // Remove 'area' if it exists to avoid confusion
+    delete normalizedFilters.area;
     const response = yield call(
       http.post,
       `/api/report/list?projectId=${projectId}&pageNumber=${page}`,
-      { ...requestFilters, ...requestSorting },
+      { ...normalizedFilters, ...requestSorting },
     );
     yield put(
       actions.getIncorrectList.success(
@@ -230,7 +268,8 @@ function* openReportEdition({ projectId, reportId }) {
       sex: null,
       supervisorId: null,
       trainingStatus: null,
-      name: null,
+      name: "",
+      locations: normalizeLocations(null),
       dataCollectorType: response.value.dataCollectorType,
     };
     const dataCollectors = yield call(
@@ -328,7 +367,8 @@ function* openSendReport({ projectId }) {
       sex: null,
       supervisorId: null,
       trainingStatus: null,
-      name: null,
+      name: "",
+      locations: normalizeLocations(null),
     };
     const nationalSocietyId = yield select(
       (state) => state.appData.siteMap.parameters.nationalSocietyId,

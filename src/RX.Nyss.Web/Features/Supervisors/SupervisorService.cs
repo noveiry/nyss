@@ -63,8 +63,10 @@ namespace RX.Nyss.Web.Features.Supervisors
                 SupervisorUser user;
                 using (var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var identityUser = await _identityUserRegistrationService.CreateIdentityUser(createSupervisorRequestDto.Email, Role.Supervisor);
-                    securityStamp = await _identityUserRegistrationService.GenerateEmailVerification(identityUser.Email);
+                    var identityUser = await _identityUserRegistrationService.CreateIdentityUser(createSupervisorRequestDto.Email, Role.Supervisor)
+                        ?? throw new ResultException(ResultKey.User.Registration.UserNotFound);
+    
+                    securityStamp = await _identityUserRegistrationService.GenerateEmailVerification(createSupervisorRequestDto.Email);
 
                     user = await CreateSupervisorUser(identityUser, nationalSocietyId, createSupervisorRequestDto);
 
@@ -286,12 +288,8 @@ namespace RX.Nyss.Web.Features.Supervisors
         private async Task<SupervisorUser> CreateSupervisorUser(IdentityUser identityUser, int nationalSocietyId, CreateSupervisorRequestDto createSupervisorRequestDto)
         {
             var nationalSociety = await _nyssContext.NationalSocieties.Include(ns => ns.ContentLanguage)
-                .SingleOrDefaultAsync(ns => ns.Id == nationalSocietyId);
-
-            if (nationalSociety == null)
-            {
-                throw new ResultException(ResultKey.User.Registration.NationalSocietyDoesNotExist);
-            }
+                .SingleOrDefaultAsync(ns => ns.Id == nationalSocietyId) 
+                ?? throw new ResultException(ResultKey.User.Registration.NationalSocietyDoesNotExist);
 
             if (nationalSociety.IsArchived)
             {
@@ -405,7 +403,11 @@ namespace RX.Nyss.Web.Features.Supervisors
             {
                 if (user.HeadSupervisor == null || user.HeadSupervisor.Id != headSupervisorId)
                 {
-                    user.HeadSupervisor = (HeadSupervisorUser)await _nyssContext.Users.FirstOrDefaultAsync(u => u.Id == headSupervisorId);
+                    var headSupervisor = await _nyssContext.Users.FirstOrDefaultAsync(u => u.Id == headSupervisorId);
+                    if (headSupervisor != null)
+                    {
+                        user.HeadSupervisor = (HeadSupervisorUser)headSupervisor;
+                    }
                 }
             }
         }

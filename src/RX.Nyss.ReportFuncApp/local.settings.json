@@ -12,7 +12,7 @@
     "SERVICEBUS_MTNREPORTQUEUE": "nrx-cbs-nyss-bus-mtn-report-queue-dev",
     "SERVICEBUS_EIDSRREPORTQUEUE": "nrx-cbs-nyss-bus-eidsr-report-queue-dev",
     "SERVICEBUS_DHISREPORTQUEUE": "nrx-cbs-nyss-bus-dhis-report-queue-dev",
-    "ReportApiBaseUrl": "https://localhost:44341/"
+    "ReportApiBaseUrl": "https://localhost:44341"
   },
   "Host": {
     "LocalHttpPort": 7071

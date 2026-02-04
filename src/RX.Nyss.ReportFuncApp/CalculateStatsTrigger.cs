@@ -19,13 +19,12 @@ public class CalculateStatsTrigger
 
     [Function("CalculateStatsTrigger")]
     public async Task CalculateStats(
-        [TimerTrigger("0 0 0 * * *")] TimerInfo timer,
-        ILogger log)
+        [TimerTrigger("0 0 0 * * *")] TimerInfo timer)
     {
-        log.LogInformation("Running calculate stats trigger.");
+        _logger.LogInformation("Running calculate stats trigger.");
         if (timer.IsPastDue)
         {
-            log.LogWarning($"Calculate stats trigger function is running late. Executed at: {DateTime.UtcNow}");
+            _logger.LogWarning($"Calculate stats trigger function is running late. Executed at: {DateTime.UtcNow}");
         }
 
         var client = _httpClientFactory.CreateClient();

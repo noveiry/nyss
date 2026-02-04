@@ -63,7 +63,13 @@ function* openDataCollectorsList({ projectId }) {
 
     const filters = {
       supervisorId: null,
-      locations: null,
+      locations: {
+        regionIds: [],
+        districtIds: [],
+        villageIds: [],
+        zoneIds: [],
+        includeUnknownLocation: true
+      },
       sex: null,
       trainingStatus: "All",
       deployedMode: "Deployed",
@@ -172,10 +178,43 @@ function* createDataCollector({ data }) {
 function* editDataCollector({ data }) {
   yield put(actions.edit.request());
   try {
+    // Build payload ensuring displayName is only included for Human data collectors
+    // Explicitly exclude it for CollectionPoint to avoid validation errors
+    const payload = {
+      id: data.id,
+      dataCollectorType: data.dataCollectorType,
+      name: data.name,
+      phoneNumber: data.phoneNumber,
+      additionalPhoneNumber: data.additionalPhoneNumber,
+      supervisorId: data.supervisorId,
+      deployed: data.deployed,
+      locations: data.locations,
+      linkedToHeadSupervisor: data.linkedToHeadSupervisor,
+    };
+    
+    // Only include Human-specific fields when dataCollectorType is Human
+    // For CollectionPoint, these fields must NOT be in the payload
+    if (data.dataCollectorType === consts.dataCollectorType.human) {
+      payload.displayName = data.displayName;
+      payload.sex = data.sex;
+      payload.birthGroupDecade = data.birthGroupDecade;
+    }
+    // Explicitly ensure displayName is not present for CollectionPoint
+    else if (data.dataCollectorType === consts.dataCollectorType.collectionPoint) {
+      // Make sure displayName is not included
+      if (payload.hasOwnProperty('displayName')) {
+        delete payload.displayName;
+      }
+    }
+    
+    console.log('Edit payload dataCollectorType:', payload.dataCollectorType);
+    console.log('Edit payload has displayName:', payload.hasOwnProperty('displayName'));
+    console.log('Edit payload:', JSON.stringify(payload, null, 2));
+    
     const response = yield call(
       http.post,
       `/api/dataCollector/${data.id}/edit`,
-      data,
+      payload,
     );
     yield put(actions.edit.success(response.value));
     yield put(actions.goToList(data.projectId));
@@ -223,10 +262,24 @@ function* getMapDetails({ projectId, lat, lng }) {
 function* getDataCollectors({ projectId, filters }) {
   yield put(actions.getList.request());
   try {
+    // Normalize filters to ensure required fields are always valid
+    const normalizedFilters = {
+      ...filters,
+      locations: filters?.locations && typeof filters.locations === 'object' 
+        ? filters.locations 
+        : {
+            regionIds: [],
+            districtIds: [],
+            villageIds: [],
+            zoneIds: [],
+            includeUnknownLocation: true
+          },
+      name: filters?.name != null ? filters.name : "",
+    };
     const response = yield call(
       http.post,
       `/api/dataCollector/list?projectId=${projectId}`,
-      filters,
+      normalizedFilters,
     );
     yield put(actions.getList.success(response.value, filters));
   } catch (error) {
@@ -303,10 +356,25 @@ function* openDataCollectorsPerformanceList({ projectId }) {
 function* getDataCollectorsPerformance({ projectId, filters }) {
   yield put(actions.getDataCollectorsPerformanceList.request());
   try {
+    // Normalize filters to ensure required fields are always valid
+    const normalizedFilters = {
+      ...filters,
+      locations: filters?.locations && typeof filters.locations === 'object' 
+        ? filters.locations 
+        : {
+            regionIds: [],
+            districtIds: [],
+            villageIds: [],
+            zoneIds: [],
+            includeUnknownLocation: true
+          },
+      name: filters?.name != null ? filters.name : "",
+      epiWeekFilters: Array.isArray(filters?.epiWeekFilters) ? filters.epiWeekFilters : [],
+    };
     const response = yield call(
       http.post,
       `/api/dataCollector/performance?projectId=${projectId}`,
-      filters,
+      normalizedFilters,
     );
     yield put(
       actions.getDataCollectorsPerformanceList.success(

@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.OpenApi.Models;
 using RX.Nyss.Common.Configuration;
+using RX.Nyss.Common.Utils.DataContract;
 using RX.Nyss.Common.Utils.Logging;
 using RX.Nyss.Data;
 using Serilog;
@@ -50,7 +51,7 @@ public static class DependencyConfiguration
     {
         const string applicationInsightsEnvironmentVariable = "APPINSIGHTS_INSTRUMENTATIONKEY";
         var appInsightsInstrumentationKey = configuration[applicationInsightsEnvironmentVariable];
-        GlobalLoggerConfiguration.ConfigureLogger(loggingOptions, appInsightsInstrumentationKey);
+        GlobalLoggerConfiguration.ConfigureLogger(loggingOptions);
         serviceCollection.AddSingleton(x => Log.Logger); // must be func, as the static logger is configured (changed reference) after DI registering
         serviceCollection.AddSingleton<ILoggerAdapter, SerilogLoggerAdapter>();
 
@@ -81,12 +82,12 @@ public static class DependencyConfiguration
                         .ToDictionary(stateEntry => stateEntry.Key,
                             stateEntry => stateEntry.Value.Errors.Select(x => x.ErrorMessage));
 
-                    return new BadRequestObjectResult(validationErrors);
+                    return new BadRequestObjectResult(Result.Error(ResultKey.Validation.ValidationError, validationErrors));
                 });
 
         // Register FluentValidation validators and enable automatic validation and client-side adapters
         serviceCollection.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        serviceCollection.AddFluentValidationAutoValidation();
+        //serviceCollection.AddFluentValidationAutoValidation();
         serviceCollection.AddFluentValidationClientsideAdapters();
 
         serviceCollection.AddHttpClient();

@@ -93,7 +93,7 @@ namespace RX.Nyss.Web.Services.Geolocation
             using var httpClient = _httpClientFactory.CreateClient();
 
             var baseUri = new Uri(_config.ConnectionStrings.Nominatim);
-            var requestUri = new Uri(baseUri, new Uri($"/search/?country={country}&format=json", UriKind.Relative));
+            var requestUri = new Uri(baseUri, new Uri($"/search?country={country}&format=json", UriKind.Relative));
 
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
             httpRequestMessage.Headers.Add("User-Agent", _customUserAgent);

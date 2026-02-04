@@ -288,6 +288,7 @@ serviceDependencies.local.json
 
 # Ignore local blob storage files
 __blobstorage__/
+__queuestorage__/
 
 # Ignore local azurite json config files
 __azurite_*

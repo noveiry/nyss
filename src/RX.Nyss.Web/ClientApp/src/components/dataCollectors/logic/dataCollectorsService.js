@@ -17,32 +17,41 @@ export const getIconFromStatus = (status) => {
   }
 };
 
-export const getSaveFormModel = (projectId, values, type, locations) => ({
-  projectId: projectId,
-  id: values.id,
-  dataCollectorType: type,
-  name: values.name,
-  displayName: values.displayName,
-  sex: type === dataCollectorType.human ? values.sex : null,
-  supervisorId: parseInt(values.supervisorId),
-  birthGroupDecade:
-    type === dataCollectorType.human ? parseInt(values.birthGroupDecade) : null,
-  additionalPhoneNumber: values.additionalPhoneNumber,
-  phoneNumber: values.phoneNumber,
-  deployed: values.deployed,
-  locations: locations.map((location) => ({
-    id: location.id || null,
-    latitude: parseFloat(values[`locations_${location.number}_latitude`]),
-    longitude: parseFloat(values[`locations_${location.number}_longitude`]),
-    regionId: parseInt(values[`locations_${location.number}_regionId`]),
-    districtId: parseInt(values[`locations_${location.number}_districtId`]),
-    villageId: parseInt(values[`locations_${location.number}_villageId`]),
-    zoneId: values[`locations_${location.number}_zoneId`]
-      ? parseInt(values[`locations_${location.number}_zoneId`])
-      : null,
-  })),
-  linkedToHeadSupervisor: values.linkedToHeadSupervisor,
-});
+export const getSaveFormModel = (projectId, values, type, locations) => {
+  // Build base model without displayName
+  const model = {
+    projectId: projectId,
+    id: values.id,
+    dataCollectorType: type,
+    name: values.name,
+    phoneNumber: values.phoneNumber,
+    additionalPhoneNumber: values.additionalPhoneNumber,
+    supervisorId: parseInt(values.supervisorId),
+    deployed: values.deployed,
+    locations: locations.map((location) => ({
+      id: location.id || null,
+      latitude: parseFloat(values[`locations_${location.number}_latitude`]),
+      longitude: parseFloat(values[`locations_${location.number}_longitude`]),
+      regionId: parseInt(values[`locations_${location.number}_regionId`]),
+      districtId: parseInt(values[`locations_${location.number}_districtId`]),
+      villageId: parseInt(values[`locations_${location.number}_villageId`]),
+      zoneId: values[`locations_${location.number}_zoneId`]
+        ? parseInt(values[`locations_${location.number}_zoneId`])
+        : null,
+    })),
+    linkedToHeadSupervisor: values.linkedToHeadSupervisor,
+  };
+  
+  // Only include Human-specific fields for Human data collectors
+  // Explicitly omit displayName, sex, and birthGroupDecade for CollectionPoint
+  if (type === dataCollectorType.human) {
+    model.displayName = values.displayName;
+    model.sex = values.sex;
+    model.birthGroupDecade = values.birthGroupDecade != null ? parseInt(values.birthGroupDecade) : null;
+  }
+  
+  return model;
+};
 
 export const getFormDistricts = (regionId, callback) =>
   http

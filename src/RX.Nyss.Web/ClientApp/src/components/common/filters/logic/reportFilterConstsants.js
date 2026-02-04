@@ -1,7 +1,7 @@
 export const DataCollectorType = {
-  unknownSender: "unknownSender",
-  human: "human",
-  collectionPoint: "collectionPoint",
+  unknownSender: "UnknownSender",
+  human: "Human",
+  collectionPoint: "CollectionPoint",
 };
 
 export const ReportErrorFilterType = {

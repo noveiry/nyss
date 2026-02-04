@@ -14,7 +14,7 @@ namespace RX.Nyss.Web.Features.Supervisors.Dto
         public Sex Sex { get; set; }
         public int DecadeOfBirth { get; set; }
         public string PhoneNumber { get; set; }
-        public string AdditionalPhoneNumber { get; set; }
+        public string? AdditionalPhoneNumber { get; set; }
         public string Email { get; set; }
         public int? ProjectId { get; set; }
         public int? OrganizationId { get; set; }
@@ -35,7 +35,7 @@ namespace RX.Nyss.Web.Features.Supervisors.Dto
                 RuleFor(m => m.Email).NotEmpty().MaximumLength(100).EmailAddress();
                 RuleFor(m => m.AdditionalPhoneNumber).MaximumLength(20).PhoneNumber().Unless(r => string.IsNullOrEmpty(r.AdditionalPhoneNumber));
                 RuleFor(p => p.ProjectId)
-                    .MustAsync((projectId, _) => projectAccessService.HasCurrentUserAccessToProject(projectId.Value))
+                    .MustAsync((projectId, _) => projectAccessService.HasCurrentUserAccessToProject(projectId ?? 0))
                     .When(m => m.ProjectId.HasValue)
                     .WithMessageKey(ResultKey.Unauthorized);
                 RuleFor(m => m.OrganizationId)

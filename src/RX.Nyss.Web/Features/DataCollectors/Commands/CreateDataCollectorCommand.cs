@@ -26,7 +26,7 @@ namespace RX.Nyss.Web.Features.DataCollectors.Commands
 
         public string Name { get; set; }
 
-        public string DisplayName { get; set; }
+        public string? DisplayName { get; set; }
 
         public Sex? Sex { get; set; }
 

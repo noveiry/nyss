@@ -22,7 +22,7 @@ namespace RX.Nyss.Web.Features.HealthRisks.Dto
 
         public IEnumerable<HealthRiskLanguageContentDto> LanguageContent { get; set; }
 
-        public IEnumerable<SuspectedDiseaseListItemResponseDto> SuspectedDiseasesList { get; set; }
+        //public IEnumerable<SuspectedDiseaseListItemResponseDto> SuspectedDiseasesList { get; set; }
 
         public class Validator : AbstractValidator<HealthRiskRequestDto>
         {

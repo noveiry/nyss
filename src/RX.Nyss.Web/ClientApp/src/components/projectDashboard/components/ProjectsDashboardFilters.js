@@ -238,16 +238,16 @@ const Filter = ({
           select
           label={strings(stringKeys.dashboard.filters.reportsType)}
           onChange={handleDataCollectorTypeChange}
-          value={localFilters.dataCollectorType || "all"}
+          value={localFilters.dataCollectorType || "All"}
           className={classes.selectFilterItem}
           InputLabelProps={{ shrink: true }}
         >
-          <MenuItem value="all">{collectionsTypes["all"]}</MenuItem>
-          <MenuItem value="dataCollector">
-            {collectionsTypes["dataCollector"]}
+          <MenuItem value="All">{collectionsTypes["All"]}</MenuItem>
+          <MenuItem value="DataCollector">
+            {collectionsTypes["DataCollector"]}
           </MenuItem>
-          <MenuItem value="dataCollectionPoint">
-            {collectionsTypes["dataCollectionPoint"]}
+          <MenuItem value="DataCollectionPoint">
+            {collectionsTypes["DataCollectionPoint"]}
           </MenuItem>
         </TextField>
       </Grid>
@@ -312,12 +312,13 @@ export const ProjectsDashboardFilters = ({
     updateLocalFilters,
   );
 
+  // Keys must match server enum casing
   const collectionsTypes = {
-    all: strings(stringKeys.dashboard.filters.allReportsType),
-    dataCollector: strings(
+    All: strings(stringKeys.dashboard.filters.allReportsType),
+    DataCollector: strings(
       stringKeys.dashboard.filters.dataCollectorReportsType,
     ),
-    dataCollectionPoint: strings(
+    DataCollectionPoint: strings(
       stringKeys.dashboard.filters.dataCollectionPointReportsType,
     ),
   };
@@ -336,9 +337,25 @@ export const ProjectsDashboardFilters = ({
     onChange(updateLocalFilters(localFilters));
   };
 
+  const safeLocations =
+    locations || {
+      regions: [],
+      districts: [],
+      villages: [],
+      zones: [],
+    };
+
+  const safeFilterLocations = localFilters.locations || {
+    regionIds: [],
+    districtIds: [],
+    villageIds: [],
+    zoneIds: [],
+    includeUnknownLocation: true,
+  };
+
   const allLocationsSelected = () =>
-    !localFilters.locations ||
-    localFilters.locations.regionIds.length === locations.regions.length;
+    !safeFilterLocations ||
+    safeFilterLocations.regionIds.length === safeLocations.regions.length;
 
   if (!localFilters) {
     return null;
@@ -437,12 +454,12 @@ export const ProjectsDashboardFilters = ({
             )}
           {!isGeneratingPdf &&
             !isFilterExpanded &&
-            localFilters.dataCollectorType !== "all" && (
+            localFilters.dataCollectorType !== "All" && (
               <Grid item>
                 <Chip
                   label={collectionsTypes[localFilters.dataCollectorType]}
                   onDelete={() =>
-                    handleFiltersChange({ dataCollectorType: "all" })
+                    handleFiltersChange({ dataCollectorType: "All" })
                   }
                   onClick={() => setIsFilterExpanded(!isFilterExpanded)}
                 />

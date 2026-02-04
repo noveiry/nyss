@@ -1,3 +1,31 @@
+const normalizeDataCollectorType = (value) => {
+  const map = {
+    all: "All",
+    All: "All",
+    dataCollector: "DataCollector",
+    DataCollector: "DataCollector",
+    dataCollectionPoint: "DataCollectionPoint",
+    DataCollectionPoint: "DataCollectionPoint",
+  };
+  return map[value] || "All";
+};
+
+const normalizeFilters = (filters) => {
+  const normalizedLocations =
+    filters?.locations || {
+      regionIds: [],
+      districtIds: [],
+      villageIds: [],
+      zoneIds: [],
+      includeUnknownLocation: true,
+    };
+
+  return {
+    ...filters,
+    locations: normalizedLocations,
+    dataCollectorType: normalizeDataCollectorType(filters?.dataCollectorType),
+  };
+};
 import { call, put, takeEvery, select } from "redux-saga/effects";
 import * as consts from "./projectDashboardConstants";
 import * as actions from "./projectDashboardActions";
@@ -42,7 +70,8 @@ function* openProjectDashboard({ projectId }) {
       startDate: endDate.add(-7, "day"),
       endDate: endDate,
       groupingType: "Day",
-      dataCollectorType: "all",
+      // Use server enum casing
+      dataCollectorType: "All",
       reportStatus: {
         kept: true,
         dismissed: false,
@@ -63,14 +92,15 @@ function* openProjectDashboard({ projectId }) {
 function* getProjectDashboardData({ projectId, filters }) {
   yield put(actions.getDashboardData.request());
   try {
+    const normalizedFilters = normalizeFilters(filters);
     const response = yield call(
       http.post,
       `/api/projectDashboard/data?projectId=${projectId}`,
-      filters,
+      normalizedFilters,
     );
     yield put(
       actions.getDashboardData.success(
-        filters,
+        normalizedFilters,
         response.value.summary,
         response.value.reportsGroupedByHealthRiskAndDate,
         response.value.reportsGroupedByFeaturesAndDate,
@@ -94,10 +124,11 @@ function* getProjectDashboardReportHealthRisks({
   yield put(actions.getReportHealthRisks.request());
   try {
     const filters = yield select((state) => state.projectDashboard.filters);
+    const normalizedFilters = normalizeFilters(filters);
     const response = yield call(
       http.post,
       `/api/projectDashboard/reportHealthRisks?projectId=${projectId}&latitude=${latitude}&longitude=${longitude}`,
-      filters,
+      normalizedFilters,
     );
     yield put(actions.getReportHealthRisks.success(response.value));
   } catch (error) {
