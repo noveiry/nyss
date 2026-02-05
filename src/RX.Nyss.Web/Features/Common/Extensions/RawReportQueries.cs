@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -96,7 +96,7 @@ namespace RX.Nyss.Web.Features.Common.Extensions
             };
 
         public static IQueryable<RawReport> FilterByReportStatus(this IQueryable<RawReport> rawReports, ReportStatusFilterDto filterDto) =>
-            filterDto != null
+            filterDto != null && (filterDto.Kept || filterDto.Dismissed || filterDto.NotCrossChecked)
                 ? rawReports.Where(r => (filterDto.Kept && r.Report != null && r.Report.Status == ReportStatus.Accepted)
                     || (filterDto.Dismissed && r.Report != null && r.Report.Status == ReportStatus.Rejected)
                     || (filterDto.NotCrossChecked && r.Report != null && (r.Report.Status == ReportStatus.New || r.Report.Status == ReportStatus.Pending || r.Report.Status == ReportStatus.Closed)))
