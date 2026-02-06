@@ -48,11 +48,11 @@ namespace RX.Nyss.Web.Features.Reports.Queries
                 };
 
                 var gatewayModems = await _nyssContext.GatewayModems
-                    .Where(gm => gm.GatewaySetting.NationalSocietyId == request.NationalSocietyId)
+                    .Where(gm => gm.GatewaySetting!.NationalSocietyId == request.NationalSocietyId)
                     .Select(gm => new GatewayModemResponseDto
                     {
                         Id = gm.Id,
-                        Name = gm.Name
+                        Name = gm.Name ?? string.Empty
                     })
                     .ToListAsync(cancellationToken);
 
@@ -67,7 +67,7 @@ namespace RX.Nyss.Web.Features.Reports.Queries
 
             private async Task<int?> GetTechnicalAdvisorModemId(int technicalAdvisorId, int nationalSocietyId) =>
                 await _nyssContext.TechnicalAdvisorUserGatewayModems
-                    .Where(tam => tam.TechnicalAdvisorUserId == technicalAdvisorId && tam.GatewayModem.GatewaySetting.NationalSocietyId == nationalSocietyId)
+                    .Where(tam => tam.TechnicalAdvisorUserId == technicalAdvisorId && tam.GatewayModem!.GatewaySetting!.NationalSocietyId == nationalSocietyId)
                     .Select(tam => tam.GatewayModemId)
                     .FirstOrDefaultAsync();
         }

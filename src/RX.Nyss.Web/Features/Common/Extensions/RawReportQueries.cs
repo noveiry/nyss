@@ -14,10 +14,10 @@ namespace RX.Nyss.Web.Features.Common.Extensions
             dataCollectorType switch
             {
                 DataCollectorType.Human =>
-                    reports.Where(r => r.DataCollector.DataCollectorType == DataCollectorType.Human),
+                    reports.Where(r => r.DataCollector!.DataCollectorType == DataCollectorType.Human),
 
                 DataCollectorType.CollectionPoint =>
-                    reports.Where(r => r.DataCollector.DataCollectorType == DataCollectorType.CollectionPoint),
+                    reports.Where(r => r.DataCollector!.DataCollectorType == DataCollectorType.CollectionPoint),
 
                 _ =>
                     reports
@@ -26,20 +26,20 @@ namespace RX.Nyss.Web.Features.Common.Extensions
         public static IQueryable<RawReport> FilterByDataCollectorType(this IQueryable<RawReport> reports, ReportListDataCollectorType reportDataCollectorType) =>
             reportDataCollectorType switch
             {
-                ReportListDataCollectorType.Human => reports.Where(r => r.DataCollector.DataCollectorType == DataCollectorType.Human),
-                ReportListDataCollectorType.CollectionPoint => reports.Where(r => r.DataCollector.DataCollectorType == DataCollectorType.CollectionPoint),
+                ReportListDataCollectorType.Human => reports.Where(r => r.DataCollector!.DataCollectorType == DataCollectorType.Human),
+                ReportListDataCollectorType.CollectionPoint => reports.Where(r => r.DataCollector!.DataCollectorType == DataCollectorType.CollectionPoint),
                 ReportListDataCollectorType.UnknownSender => reports.Where(r => r.DataCollector == null),
                 _ => reports
             };
 
         public static IQueryable<RawReport> FilterReportsByNationalSociety(this IQueryable<RawReport> reports, int? nationalSocietyId) =>
-            reports.Where(r => !nationalSocietyId.HasValue || r.DataCollector.Project.NationalSocietyId == nationalSocietyId.Value);
+            reports.Where(r => !nationalSocietyId.HasValue || r.DataCollector!.Project!.NationalSocietyId == nationalSocietyId.Value);
 
         public static IQueryable<RawReport> FilterByOrganization(this IQueryable<RawReport> reports, int? organizationId) =>
             organizationId.HasValue
-                ? reports.Where(r => r.DataCollector.Supervisor.UserNationalSocieties
+                ? reports.Where(r => r.DataCollector!.Supervisor!.UserNationalSocieties!
                     .Any(uns =>
-                        uns.NationalSociety == r.DataCollector.Project.NationalSociety
+                        uns.NationalSociety == r.DataCollector!.Project!.NationalSociety
                         && uns.OrganizationId == organizationId.Value))
                 : reports;
 
@@ -50,30 +50,30 @@ namespace RX.Nyss.Web.Features.Common.Extensions
             reports.Where(r => r.ReceivedAt >= startDate && r.ReceivedAt < endDate);
 
         public static IQueryable<RawReport> FilterByHealthRisk(this IQueryable<RawReport> reports, int? healthRiskId) =>
-            reports.Where(r => !healthRiskId.HasValue || (r.Report != null && r.Report.ProjectHealthRisk.HealthRiskId == healthRiskId.Value));
+            reports.Where(r => !healthRiskId.HasValue || (r.Report != null && r.Report.ProjectHealthRisk!.HealthRiskId == healthRiskId.Value));
 
         public static IQueryable<RawReport> FilterByHealthRisks(this IQueryable<RawReport> reports, IList<int> healthRiskIds) =>
             healthRiskIds != null && healthRiskIds.Any()
-                ? reports.Where(r => healthRiskIds.Contains(r.Report.ProjectHealthRisk.HealthRiskId))
+                ? reports.Where(r => r.Report != null && healthRiskIds.Contains(r.Report.ProjectHealthRisk!.HealthRiskId))
                 : reports;
 
         public static IQueryable<RawReport> FilterByHealthRisksWithActivityReports(this IQueryable<RawReport> reports, IList<int> healthRiskIds) =>
             healthRiskIds != null && healthRiskIds.Any()
-                ? reports.Where(r => healthRiskIds.Contains(r.Report.ProjectHealthRisk.HealthRiskId) || r.Report.ProjectHealthRisk.HealthRisk.HealthRiskType == HealthRiskType.Activity)
+                ? reports.Where(r => r.Report != null && (healthRiskIds.Contains(r.Report.ProjectHealthRisk!.HealthRiskId) || r.Report.ProjectHealthRisk.HealthRisk.HealthRiskType == HealthRiskType.Activity))
                 : reports;
 
         public static IQueryable<RawReport> FilterByProject(this IQueryable<RawReport> reports, int? projectId) =>
-            reports.Where(r => !projectId.HasValue || r.DataCollector.Project.Id == projectId.Value);
+            reports.Where(r => !projectId.HasValue || r.DataCollector!.Project!.Id == projectId.Value);
 
         public static IQueryable<RawReport> FromKnownDataCollector(this IQueryable<RawReport> reports) =>
             reports.Where(r => r.DataCollector != null);
 
         public static IQueryable<RawReport> FilterByArea(this IQueryable<RawReport> reports, AreaDto area) =>
             area != null && area.RegionIds.Any()
-                ? reports.Where(r => area.RegionIds.Contains(r.Village.District.Region.Id)
+                ? reports.Where(r => (area.RegionIds.Contains(r.Village!.District!.Region.Id)
                     && area.DistrictIds.Contains(r.Village.District.Id)
                     && area.VillageIds.Contains(r.Village.Id)
-                    && (r.Zone == null || area.ZoneIds.Contains(r.Zone.Id))
+                    && (r.Zone == null || area.ZoneIds.Contains(r.Zone.Id)))
                     || (area.IncludeUnknownLocation && r.Village == null))
                 : reports;
 
@@ -96,7 +96,7 @@ namespace RX.Nyss.Web.Features.Common.Extensions
             };
 
         public static IQueryable<RawReport> FilterByReportStatus(this IQueryable<RawReport> rawReports, ReportStatusFilterDto filterDto) =>
-            filterDto != null
+            filterDto != null && (filterDto.Kept || filterDto.Dismissed || filterDto.NotCrossChecked)
                 ? rawReports.Where(r => (filterDto.Kept && r.Report != null && r.Report.Status == ReportStatus.Accepted)
                     || (filterDto.Dismissed && r.Report != null && r.Report.Status == ReportStatus.Rejected)
                     || (filterDto.NotCrossChecked && r.Report != null && (r.Report.Status == ReportStatus.New || r.Report.Status == ReportStatus.Pending || r.Report.Status == ReportStatus.Closed)))
@@ -120,16 +120,13 @@ namespace RX.Nyss.Web.Features.Common.Extensions
 
         private static Alert GetRawReportAlert(RawReport rawReport)
         {
-            var report = rawReport.Report;
-            var alerts = report.ReportAlerts;
-            return rawReport?.Report?.ReportAlerts?.FirstOrDefault()?.Alert;
+            return rawReport!.Report!.ReportAlerts!.FirstOrDefault()!.Alert;
 
         }
 
         private static bool ReportAlertHasStatus(RawReport report, AlertStatus alertStatus)
         {
-            Alert alert = GetRawReportAlert(report);
-            var test = alert.Status;
+            var alert = GetRawReportAlert(report);
             return alert != null && alert.Status == alertStatus;
         }
 
@@ -139,9 +136,9 @@ namespace RX.Nyss.Web.Features.Common.Extensions
 
         public static bool ReportWasCrossCheckedBeforeAlertWasEscalated(RawReport report)
         {
-            Alert alert = GetRawReportAlert(report);
+            var alert = GetRawReportAlert(report);
 
-            return alert != null && (report.Report.AcceptedAt < alert.EscalatedAt || report.Report.RejectedAt < alert.EscalatedAt);
+            return alert != null && (report.Report!.AcceptedAt < alert.EscalatedAt || report.Report.RejectedAt < alert.EscalatedAt);
         }
         public static IQueryable<RawReport> AllReportsCrossCheckedBeforeAlertEscalated(this IQueryable<RawReport> rawReports) =>
             rawReports.Where(r => ReportWasCrossCheckedBeforeAlertWasEscalated(r));

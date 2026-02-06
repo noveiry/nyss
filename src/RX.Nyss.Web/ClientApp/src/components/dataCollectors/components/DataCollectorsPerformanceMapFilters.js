@@ -16,8 +16,10 @@ export const DataCollectorsPerformanceMapFilters = ({ filters, onChange }) => {
 
 
   //Fetches new data based on changes in filters
-  const handleFiltersChange = (filters) =>
-    onChange(updateLocalFilters(filters));
+  const handleFiltersChange = (filterChanges) => {
+    const updatedFilters = updateLocalFilters(filterChanges);
+    onChange(updatedFilters);
+  };
 
   const handleDateFromChange = (date) =>
     handleFiltersChange({ startDate: convertToUtc(date) });

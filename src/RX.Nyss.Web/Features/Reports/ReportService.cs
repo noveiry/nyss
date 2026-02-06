@@ -91,120 +91,118 @@ public class ReportService : IReportService
         _loggerAdapter = loggerAdapter;
     }
 
-    public async Task<Result<PaginatedList<ReportListResponseDto>>> List(int projectId, int pageNumber, ReportListFilterRequestDto filter)
-{
-    var currentUserName = _authorizationService.GetCurrentUserName();
-    var currentRole = (await _authorizationService.GetCurrentUser()).Role;
-
-    var isSupervisor = currentRole == Role.Supervisor;
-    var isHeadSupervisor = currentRole == Role.HeadSupervisor;
-    var currentUserId = await _nyssContext.Users.FilterAvailable()
-        .Where(u => u.EmailAddress == currentUserName)
-        .Select(u => u.Id)
-        .SingleOrDefaultAsync();
-
-    if (currentUserId == default)
+    public async Task<Result<PaginatedList<ReportListResponseDto>>> List(
+        int projectId, 
+        int pageNumber, 
+        ReportListFilterRequestDto filter)
     {
-        return Success(new PaginatedList<ReportListResponseDto>(new List<ReportListResponseDto>(), 0, pageNumber, _config.PaginationRowsPerPage));
+        var currentUserName = _authorizationService.GetCurrentUserName();
+        var currentRole = (await _authorizationService.GetCurrentUser()).Role;
+
+        var isSupervisor = currentRole == Role.Supervisor;
+        var isHeadSupervisor = currentRole == Role.HeadSupervisor;
+        var currentUserId = await _nyssContext.Users.FilterAvailable()
+            .Where(u => u.EmailAddress == currentUserName)
+            .Select(u => u.Id)
+            .SingleOrDefaultAsync();
+
+        if (currentUserId == default)
+        {
+            return Success(new PaginatedList<ReportListResponseDto>(new List<ReportListResponseDto>(), 0, pageNumber, _config.PaginationRowsPerPage));
+        }
+
+        var userApplicationLanguageCode = await _userService.GetUserApplicationLanguageCode(currentUserName);
+        var strings = await _stringsService.GetForCurrentUser();
+
+        var baseQuery = await BuildRawReportsBaseQuery(filter, projectId);
+
+        if (baseQuery == null)
+        {
+            return Success(new PaginatedList<ReportListResponseDto>(new List<ReportListResponseDto>(), 0, pageNumber, _config.PaginationRowsPerPage));
+        }
+
+        var currentUserOrganization = await _nyssContext.Projects
+            .Where(p => p.Id == projectId)
+            .SelectMany(p => p.NationalSociety.NationalSocietyUsers)
+            .Where(uns => uns.User != null && uns.User.Id == currentUserId)
+            .Select(uns => uns.Organization)
+            .SingleOrDefaultAsync();
+
+        var currentUserOrganizationId = currentUserOrganization?.Id ?? 0;
+
+        var result = baseQuery.Select(r => new ReportListResponseDto
+        {
+            Id = r.Id,
+            IsAnonymized = currentRole != Role.Administrator && !r.NationalSociety.NationalSocietyUsers.Any(
+                    nsu => (nsu.UserId == r.DataCollector.Supervisor.Id && nsu.OrganizationId == currentUserOrganizationId)
+                        || (nsu.UserId == r.DataCollector.HeadSupervisor.Id && nsu.OrganizationId == currentUserOrganizationId)),
+            OrganizationName = r.NationalSociety.NationalSocietyUsers
+                    .Where(nsu => nsu.UserId == (r.DataCollector != null ? r.DataCollector.Supervisor.Id : 0) || nsu.UserId == (r.DataCollector != null ? r.DataCollector.HeadSupervisor.Id : 0))
+                    .Select(nsu => nsu.Organization.Name)
+                    .FirstOrDefault(),
+            DateTime = r.ReceivedAt.AddHours(filter != null ? filter.UtcOffset : 0),
+            HealthRiskName = r.Report != null && r.Report.ProjectHealthRisk != null && r.Report.ProjectHealthRisk.HealthRisk != null
+                    ? r.Report.ProjectHealthRisk.HealthRisk.LanguageContents
+                        .Where(lc => lc.ContentLanguage.LanguageCode == userApplicationLanguageCode)
+                        .Select(lc => lc.Name)
+                        .SingleOrDefault()
+                    : null,
+            IsActivityReport = (r.Report != null && r.Report.ProjectHealthRisk != null && r.Report.ProjectHealthRisk.HealthRisk != null && r.Report.ProjectHealthRisk.HealthRisk.HealthRiskCode == 99)
+                    || (r.Report != null && r.Report.ProjectHealthRisk != null && r.Report.ProjectHealthRisk.HealthRisk != null && r.Report.ProjectHealthRisk.HealthRisk.HealthRiskCode == 98),
+            IsValid = r.Report != null,
+            Region = r.Village != null && r.Village.District != null && r.Village.District.Region != null ? r.Village.District.Region.Name : null,
+            District = r.Village != null && r.Village.District != null ? r.Village.District.Name : null,
+            Village = r.Village != null ? r.Village.Name : null,
+            Zone = r.Zone != null ? r.Zone.Name : null,
+            DataCollectorDisplayName = r.DataCollector != null && r.DataCollector.DataCollectorType == DataCollectorType.CollectionPoint
+                    ? r.DataCollector.Name
+                    : (r.DataCollector != null ? r.DataCollector.DisplayName : null),
+            SupervisorName = r.DataCollector != null ? (r.DataCollector.Supervisor != null ? r.DataCollector.Supervisor.Name : (r.DataCollector.HeadSupervisor != null ? r.DataCollector.HeadSupervisor.Name : null)) : null,
+            PhoneNumber = r.Sender,
+            Alert = r.Report.ReportAlerts
+                    .OrderByDescending(ra => ra.AlertId)
+                    .Select(ra => new ReportListAlert
+                    {
+                        Id = ra.AlertId,
+                        Status = ra.Alert != null ? ra.Alert.Status : default,
+                        ReportWasCrossCheckedBeforeEscalation = (ra.Report != null && ra.Alert != null) &&
+                            (
+                                (ra.Report.AcceptedAt.HasValue && ra.Alert.EscalatedAt.HasValue && ra.Report.AcceptedAt < ra.Alert.EscalatedAt)
+                                || (ra.Report.RejectedAt.HasValue && ra.Alert.EscalatedAt.HasValue && ra.Report.RejectedAt < ra.Alert.EscalatedAt)
+                            )
+                    })
+                    .FirstOrDefault(),
+            ReportId = r.ReportId,
+            ReportType = r.Report != null ? (ReportType?)r.Report.ReportType : null,
+            Message = r.Text,
+            CountMalesBelowFive = (r.Report != null && r.Report.ReportedCase != null) ? r.Report.ReportedCase.CountMalesBelowFive : (int?)null,
+            CountMalesAtLeastFive = (r.Report != null && r.Report.ReportedCase != null) ? r.Report.ReportedCase.CountMalesAtLeastFive : (int?)null,
+            CountFemalesBelowFive = (r.Report != null && r.Report.ReportedCase != null) ? r.Report.ReportedCase.CountFemalesBelowFive : (int?)null,
+            CountFemalesAtLeastFive = (r.Report != null && r.Report.ReportedCase != null) ? r.Report.ReportedCase.CountFemalesAtLeastFive : (int?)null,
+            ReferredCount = (r.Report != null && r.Report.DataCollectionPointCase != null) ? r.Report.DataCollectionPointCase.ReferredCount : (int?)null,
+            Status = r.Report != null ? r.Report.Status : ReportStatus.New,
+            ReportErrorType = r.ErrorType,
+            DataCollectorIsDeleted = r.DataCollector != null && r.DataCollector.Name == Anonymization.Text,
+            IsCorrected = r.MarkedAsCorrectedAtUtc != null,
+        })
+            //ToDo: order base on filter.OrderBy property
+            .OrderBy(r => r.DateTime, filter?.SortAscending ?? true);
+
+        var rowsPerPage = _config.PaginationRowsPerPage;
+        var reports = await result
+            .Page(pageNumber, rowsPerPage)
+            .ToListAsync<IReportListResponseDto>();
+
+        reports ??= new List<IReportListResponseDto>();
+
+        if (filter?.DataCollectorType != ReportListDataCollectorType.UnknownSender && currentUserOrganization?.Name != null)
+        {
+            AnonymizeCrossOrganizationReports(reports, currentUserOrganization.Name, strings);
+        }
+
+        var totalCount = await baseQuery.CountAsync();
+        return Success(reports.Cast<ReportListResponseDto>().AsPaginatedList(pageNumber, totalCount, rowsPerPage));
     }
-
-    var userApplicationLanguageCode = await _userService.GetUserApplicationLanguageCode(currentUserName);
-    var strings = await _stringsService.GetForCurrentUser();
-
-    var baseQuery = await BuildRawReportsBaseQuery(filter, projectId);
-
-    if (baseQuery == null)
-    {
-        return Success(new PaginatedList<ReportListResponseDto>(new List<ReportListResponseDto>(), 0, pageNumber, _config.PaginationRowsPerPage));
-    }
-
-    var currentUserOrganization = await _nyssContext.Projects
-        .Where(p => p.Id == projectId)
-        .SelectMany(p => p.NationalSociety.NationalSocietyUsers)
-        .Where(uns => uns.User.Id == currentUserId)
-        .Select(uns => uns.Organization)
-        .SingleOrDefaultAsync();
-
-    var currentUserOrganizationId = currentUserOrganization?.Id ?? 0;
-    var supervisorId = 0;
-    var headSupervisorId = 0;
-
-    var result = baseQuery.Select(r => new ReportListResponseDto
-    {
-        Id = r.Id,
-        IsAnonymized = currentRole != Role.Administrator && !r.NationalSociety.NationalSocietyUsers.Any(
-                nsu => (nsu.UserId == r.DataCollector.Supervisor.Id && nsu.OrganizationId == currentUserOrganizationId)
-                    || (nsu.UserId == r.DataCollector.HeadSupervisor.Id && nsu.OrganizationId == currentUserOrganizationId)),
-        OrganizationName = r.NationalSociety.NationalSocietyUsers
-                .Where(nsu => nsu.UserId == (r.DataCollector != null ? r.DataCollector.Supervisor.Id : 0) || nsu.UserId == (r.DataCollector != null ? r.DataCollector.HeadSupervisor.Id : 0))
-                .Select(nsu => nsu.Organization.Name)
-                .FirstOrDefault(),
-        DateTime = r.ReceivedAt.AddHours(filter != null ? filter.UtcOffset : 0),
-        HealthRiskName = r.Report != null && r.Report.ProjectHealthRisk != null && r.Report.ProjectHealthRisk.HealthRisk != null
-                ? r.Report.ProjectHealthRisk.HealthRisk.LanguageContents
-                    .Where(lc => lc.ContentLanguage.LanguageCode == userApplicationLanguageCode)
-                    .Select(lc => lc.Name)
-                    .SingleOrDefault()
-                : null,
-        IsActivityReport = (r.Report != null && r.Report.ProjectHealthRisk != null && r.Report.ProjectHealthRisk.HealthRisk != null && r.Report.ProjectHealthRisk.HealthRisk.HealthRiskCode == 99)
-                || (r.Report != null && r.Report.ProjectHealthRisk != null && r.Report.ProjectHealthRisk.HealthRisk != null && r.Report.ProjectHealthRisk.HealthRisk.HealthRiskCode == 98),
-        IsValid = r.Report != null,
-        Region = r.Village != null && r.Village.District != null && r.Village.District.Region != null ? r.Village.District.Region.Name : null,
-        District = r.Village != null && r.Village.District != null ? r.Village.District.Name : null,
-        Village = r.Village != null ? r.Village.Name : null,
-        Zone = r.Zone != null ? r.Zone.Name : null,
-        DataCollectorDisplayName = r.DataCollector != null && r.DataCollector.DataCollectorType == DataCollectorType.CollectionPoint
-                ? r.DataCollector.Name
-                : (r.DataCollector != null ? r.DataCollector.DisplayName : null),
-        SupervisorName = r.DataCollector != null ? (r.DataCollector.Supervisor != null ? r.DataCollector.Supervisor.Name : (r.DataCollector.HeadSupervisor != null ? r.DataCollector.HeadSupervisor.Name : null)) : null,
-        PhoneNumber = r.Sender,
-        Alert = r.Report.ReportAlerts
-                .OrderByDescending(ra => ra.AlertId)
-                .Select(ra => new ReportListAlert
-                {
-                    Id = ra.AlertId,
-                    Status = ra.Alert != null ? ra.Alert.Status : default,
-                    ReportWasCrossCheckedBeforeEscalation = (ra.Report != null && ra.Alert != null) &&
-                        (
-                            (ra.Report.AcceptedAt.HasValue && ra.Alert.EscalatedAt.HasValue && ra.Report.AcceptedAt < ra.Alert.EscalatedAt)
-                            || (ra.Report.RejectedAt.HasValue && ra.Alert.EscalatedAt.HasValue && ra.Report.RejectedAt < ra.Alert.EscalatedAt)
-                        )
-                })
-                .FirstOrDefault(),
-        ReportId = r.ReportId,
-        ReportType = r.Report != null ? (ReportType?)r.Report.ReportType : null,
-        Message = r.Text,
-        CountMalesBelowFive = (r.Report != null && r.Report.ReportedCase != null) ? r.Report.ReportedCase.CountMalesBelowFive : (int?)null,
-        CountMalesAtLeastFive = (r.Report != null && r.Report.ReportedCase != null) ? r.Report.ReportedCase.CountMalesAtLeastFive : (int?)null,
-        CountFemalesBelowFive = (r.Report != null && r.Report.ReportedCase != null) ? r.Report.ReportedCase.CountFemalesBelowFive : (int?)null,
-        CountFemalesAtLeastFive = (r.Report != null && r.Report.ReportedCase != null) ? r.Report.ReportedCase.CountFemalesAtLeastFive : (int?)null,
-        ReferredCount = (r.Report != null && r.Report.DataCollectionPointCase != null) ? r.Report.DataCollectionPointCase.ReferredCount : (int?)null,
-        Status = r.Report != null ? r.Report.Status : ReportStatus.New,
-        ReportErrorType = r.ErrorType,
-        DataCollectorIsDeleted = r.DataCollector != null && r.DataCollector.Name == Anonymization.Text,
-        IsCorrected = r.MarkedAsCorrectedAtUtc != null,
-    })
-        //ToDo: order base on filter.OrderBy property
-        .OrderBy(r => r.DateTime, filter?.SortAscending ?? true);
-
-    var rowsPerPage = _config.PaginationRowsPerPage;
-    var reports = await result
-        .Page(pageNumber, rowsPerPage)
-        .ToListAsync<IReportListResponseDto>();
-
-    if (reports == null)
-    {
-        reports = new List<IReportListResponseDto>();
-    }
-
-    if (filter?.DataCollectorType != ReportListDataCollectorType.UnknownSender)
-    {
-        AnonymizeCrossOrganizationReports(reports, currentUserOrganization?.Name, strings);
-    }
-
-    var totalCount = await baseQuery.CountAsync();
-    return Success(reports.Cast<ReportListResponseDto>().AsPaginatedList(pageNumber, totalCount, rowsPerPage));
-}
 
 
 

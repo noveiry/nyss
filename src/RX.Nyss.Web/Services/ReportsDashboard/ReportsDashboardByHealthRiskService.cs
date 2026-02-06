@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -55,28 +56,71 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
             };
         }
 
-        private async Task<ReportByHealthRiskAndDateResponseDto> GroupReportsByHealthRiskAndDay(IQueryable<Report> reports, DateTime startDate, DateTime endDate, int utcOffset)
+        private async Task<ReportByHealthRiskAndDateResponseDto> GroupReportsByHealthRiskAndDay(
+            IQueryable<Report> reports,
+            DateTime startDate,
+            DateTime endDate,
+            int utcOffset)
         {
-            var groupedReports = await reports
-                .GroupBy(r => new
+            if (startDate > endDate)
+            {
+                return new ReportByHealthRiskAndDateResponseDto
                 {
-                    Date = r.ReceivedAt.AddHours(utcOffset).Date,
-                    HealthRiskId = r.ProjectHealthRisk.HealthRiskId,
-                    ContentLanguageId = r.ProjectHealthRisk.Project.NationalSociety.ContentLanguage.Id
-                })
-                .Select(grouping => new
+                    HealthRisks = Enumerable.Empty<ReportByHealthRiskAndDateResponseDto.ReportHealthRiskDto>(),
+                    AllPeriods = new List<string>()
+                };
+            }
+            //  SQL-safe data fetch
+            var rawData = await reports
+                .Where(r => r.ReceivedAt >= startDate && r.ReceivedAt <= endDate)
+                .Select(r => new
                 {
-                    Period = grouping.Key.Date,
-                    HealthRiskId = grouping.Key.HealthRiskId,
-                    HealthRiskName = _nyssContext.HealthRisks.FirstOrDefault(hr => hr.Id == grouping.Key.HealthRiskId).LanguageContents
-                        .Where(lc => lc.ContentLanguage.Id == grouping.Key.ContentLanguageId)
-                        .Select(lc => lc.Name).FirstOrDefault(),
-                    Count = grouping.Sum(r => r.ReportedCaseCount)
+                    r.ReceivedAt,
+                    r.ReportedCaseCount,
+                    HealthRiskId = r.ProjectHealthRisk != null ? r.ProjectHealthRisk.HealthRiskId : 0, // Default to 0 if null, to avoid issues in join
+                    ContentLanguageId = r.ProjectHealthRisk != null && r.ProjectHealthRisk.Project.NationalSociety.ContentLanguage != null ? r.ProjectHealthRisk.Project.NationalSociety.ContentLanguage.Id : 1 //  Default to 1 if null, to avoid issues in join
                 })
-                .Where(g => g.Count > 0)
-                .AsSplitQuery()
                 .ToListAsync();
 
+            //  Load health risk names ONCE
+            var healthRiskNames = await _nyssContext.HealthRisks
+                .SelectMany(hr => hr.LanguageContents.Select(lc => new
+                {
+                    hr.Id,
+                    LanguageId = lc.ContentLanguage.Id,
+                    lc.Name
+                }))
+                .ToListAsync();
+
+            //  In-memory transformation (SAFE)
+            var groupedReports = rawData
+                .Select(r => new
+                {
+                    Period = r.ReceivedAt.AddHours(utcOffset).Date,
+                    r.HealthRiskId,
+                    HealthRiskName = healthRiskNames
+                        .FirstOrDefault(n =>
+                            n.Id == r.HealthRiskId &&
+                            n.LanguageId == r.ContentLanguageId)?.Name,
+                    Count = r.ReportedCaseCount
+                })
+                .Where(r => r.Count > 0)
+                .GroupBy(r => new
+                {
+                    r.Period,
+                    r.HealthRiskId,
+                    r.HealthRiskName
+                })
+                .Select(g => new
+                {
+                    g.Key.Period,
+                    g.Key.HealthRiskId,
+                    g.Key.HealthRiskName,
+                    Count = g.Sum(x => x.Count)
+                })
+                .ToList();
+
+            //  Group by health risk
             var reportsGroupedByHealthRisk = groupedReports
                 .GroupBy(r => new
                 {
@@ -93,36 +137,42 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
 
             var maxHealthRiskCount = _config.View.NumberOfGroupedHealthRisksInDashboard;
 
+            //  Truncate & merge "rest"
             var truncatedHealthRisksList = reportsGroupedByHealthRisk
                 .Take(maxHealthRiskCount)
-                .Union(reportsGroupedByHealthRisk
-                    .Skip(maxHealthRiskCount)
-                    .SelectMany(_ => _.Data)
-                    .GroupBy(_ => true)
-                    .Select(gr => new
-                    {
-                        HealthRisk = new
+                .Concat(
+                    reportsGroupedByHealthRisk
+                        .Skip(maxHealthRiskCount)
+                        .SelectMany(_ => _.Data)
+                        .GroupBy(_ => true)
+                        .Select(gr => new
                         {
-                            HealthRiskId = 0,
-                            HealthRiskName = "(rest)"
-                        },
-                        Data = gr.ToList()
-                    })
+                            HealthRisk = new
+                            {
+                                HealthRiskId = 0,
+                                HealthRiskName = "(rest)"
+                            },
+                            Data = gr.ToList()
+                        })
                 )
                 .Select(g => new ReportByHealthRiskAndDateResponseDto.ReportHealthRiskDto
                 {
                     HealthRiskName = g.HealthRisk.HealthRiskName,
-                    Periods = g.Data.GroupBy(v => v.Period).OrderBy(g => g.Key)
-                        .Select(g => new PeriodDto
+                    Periods = g.Data
+                        .GroupBy(v => v.Period)
+                        .OrderBy(v => v.Key)
+                        .Select(v => new PeriodDto
                         {
-                            Period = g.Key.ToString("dd/MM/yy", CultureInfo.InvariantCulture),
-                            Count = g.Sum(w => w.Count)
+                            Period = v.Key.ToString("dd/MM/yy", CultureInfo.InvariantCulture),
+                            Count = v.Sum(w => w.Count)
                         })
                         .ToList()
-                });
+                })
+                .ToList();
 
-            var allPeriods = startDate.GetDaysRange(endDate)
-                .Select(i => i.ToString("dd/MM/yy", CultureInfo.InvariantCulture))
+            var allPeriods = startDate
+                .GetDaysRange(endDate)
+                .Select(d => d.ToString("dd/MM/yy", CultureInfo.InvariantCulture))
                 .ToList();
 
             return new ReportByHealthRiskAndDateResponseDto
@@ -132,33 +182,82 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
             };
         }
 
-        private async Task<ReportByHealthRiskAndDateResponseDto> GroupReportsByHealthRiskAndWeek(IQueryable<Report> reports, DateTime startDate, DateTime endDate, DayOfWeek epiWeekStartDay)
+
+        private async Task<ReportByHealthRiskAndDateResponseDto> GroupReportsByHealthRiskAndWeek(
+            IQueryable<Report> reports,
+            DateTime startDate,
+            DateTime endDate,
+            DayOfWeek epiWeekStartDay)
         {
-            var groupedReports = await reports
-                .GroupBy(r => new
+            if (startDate > endDate)
+            {
+                return new ReportByHealthRiskAndDateResponseDto
+                {
+                    HealthRisks = Enumerable.Empty<ReportByHealthRiskAndDateResponseDto.ReportHealthRiskDto>(),
+                    AllPeriods = new List<string>()
+                };
+            }
+            //  SQL-safe projection ONLY
+            var rawData = await reports
+                .Where(r => r.ReceivedAt >= startDate && r.ReceivedAt <= endDate)
+                .Select(r => new
                 {
                     r.EpiYear,
                     r.EpiWeek,
-                    r.ProjectHealthRisk.HealthRiskId,
-                    ContentLanguageId = r.ProjectHealthRisk.Project.NationalSociety.ContentLanguage.Id
+                    r.ReportedCaseCount,
+                    HealthRiskId = r.ProjectHealthRisk!.HealthRiskId,
+                    ContentLanguageId = r.ProjectHealthRisk.Project.NationalSociety.ContentLanguage!.Id
                 })
-                .Select(grouping => new
+                .ToListAsync();
+
+            //  Load health risk names once
+            var healthRiskNames = await _nyssContext.HealthRisks
+                .SelectMany(hr => hr.LanguageContents.Select(lc => new
+                {
+                    hr.Id,
+                    LanguageId = lc.ContentLanguage.Id,
+                    lc.Name
+                }))
+                .ToListAsync();
+
+            //  In-memory grouping (SAFE)
+            var groupedReports = rawData
+                .Where(r => r.ReportedCaseCount > 0)
+                .Select(r => new
                 {
                     Period = new
                     {
-                        grouping.Key.EpiYear,
-                        grouping.Key.EpiWeek
+                        r.EpiYear,
+                        r.EpiWeek
                     },
-                    Count = grouping.Sum(g => g.ReportedCaseCount),
-                    HealthRiskId = grouping.Key.HealthRiskId,
-                    HealthRiskName = _nyssContext.HealthRisks.FirstOrDefault(hr => hr.Id == grouping.Key.HealthRiskId).LanguageContents
-                        .Where(lc => lc.ContentLanguage.Id == grouping.Key.ContentLanguageId)
-                        .Select(lc => lc.Name).FirstOrDefault()
+                    r.HealthRiskId,
+                    HealthRiskName = healthRiskNames
+                        .FirstOrDefault(n =>
+                            n.Id == r.HealthRiskId &&
+                            n.LanguageId == r.ContentLanguageId)?.Name,
+                    Count = r.ReportedCaseCount
                 })
-                .Where(g => g.Count > 0)
-                .AsSplitQuery()
-                .ToListAsync();
+                .GroupBy(r => new
+                {
+                    r.Period.EpiYear,
+                    r.Period.EpiWeek,
+                    r.HealthRiskId,
+                    r.HealthRiskName
+                })
+                .Select(g => new
+                {
+                    Period = new
+                    {
+                        g.Key.EpiYear,
+                        g.Key.EpiWeek
+                    },
+                    g.Key.HealthRiskId,
+                    g.Key.HealthRiskName,
+                    Count = g.Sum(x => x.Count)
+                })
+                .ToList();
 
+            //  Group by health risk
             var reportsGroupedByHealthRisk = groupedReports
                 .GroupBy(r => new
                 {
@@ -175,37 +274,44 @@ namespace RX.Nyss.Web.Services.ReportsDashboard
 
             var maxHealthRiskCount = _config.View.NumberOfGroupedHealthRisksInDashboard;
 
+            //  Truncate & merge "rest"
             var truncatedHealthRisksList = reportsGroupedByHealthRisk
                 .Take(maxHealthRiskCount)
-                .Union(reportsGroupedByHealthRisk
-                    .Skip(maxHealthRiskCount)
-                    .SelectMany(_ => _.Data)
-                    .GroupBy(_ => true)
-                    .Select(g => new
-                    {
-                        HealthRisk = new
+                .Concat(
+                    reportsGroupedByHealthRisk
+                        .Skip(maxHealthRiskCount)
+                        .SelectMany(_ => _.Data)
+                        .GroupBy(_ => true)
+                        .Select(g => new
                         {
-                            HealthRiskId = 0,
-                            HealthRiskName = "(rest)"
-                        },
-                        Data = g.ToList()
-                    })
+                            HealthRisk = new
+                            {
+                                HealthRiskId = 0,
+                                HealthRiskName = "(rest)"
+                            },
+                            Data = g.ToList()
+                        })
                 )
                 .Select(x => new ReportByHealthRiskAndDateResponseDto.ReportHealthRiskDto
                 {
                     HealthRiskName = x.HealthRisk.HealthRiskName,
-                    Periods = x.Data.GroupBy(v => v.Period).OrderBy(g => g.Key.EpiYear).ThenBy(g => g.Key.EpiWeek)
+                    Periods = x.Data
+                        .GroupBy(v => new { v.Period.EpiYear, v.Period.EpiWeek })
+                        .OrderBy(g => g.Key.EpiYear)
+                        .ThenBy(g => g.Key.EpiWeek)
                         .Select(g => new PeriodDto
                         {
-                            Period = $"{g.Key.EpiYear.ToString()}/{g.Key.EpiWeek.ToString()}",
+                            Period = $"{g.Key.EpiYear}/{g.Key.EpiWeek}",
                             Count = g.Sum(w => w.Count)
                         })
                         .ToList()
                 })
                 .ToList();
 
-            var allPeriods = _dateTimeProvider.GetEpiDateRange(startDate, endDate, epiWeekStartDay)
-                .Select(day => $"{day.EpiYear.ToString()}/{day.EpiWeek.ToString()}");
+            var allPeriods = _dateTimeProvider
+                .GetEpiDateRange(startDate, endDate, epiWeekStartDay)
+                .Select(d => $"{d.EpiYear}/{d.EpiWeek}")
+                .ToList();
 
             return new ReportByHealthRiskAndDateResponseDto
             {

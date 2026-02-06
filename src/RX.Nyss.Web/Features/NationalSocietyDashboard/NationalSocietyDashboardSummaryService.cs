@@ -34,52 +34,83 @@ namespace RX.Nyss.Web.Features.NationalSocietyDashboard
 
         public async Task<NationalSocietySummaryResponseDto> GetData(ReportsFilter filters)
         {
-            if (!filters.NationalSocietyId.HasValue)
+            if (filters.NationalSocietyId is null)
             {
                 throw new InvalidOperationException("NationalSocietyId was not supplied");
             }
 
             var nationalSocietyId = filters.NationalSocietyId.Value;
 
-            // Keep as IQueryable for methods that need it
-            var dashboardReports = _reportService.GetDashboardHealthRiskEventReportsQuery(filters);
-            var rawReportsWithDataCollectorAndActivityReports = _reportService.GetRawReportsWithDataCollectorAndActivityReportsQuery(filters);
-
-            // Check if national society exists
-            var nationalSocietyExists = await _nyssContext.NationalSocieties
+            // Check existence first (cheap, indexed lookup)
+            var exists = await _nyssContext.NationalSocieties
+                .AsNoTracking()
                 .AnyAsync(ns => ns.Id == nationalSocietyId);
 
-            if (!nationalSocietyExists)
+            if (!exists)
             {
-                return null;
+                throw new InvalidOperationException($"NationalSociety with id {nationalSocietyId} does not exist");
             }
 
-            // Execute the queries that need to be materialized
-            var dashboardReportsList = await dashboardReports.ToListAsync();
-            var rawReportsList = await rawReportsWithDataCollectorAndActivityReports.ToListAsync();
+            // Base queries (keep IQueryable)
+            var dashboardReportsQuery =
+                _reportService.GetDashboardHealthRiskEventReportsQuery(filters);
 
-            // Perform calculations
+            var rawReportsQuery =
+                _reportService.GetRawReportsWithDataCollectorAndActivityReportsQuery(filters);
+
+            // Materialize ONLY what must be in memory
+            var dashboardReports = await dashboardReportsQuery
+                .Select(r => new
+                {
+                    r.ReportedCaseCount
+                })
+                .ToListAsync();
+
+            var rawReports = await rawReportsQuery
+                .Select(r => new
+                {
+                    DataCollectorId = r.DataCollector != null ? r.DataCollector.Id : (int?)null,
+                    DistrictId = r.Village != null ? r.Village.District.Id : (int?)null,
+                    VillageId = r.Village.Id
+                })
+                .ToListAsync();
+
             return new NationalSocietySummaryResponseDto
             {
-                TotalReportCount = dashboardReportsList.Sum(r => r.ReportedCaseCount),
-                ActiveDataCollectorCount = rawReportsList
-                    .Where(r => r.DataCollector != null)
-                    .Select(r => r.DataCollector.Id)
-                    .Distinct()
-                    .Count(),
-                DataCollectionPointSummary = _reportsDashboardSummaryService.DataCollectionPointsSummary(dashboardReports),
-                AlertsSummary = _reportsDashboardSummaryService.AlertsSummary(filters),
-                NumberOfDistricts = rawReportsList
-                    .Where(r => r.Village?.District != null)
-                    .Select(r => r.Village.District)
-                    .Distinct()
-                    .Count(),
-                NumberOfVillages = rawReportsList
-                    .Where(r => r.Village != null)
-                    .Select(r => r.Village)
-                    .Distinct()
-                    .Count()
+                TotalReportCount =
+                    dashboardReports.Sum(r => r.ReportedCaseCount),
+
+                ActiveDataCollectorCount =
+                    rawReports
+                        .Where(r => r.DataCollectorId.HasValue)
+                        .Select(r => r.DataCollectorId.Value)
+                        .Distinct()
+                        .Count(),
+
+                // Keep these server-side
+                DataCollectionPointSummary =
+                    _reportsDashboardSummaryService
+                        .DataCollectionPointsSummary(dashboardReportsQuery),
+
+                AlertsSummary =
+                    _reportsDashboardSummaryService
+                        .AlertsSummary(filters),
+
+                NumberOfDistricts =
+                    rawReports
+                        .Where(r => r.DistrictId.HasValue)
+                        .Select(r => r.DistrictId.Value)
+                        .Distinct()
+                        .Count(),
+
+                NumberOfVillages =
+                    rawReports
+                        .Where(r => r.VillageId > 0)
+                        .Select(r => r.VillageId)
+                        .Distinct()
+                        .Count()
             };
         }
+
     }
 }

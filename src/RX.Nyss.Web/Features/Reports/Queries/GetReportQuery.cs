@@ -33,20 +33,20 @@ public class GetReportQuery : IRequest<Result<ReportResponseDto>>
         {
             var report = await _nyssContext.RawReports
                 .Include(r => r.Report)
-                .ThenInclude(r => r.ProjectHealthRisk)
-                .ThenInclude(r => r.HealthRisk)
+                .ThenInclude(r => r!.ProjectHealthRisk)
+                .ThenInclude(r => r!.HealthRisk)
                 .Select(r => new ReportResponseDto
                 {
                     Id = r.Id,
-                    DataCollectorId = r.DataCollector.Id,
-                    ReportType = r.Report.ReportType,
+                    DataCollectorId = r.DataCollector!.Id,
+                    ReportType = r.Report!.ReportType,
                     ReportStatus = r.Report.Status,
-                    LocationId = r.DataCollector.DataCollectorLocations
+                    LocationId = r.DataCollector.DataCollectorLocations!
                         .Where(dcl => dcl.Village == r.Village && (dcl.Zone == null || dcl.Zone == r.Zone))
                         .Select(dcl => dcl.Id)
                         .FirstOrDefault(),
                     Date = r.ReceivedAt.Date,
-                    HealthRiskId = r.Report.ProjectHealthRisk.HealthRiskId,
+                    HealthRiskId = r.Report!.ProjectHealthRisk!.HealthRiskId,
                     CountMalesBelowFive = r.Report.ReportedCase.CountMalesBelowFive,
                     CountMalesAtLeastFive = r.Report.ReportedCase.CountMalesAtLeastFive,
                     CountFemalesBelowFive = r.Report.ReportedCase.CountFemalesBelowFive,

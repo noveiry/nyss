@@ -14,26 +14,49 @@ public class CalculateStatsTrigger
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+
+        if (string.IsNullOrWhiteSpace(config?.ReportApiBaseUrl))
+        {
+            throw new ArgumentException("ReportApiBaseUrl is not configured");
+        }
+
         _reportApiBaseUrl = new Uri(config.ReportApiBaseUrl, UriKind.Absolute);
     }
 
     [Function("CalculateStatsTrigger")]
     public async Task CalculateStats(
-        [TimerTrigger("0 0 0 * * *")] TimerInfo timer)
+    [TimerTrigger("0 0 0 * * *")] TimerInfo timer)
     {
         _logger.LogInformation("Running calculate stats trigger.");
+
         if (timer.IsPastDue)
         {
             _logger.LogWarning($"Calculate stats trigger function is running late. Executed at: {DateTime.UtcNow}");
         }
 
-        var client = _httpClientFactory.CreateClient();
-        var postResult = await client.PostAsync(new Uri(_reportApiBaseUrl, "api/stats/calculate"), null);
-
-        if (!postResult.IsSuccessStatusCode)
+        try
         {
-            _logger.LogError($"Status code: {(int)postResult.StatusCode} ReasonPhrase: {postResult.ReasonPhrase}");
-            throw new Exception("Calculate stats was not handled properly by the Report API.");
+            var client = _httpClientFactory.CreateClient();
+            client.Timeout = TimeSpan.FromMinutes(5); // Adjust as needed
+
+            var targetUri = new Uri(_reportApiBaseUrl, "api/stats/calculate");
+            _logger.LogInformation($"Calling: {targetUri}");
+
+            var postResult = await client.PostAsync(targetUri, null);
+
+            if (!postResult.IsSuccessStatusCode)
+            {
+                var responseBody = await postResult.Content.ReadAsStringAsync();
+                _logger.LogError($"Status code: {(int)postResult.StatusCode}, ReasonPhrase: {postResult.ReasonPhrase}, Response: {responseBody}");
+                throw new Exception("Calculate stats was not handled properly by the Report API.");
+            }
+
+            _logger.LogInformation("Calculate stats completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during calculate stats execution");
+            throw;
         }
     }
 }
