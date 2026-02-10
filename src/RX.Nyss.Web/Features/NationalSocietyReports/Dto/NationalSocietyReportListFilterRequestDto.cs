@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using FluentValidation;
 using RX.Nyss.Web.Features.Common;
 using RX.Nyss.Web.Features.Common.Dto;
@@ -16,6 +17,8 @@ namespace RX.Nyss.Web.Features.NationalSocietyReports.Dto
         public string OrderBy { get; set; }
         public bool SortAscending { get; set; }
         public int UtcOffset { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
 
         public class Validator : AbstractValidator<NationalSocietyReportListFilterRequestDto>
         {

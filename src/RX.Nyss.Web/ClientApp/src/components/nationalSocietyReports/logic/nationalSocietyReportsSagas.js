@@ -12,6 +12,21 @@ import { DateColumnName } from "./nationalSocietyReportsConstants";
 import { getUtcOffset } from "../../../utils/date";
 import dayjs from "dayjs";
 
+// Helper to serialize dayjs dates to ISO strings for proper API serialization
+const serializeDate = (date) => {
+  if (!date) return date;
+  // Check if it's a dayjs object (has format method)
+  if (typeof date === 'object' && typeof date.format === 'function') {
+    // Use toISOString if available (with utc plugin), otherwise format manually
+    if (typeof date.toISOString === 'function') {
+      return date.toISOString();
+    }
+    // Fallback: format as ISO string manually
+    return date.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+  }
+  return date;
+};
+
 export const nationalSocietyReportsSagas = () => [
   takeEvery(
     consts.OPEN_NATIONAL_SOCIETY_CORRECT_REPORTS_LIST.INVOKE,
@@ -175,12 +190,19 @@ function* getNationalSocietyCorrectReports({
       sortAscending: false,
     };
 
+    // Serialize dates before sending to API
+    const normalizedFilters = {
+      ...requestFilters,
+      startDate: serializeDate(requestFilters.startDate),
+      endDate: serializeDate(requestFilters.endDate),
+    };
+
     const response = yield call(
       http.post,
       `/api/nationalSocietyReport/list?nationalSocietyId=${nationalSocietyId}&pageNumber=${
         pageNumber || 1
       }`,
-      { ...requestFilters, ...requestSorting },
+      { ...normalizedFilters, ...requestSorting },
     );
     yield put(
       actions.getCorrectList.success(
@@ -230,12 +252,19 @@ function* getNationalSocietyIncorrectReports({
       sortAscending: false,
     };
 
+    // Serialize dates before sending to API
+    const normalizedFilters = {
+      ...requestFilters,
+      startDate: serializeDate(requestFilters.startDate),
+      endDate: serializeDate(requestFilters.endDate),
+    };
+    
     const response = yield call(
       http.post,
       `/api/nationalSocietyReport/list?nationalSocietyId=${nationalSocietyId}&pageNumber=${
         pageNumber || 1
       }`,
-      { ...requestFilters, ...requestSorting },
+      { ...normalizedFilters, ...requestSorting },
     );
     yield put(
       actions.getIncorrectList.success(

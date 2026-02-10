@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RX.Nyss.Common.Utils;
@@ -71,7 +71,8 @@ namespace RX.Nyss.Web.Features.NationalSocietyReports
                 .FilterByArea(filter.Locations)
                 .FilterByTrainingMode(TrainingStatusDto.Trained)
                 .FilterByReportStatus(filter.ReportStatus)
-                .FilterByErrorType(filter.ErrorType);
+                .FilterByErrorType(filter.ErrorType)
+                .FilterByDate(filter.StartDate, filter.EndDate.AddDays(1));
 
             var result = await baseQuery.Select(r => new NationalSocietyReportListResponseDto
             {

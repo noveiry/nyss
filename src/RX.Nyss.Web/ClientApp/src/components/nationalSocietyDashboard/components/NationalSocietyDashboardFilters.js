@@ -276,15 +276,40 @@ export const NationalSocietyDashboardFilters = ({
   //Fetches new data based on changes in filters
   const handleFiltersChange = (filters) => {
     trackEvent("NsDashboardFilterChange", { filters });
-    if (isMediumScreen) {
-      updateLocalFilters(filters);
-    } else {
-      onChange(updateLocalFilters(filters));
+
+    const nextFilters = updateLocalFilters(filters);
+
+    // Guard against invalid date ranges (end before start) to avoid crashes
+    if (
+      nextFilters.startDate &&
+      nextFilters.endDate &&
+      typeof nextFilters.endDate.isBefore === "function" &&
+      nextFilters.endDate.isBefore(nextFilters.startDate)
+    ) {
+      // Do not propagate invalid filters to the backend
+      return;
+    }
+
+    if (!isMediumScreen) {
+      onChange(nextFilters);
     }
   };
 
   const showResults = () => {
-    onChange(updateLocalFilters(localFilters));
+    // When using the drawer on small screens, validate date range before fetching
+    const nextFilters = localFilters;
+
+    if (
+      nextFilters.startDate &&
+      nextFilters.endDate &&
+      typeof nextFilters.endDate.isBefore === "function" &&
+      nextFilters.endDate.isBefore(nextFilters.startDate)
+    ) {
+      // Do not propagate invalid filters to the backend
+      return;
+    }
+
+    onChange(updateLocalFilters(nextFilters));
   };
 
   //Syncs locations from redux store with filter state and sets label for location filter to 'All' or "Region (+n)"
