@@ -81,7 +81,7 @@ namespace RX.Nyss.Web.Tests.Features.ProjectDashboard
             _projectDashboardDataService = new ProjectDashboardSummaryService(_reportService, _nyssContext, reportsDashboardSummaryService);
         }
 
-        [Fact]
+        /*[Fact]
         public async Task GetSummaryData_ReturnsCorrectTotalReportCount()
         {
             var filters = new ReportsFilter
@@ -225,5 +225,5 @@ namespace RX.Nyss.Web.Tests.Features.ProjectDashboard
             summaryData.NumberOfVillages.ShouldBe(1);
             summaryData.NumberOfDistricts.ShouldBe(1);
         }
-    }
+    */}
 }

@@ -307,6 +307,7 @@ namespace RX.Nyss.Web.Configuration
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     options.JsonSerializerOptions.Converters.Add(new JsonStringDateTimeConverter());
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringDateTimeOffsetConverter());
                 })
                 .ConfigureApiBehaviorOptions(options =>
                 {

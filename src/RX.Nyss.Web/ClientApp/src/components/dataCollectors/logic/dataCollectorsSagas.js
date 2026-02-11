@@ -246,13 +246,13 @@ function* removeDataCollector({ dataCollectorId }) {
 }
 
 function* getMapDetails({ projectId, lat, lng }) {
-  const fromDate = filters.startDate.format("YYYY-MM-DD");
-  const toDate = filters.endDate.format("YYYY-MM-DD");
   yield put(actions.getMapDetails.request());
   try {
     const filters = yield select(
       (state) => state.dataCollectors.mapOverviewFilters,
     );
+    const fromDate = filters.startDate.format("YYYY-MM-DD");
+    const toDate = filters.endDate.format("YYYY-MM-DD");
     const response = yield call(
       http.get,
       `/api/dataCollector/mapOverviewDetails?projectId=${projectId}&from=${fromDate}&to=${toDate}&lat=${lat}&lng=${lng}`,

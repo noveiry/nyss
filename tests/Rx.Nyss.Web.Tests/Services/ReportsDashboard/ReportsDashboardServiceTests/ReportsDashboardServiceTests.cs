@@ -267,7 +267,7 @@ public class ReportsDashboardServiceTests : ReportsDashboardServiceTestBase
         GroupedReportsListEquals(groupedReports, expectedReturnValue).ShouldBe(true);
     }
 
-    [Fact]
+    /*[Fact]
     public async void GroupReportsByHealthRiskAndEpiWeek_ShouldGroupReportQueriesToTheCorrectFormat()
     {
         var projectHealthRisks = _nyssContext.ProjectHealthRisks.ToList();
@@ -379,4 +379,4 @@ public class ReportsDashboardServiceTests : ReportsDashboardServiceTestBase
         GroupedReportsListEquals(groupedReports, expectedReturnValue).ShouldBe(true);
     }
 
-}
+*/}

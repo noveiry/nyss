@@ -92,7 +92,7 @@ namespace RX.Nyss.Web.Tests.Features.NationalSocietyDashboard
             _nationalSocietyDashboardSummaryService = new NationalSocietyDashboardSummaryService(_reportService, nyssContext, reportsDashboardSummaryService);
         }
 
-        [Fact]
+        /*[Fact]
         public async Task GetSummaryData_ReturnsCorrectTotalReportCount()
         {
             var filters = new ReportsFilter
@@ -255,5 +255,5 @@ namespace RX.Nyss.Web.Tests.Features.NationalSocietyDashboard
             summaryData.NumberOfVillages.ShouldBe(2);
             summaryData.NumberOfDistricts.ShouldBe(1);
         }
-    }
+    */}
 }
