@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -199,6 +199,7 @@ namespace RX.Nyss.Web.Features.HealthRisks
             var healthRisk = await _nyssContext.HealthRisks
                 .Include(hr => hr.AlertRule)
                 .Include(hr => hr.LanguageContents)
+                .Include(hr => hr.HealthRiskSuspectedDiseases)
                 .SingleOrDefaultAsync(hr => hr.Id == id);
 
             if (healthRisk == null)
@@ -211,19 +212,62 @@ namespace RX.Nyss.Web.Features.HealthRisks
                 return Error(ResultKey.HealthRisk.HealthRiskContainsReports);
             }
 
-            if (healthRisk.AlertRule != null)
+            // Check for alerts (though this should be covered by reports check, adding for safety)
+            if (await HealthRiskHasAlerts(id))
             {
-                _nyssContext.AlertRules.Remove(healthRisk.AlertRule);
+                return Error(ResultKey.HealthRisk.HealthRiskContainsReports);
             }
 
+            // Get all ProjectHealthRisks that reference this HealthRisk
+            var projectHealthRisks = await _nyssContext.ProjectHealthRisks
+                .Include(phr => phr.AlertRule)
+                .Include(phr => phr.ProjectHealthRiskAlertRecipients)
+                .Where(phr => phr.HealthRiskId == id)
+                .ToListAsync();
+
+            // Delete ProjectHealthRisks and their related entities first
+            foreach (var projectHealthRisk in projectHealthRisks)
+            {
+                // Delete ProjectHealthRiskAlertRecipients (many-to-many relationship)
+                if (projectHealthRisk.ProjectHealthRiskAlertRecipients != null && projectHealthRisk.ProjectHealthRiskAlertRecipients.Any())
+                {
+                    _nyssContext.ProjectHealthRiskAlertRecipients.RemoveRange(projectHealthRisk.ProjectHealthRiskAlertRecipients);
+                }
+
+                // Delete AlertRule if it exists
+                if (projectHealthRisk.AlertRule != null)
+                {
+                    var projectHealthRiskAlertRule = projectHealthRisk.AlertRule;
+                    _nyssContext.AlertRules.Remove(projectHealthRiskAlertRule);
+                }
+
+                // Delete ProjectHealthRisk
+                _nyssContext.ProjectHealthRisks.Remove(projectHealthRisk);
+            }
+
+            await _nyssContext.SaveChangesAsync();
+
+            var alertRuleToDelete = healthRisk.AlertRule;
+
+            // Delete HealthRisk first using EF (this removes the foreign key reference)
             _nyssContext.HealthRisks.Remove(healthRisk);
             await _nyssContext.SaveChangesAsync();
+
+            // Now delete the AlertRule if it existed (safe to delete now that HealthRisk is gone)
+            if (alertRuleToDelete != null)
+            {
+                _nyssContext.AlertRules.Remove(alertRuleToDelete);
+                await _nyssContext.SaveChangesAsync();
+            }
 
             return SuccessMessage(ResultKey.HealthRisk.Remove.RemoveSuccess);
         }
 
         private async Task<bool> HealthRiskContainsReports(int healthRiskId) =>
             await _nyssContext.ProjectHealthRisks.AnyAsync(phr => phr.HealthRiskId == healthRiskId && phr.Reports.Any(r => !r.IsTraining));
+
+        private async Task<bool> HealthRiskHasAlerts(int healthRiskId) =>
+            await _nyssContext.ProjectHealthRisks.AnyAsync(phr => phr.HealthRiskId == healthRiskId && phr.Alerts.Any());
 
         private HealthRiskLanguageContent CreateNewLanguageContent(HealthRisk healthRisk, int languageId)
         {
