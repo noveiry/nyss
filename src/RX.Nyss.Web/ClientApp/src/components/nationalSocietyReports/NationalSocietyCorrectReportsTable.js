@@ -23,7 +23,6 @@ import {
   renderReportValue,
 } from "../reports/logic/reportsService";
 import { ReportStatusChip } from "../common/chip/ReportStatusChip";
-import { sortByReportStatus } from "../../utils/sortReportByStatus";
 
 export const NationalSocietyCorrectReportsTable = ({
   isListFetching,
@@ -125,7 +124,7 @@ export const NationalSocietyCorrectReportsTable = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {list.sort(sortByReportStatus).map((row) => (
+          {list.map((row) => (
             <TableRow key={row.id} hover>
               <TableCell>
                 <span>{dayjs(row.dateTime).format("YYYY-MM-DD HH:mm")}</span>

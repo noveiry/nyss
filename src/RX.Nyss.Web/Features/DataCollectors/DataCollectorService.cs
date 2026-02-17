@@ -36,9 +36,9 @@ namespace RX.Nyss.Web.Features.DataCollectors
 
         Task<Result<DataCollectorFormDataResponse>> GetFormData(int projectId);
 
-        Task<Result<MapOverviewResponseDto>> MapOverview(int projectId, DateTime from, DateTime to);
+        Task<Result<MapOverviewResponseDto>> MapOverview(int projectId, DateTimeOffset from, DateTimeOffset to);
 
-        Task<Result<List<MapOverviewDataCollectorResponseDto>>> MapOverviewDetails(int projectId, DateTime from, DateTime to, double lat, double lng);
+        Task<Result<List<MapOverviewDataCollectorResponseDto>>> MapOverviewDetails(int projectId, DateTimeOffset from, DateTimeOffset to, double lat, double lng);
 
         Task AnonymizeDataCollectorsWithReports(int projectId);
 
@@ -386,23 +386,28 @@ namespace RX.Nyss.Web.Features.DataCollectors
                 .BatchUpdateAsync(x => new Report { PhoneNumber = Anonymization.Text });
         }
 
-        public async Task<Result<MapOverviewResponseDto>> MapOverview(int projectId, DateTime from, DateTime to)
+        public async Task<Result<MapOverviewResponseDto>> MapOverview(int projectId, DateTimeOffset from, DateTimeOffset to)
         {
-            var endDate = to.Date.AddDays(1);
+            var fromUtc = from.UtcDateTime;
+            var endDateUtc = to.AddDays(1).UtcDateTime;
+            
             var dataCollectors = (await GetDataCollectorsForCurrentUserInProject(projectId))
-                .Where(dc => dc.CreatedAt < endDate && dc.Name != Anonymization.Text && dc.DeletedAt == null && dc.Deployed);
+                .Where(dc => dc.Name != Anonymization.Text 
+                    && dc.DeletedAt == null 
+                    && dc.Deployed
+                    && dc.DataCollectorLocations.Any()); 
 
             var dataCollectorsWithReports = dataCollectors
                 .Select(r => new
                 {
-                    r.DataCollectorLocations.First().Location.X,
-                    r.DataCollectorLocations.First().Location.Y,
+                    LocationX = r.DataCollectorLocations.First().Location.X,
+                    LocationY = r.DataCollectorLocations.First().Location.Y,
                     InvalidReports = r.RawReports
                         .Count(rr => !rr.ReportId.HasValue && rr.IsTraining.HasValue && !rr.IsTraining.Value
-                            && rr.ReceivedAt >= from.Date && rr.ReceivedAt < endDate),
+                            && rr.ReceivedAt >= fromUtc && rr.ReceivedAt < endDateUtc),
                     ValidReports = r.RawReports
                         .Count(rr => rr.ReportId.HasValue && rr.IsTraining.HasValue && !rr.IsTraining.Value
-                            && rr.ReceivedAt >= from.Date && rr.ReceivedAt < endDate)
+                            && rr.ReceivedAt >= fromUtc && rr.ReceivedAt < endDateUtc)
                 });
 
             var locations = await dataCollectorsWithReports
@@ -410,8 +415,8 @@ namespace RX.Nyss.Web.Features.DataCollectors
                 {
                     Location = new LocationDto
                     {
-                        Latitude = dc.Y,
-                        Longitude = dc.X
+                        Latitude = dc.LocationY,
+                        Longitude = dc.LocationX
                     },
                     CountReportingCorrectly = dc.ValidReports,
                     CountReportingWithErrors = dc.InvalidReports
@@ -438,8 +443,12 @@ namespace RX.Nyss.Web.Features.DataCollectors
             return Success(result);
         }
 
-        public async Task<Result<List<MapOverviewDataCollectorResponseDto>>> MapOverviewDetails(int projectId, DateTime from, DateTime to, double lat, double lng)
+        public async Task<Result<List<MapOverviewDataCollectorResponseDto>>> MapOverviewDetails(int projectId, DateTimeOffset from, DateTimeOffset to, double lat, double lng)
         {
+            // Convert DateTimeOffset to DateTime (UTC) explicitly for consistent comparison
+            var fromUtc = from.UtcDateTime;
+            var endDateUtc = to.AddDays(1).UtcDateTime;
+            
             var dataCollectors = await GetDataCollectorsForCurrentUserInProject(projectId);
 
             var result = await dataCollectors
@@ -448,7 +457,7 @@ namespace RX.Nyss.Web.Features.DataCollectors
                 {
                     DataCollector = dc,
                     ReportsInTimeRange = dc.RawReports.Where(r => r.IsTraining.HasValue && !r.IsTraining.Value
-                        && r.ReceivedAt >= from.Date && r.ReceivedAt < to.Date.AddDays(1))
+                        && r.ReceivedAt >= fromUtc && r.ReceivedAt < endDateUtc)
                 })
                 .Select(dc => new MapOverviewDataCollectorResponseDto
                 {

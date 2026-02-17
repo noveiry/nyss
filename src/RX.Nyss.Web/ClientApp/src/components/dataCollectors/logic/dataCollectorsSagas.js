@@ -131,13 +131,14 @@ function* openDataCollectorMapOverview({ projectId }) {
 }
 
 function* getDataCollectorMapOverview({ projectId, filters }) {
-  const fromDate = filters.startDate.format("YYYY-MM-DD");
-  const toDate = filters.endDate.format("YYYY-MM-DD");
+  const fromIso = encodeURIComponent(filters.startDate.toISOString());
+  const toIso = encodeURIComponent(filters.endDate.toISOString());
+  
   yield put(actions.getMapOverview.request());
   try {
     const response = yield call(
       http.get,
-      `/api/dataCollector/mapOverview?projectId=${projectId}&from=${fromDate}&to=${toDate}`,
+      `/api/dataCollector/mapOverview?projectId=${projectId}&from=${fromIso}&to=${toIso}`,
     );
     yield put(
       actions.getMapOverview.success(
@@ -251,11 +252,11 @@ function* getMapDetails({ projectId, lat, lng }) {
     const filters = yield select(
       (state) => state.dataCollectors.mapOverviewFilters,
     );
-    const fromDate = filters.startDate.format("YYYY-MM-DD");
-    const toDate = filters.endDate.format("YYYY-MM-DD");
+    const fromIso = encodeURIComponent(filters.startDate.toISOString());
+    const toIso = encodeURIComponent(filters.endDate.toISOString());
     const response = yield call(
       http.get,
-      `/api/dataCollector/mapOverviewDetails?projectId=${projectId}&from=${fromDate}&to=${toDate}&lat=${lat}&lng=${lng}`,
+      `/api/dataCollector/mapOverviewDetails?projectId=${projectId}&from=${fromIso}&to=${toIso}&lat=${lat}&lng=${lng}`,
     );
     yield put(actions.getMapDetails.success(response.value));
   } catch (error) {

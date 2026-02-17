@@ -31,7 +31,6 @@ import {
   renderDataCollectorDisplayName,
   renderReportValue,
 } from "./logic/reportsService";
-import { sortByReportStatus } from "../../utils/sortReportByStatus";
 import { ReportStatusChip } from "../common/chip/ReportStatusChip";
 import { trackEvent } from "../../utils/appInsightsHelper";
 
@@ -197,7 +196,7 @@ export const CorrectReportsTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {list.sort(sortByReportStatus).map((row) => (
+            {list.map((row) => (
               <TableRow key={row.id} hover>
                 <TableCell>
                   {dayjs(row.dateTime).format("YYYY-MM-DD HH:mm")}

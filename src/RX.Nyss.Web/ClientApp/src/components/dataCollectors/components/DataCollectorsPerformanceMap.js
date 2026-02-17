@@ -90,8 +90,8 @@ export const DataCollectorsPerformanceMap = ({
     return [current];
   };
 
-  const distinctLocations = (dataCollectors) =>
-    dataCollectors.reduce(
+  const distinctLocations = (dataCollectors) => {
+    const result = dataCollectors.reduce(
       (a, c) =>
         a.some(
           (dc) =>
@@ -102,9 +102,22 @@ export const DataCollectorsPerformanceMap = ({
           : [...a, c],
       [],
     );
+    console.log('distinctLocations:', { input: dataCollectors, output: result });
+    return result;
+  };
+
+  const shouldRender = !!center || !!bounds;
+  const distinct = distinctLocations(dataCollectorLocations);
+  console.log('Map render check:', {
+    shouldRender,
+    center,
+    bounds,
+    dataCollectorLocationsLength: dataCollectorLocations?.length,
+    distinctLocationsLength: distinct?.length,
+  });
 
   return (
-    (!!center || !!bounds) && (
+    shouldRender && (
       <MapContainer
         center={center}
         length={4}
