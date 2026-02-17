@@ -79,27 +79,7 @@ public class NyssReportHandler : INyssReportHandler
         var utcOffset = parsedQueryString[UtcOffset].ParseToNullableInt();
         var apiKey = parsedQueryString[ApiKeyParameterName];
 
-        // Use the timestamp from the request for ReceivedAt so that manually sent reports with a past date
-        // appear correctly in the Map overview when filtering by that date range (otherwise validation
-        // failures would leave ReceivedAt as UtcNow and the report would not show in the selected range).
         var initialReceivedAt = _dateTimeProvider.UtcNow;
-        if (!string.IsNullOrEmpty(timestamp))
-        {
-            try
-            {
-                initialReceivedAt = _reportValidationService.ParseTimestamp(timestamp);
-                _loggerAdapter.Debug($"Parsed timestamp '{timestamp}' to ReceivedAt: {initialReceivedAt:yyyy-MM-dd HH:mm:ss} UTC");
-            }
-            catch (ReportValidationException ex)
-            {
-                // Keep UtcNow if timestamp cannot be parsed
-                _loggerAdapter.Warn($"Failed to parse timestamp '{timestamp}', using UtcNow. Error: {ex.Message}");
-            }
-        }
-        else
-        {
-            _loggerAdapter.Warn("Timestamp is null or empty, using UtcNow for ReceivedAt");
-        }
 
         DataCollector dataCollector = null;
         Report report = null;
